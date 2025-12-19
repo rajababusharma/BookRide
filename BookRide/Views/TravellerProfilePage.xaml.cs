@@ -1,9 +1,13 @@
+using BookRide.ViewModels;
+
 namespace BookRide.Views;
 
 public partial class TravellerProfilePage : ContentPage
 {
-	public TravellerProfilePage()
-	{
+	public TravellerProfilePage(TravellerProfileVM vM)
+    {
+        BindingContext = vM;
+        
 		InitializeComponent();
 	}
 

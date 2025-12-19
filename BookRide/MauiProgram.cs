@@ -30,6 +30,9 @@ namespace BookRide
             builder.Services.AddTransient<Views.DriverProfilePage>();
             builder.Services.AddTransient<Views.TravellerProfilePage>();
 
+            builder.Services.AddTransient<ViewModels.TravellerProfileVM>();
+            builder.Services.AddTransient<ViewModels.DriverProfileVM>();
+
             return builder.Build();
         }
     }
