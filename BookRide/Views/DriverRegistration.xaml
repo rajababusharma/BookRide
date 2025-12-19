@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BookRide.Views.DriverRegistration"
+                xmlns:vm="clr-namespace:BookRide.ViewModels"
+             Title="Register Here">
+    <ContentPage.BindingContext>
+        <!-- You can instantiate the ViewModel here (optional, can also be done in code-behind or via DI) -->
+        <vm:DriverRegistrationVM />
+    </ContentPage.BindingContext>
+
+    <ScrollView>
+        <VerticalStackLayout
+         Padding="24"
+         Spacing="16">
+
+            <!-- Header -->
+            <Label
+             Text="Create Account"
+             FontSize="28"
+             FontAttributes="Bold"
+             HorizontalOptions="Center"
+             TextColor="#333" />
+
+            <Label
+             Text="Please fill the details below"
+             FontSize="14"
+             HorizontalOptions="Center"
+             TextColor="#666" />
+
+            <!-- First Name -->
+            <Entry
+             Placeholder="First Name"
+             Text="{Binding FirstName}" />
+
+            <!-- Last Name -->
+            <Entry
+             Placeholder="Last Name"
+             Text="{Binding LastName}" />
+
+            <!-- Age -->
+            <Entry
+             Placeholder="Age"
+             Text="{Binding Age}"
+             Keyboard="Numeric" />
+
+            <!-- Full Address -->
+            <Editor
+             Placeholder="Full Address"
+             Text="{Binding Address}"
+             AutoSize="TextChanges"
+             HeightRequest="100" />
+
+            <!-- vehical -->
+            <Entry
+  Placeholder="VehicleNo"
+  Text="{Binding VehicleNo}" />
+
+            <!-- Aadhar -->
+            <Entry
+Placeholder="Aadhar No"
+Text="{Binding Aadhar}"/>
+
+            <!-- Driving License -->
+            <Entry
+Placeholder="Driving License"
+Text="{Binding DrivingLicense}"/>
+
+            <!-- Mobile -->
+            <Entry
+             Placeholder="Mobile Number"
+             Text="{Binding Mobile}"
+             Keyboard="Telephone"
+             MaxLength="10" />
+
+            <!-- Password -->
+            <Entry
+             Placeholder="Password"
+             Text="{Binding Password}"
+             IsPassword="True" />
+
+            <!-- Confirm Password -->
+            <Entry
+             Placeholder="Confirm Password"
+             Text="{Binding ConfirmPassword}"
+             IsPassword="True" />
+
+            <!-- Validation Message --><!--
+            <Label
+             Text="{Binding ErrorMessage}"
+             TextColor="Red"
+             IsVisible="{Binding HasError}"
+             FontSize="13" />-->
+
+            <!-- Validation Message -->
+            <Label
+    Text="{Binding ErrorMessage}"
+    TextColor="Red"
+   
+    FontSize="13" />
+
+            <!-- Register Button -->
+            <Button
+             Text="Register"
+             Command="{Binding RegisterCommand}"
+             BackgroundColor="#0066CC"
+             TextColor="White"
+             HeightRequest="48"
+             CornerRadius="8" />
+
+            <!-- Login Link -->
+            <Label
+             Text="Already have an account? Login"
+             TextColor="#0066CC"
+             HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                     Command="{Binding GoToLoginCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

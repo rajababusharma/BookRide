@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BookRide.MainPage"
+             Title="Login"
+             BackgroundColor="#F5F7FA">
+
+    <ScrollView>
+        <VerticalStackLayout
+            Padding="30"
+            Spacing="20"
+            VerticalOptions="Center">
+
+            <!-- App Logo / Title -->
+            <Image Source="car.png" HeightRequest="100" HorizontalOptions="Center" />
+            <Label
+                Text="Welcome To BookRide"
+                FontSize="28"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                TextColor="#333" />
+
+            <Label
+                Text="Login to continue"
+                FontSize="14"
+                HorizontalOptions="Center"
+                TextColor="#666" />
+
+            <!-- Username -->
+            <Entry
+                Placeholder="Email or Username"
+                Text="{Binding Username}"
+                Keyboard="Email"
+                ClearButtonVisibility="WhileEditing" />
+
+            <!-- Password -->
+            <Entry
+                Placeholder="Password"
+                Text="{Binding Password}"
+                IsPassword="True"
+                ClearButtonVisibility="WhileEditing" />
+
+            <!-- Error Message -->
+            <Label
+                Text="{Binding ErrorMessage}"
+                TextColor="Red"
+                IsVisible="{Binding HasError}"
+                FontSize="13" />
+
+            <!-- Login Button -->
+            <Button
+                Text="Login"
+                Command="{Binding LoginCommand}"
+                IsEnabled="{Binding IsNotBusy}"
+                BackgroundColor="#0066CC"
+                TextColor="White"
+                CornerRadius="8"
+                HeightRequest="48" />
+
+            <!-- register Button -->
+            <Button
+     Text="New user? Register here"
+     Command="{Binding RegisterCommand}"
+     IsEnabled="{Binding IsNotBusy}"
+     BackgroundColor="#0066CC"
+     TextColor="White"
+     CornerRadius="8"
+     HeightRequest="48" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator
+                IsRunning="{Binding IsBusy}"
+                IsVisible="{Binding IsBusy}"
+                Color="#0066CC" />
+
+            <!-- Forgot Password -->
+            <Label
+                Text="Forgot Password?"
+                TextColor="#0066CC"
+                HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                        Command="{Binding ForgotPasswordCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

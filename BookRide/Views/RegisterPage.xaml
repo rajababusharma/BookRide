@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BookRide.Views.RegisterPage"
+             Title="Select User Type">
+    <Grid Padding="20" RowSpacing="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Border Grid.Row="0"
+    Stroke="#0066CC"
+    StrokeThickness="1"
+    StrokeShape="RoundRectangle 12"
+    BackgroundColor="White"
+    Padding="16">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding DriverCommand}" />
+                </Border.GestureRecognizers>
+            <VerticalStackLayout  Spacing="10">
+                <Image Source="car.png" HeightRequest="100" HorizontalOptions="Center" />
+                <Label
+                Text="Driver"
+                FontSize="24"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                TextColor="#333" />
+            </VerticalStackLayout>
+        </Border>
+        <Border Grid.Row="1"
+    Stroke="#0066CC"
+    StrokeThickness="1"
+    StrokeShape="RoundRectangle 12"
+    BackgroundColor="White"
+    Padding="16">
+            <Border.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding TravellerCommand}"/>
+            </Border.GestureRecognizers>
+            <VerticalStackLayout Spacing="10">
+                <Image Source="car.png" HeightRequest="100" HorizontalOptions="Center" />
+                <Label
+          Text="Traveller"
+          FontSize="24"
+          FontAttributes="Bold"
+          HorizontalOptions="Center"
+          TextColor="#333" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>
