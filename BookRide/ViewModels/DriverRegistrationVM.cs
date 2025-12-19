@@ -1,5 +1,6 @@
 ﻿using BookRide.Models;
 using BookRide.Services;
+using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -12,25 +13,34 @@ using System.Threading.Tasks;
 
 namespace BookRide.ViewModels
 {
-    public partial  class DriverRegistrationVM : ObservableObject
+    public partial  class DriverRegistrationVM : ObservableObject,IQueryAttributable
     {
         private readonly RealtimeDatabaseService _db;
-        public DriverRegistrationVM()
-        {
-            _db = new RealtimeDatabaseService();
-        }
+       
         [ObservableProperty] private string firstName;
         [ObservableProperty] private string lastName;
         [ObservableProperty] private string age;
         [ObservableProperty] private string address;
         [ObservableProperty] private string mobile;
         [ObservableProperty] private string password;
-        [ObservableProperty] private string confirmPassword;
-        [ObservableProperty] private string errorMessage;
-        [ObservableProperty] private string  vehicleNo;
-        [ObservableProperty] private int aadharCard;
-        [ObservableProperty] private string drivingLicense; 
 
+        [ObservableProperty] private string confirmPassword;
+      
+        [ObservableProperty] private string  vehicleNo;
+        [ObservableProperty] private string aadharCard;
+        [ObservableProperty] private string drivingLicense;
+
+        [ObservableProperty] private string userType;
+        [ObservableProperty] private int creditPoint = 30;
+        [ObservableProperty] private string userType_para;
+
+        [ObservableProperty] private string errorMessage;
+        [ObservableProperty] private bool isDriver;
+
+        public DriverRegistrationVM()
+        {
+            _db = new RealtimeDatabaseService();
+        }
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
@@ -39,16 +49,34 @@ namespace BookRide.ViewModels
         {
             ErrorMessage = string.Empty;
 
-            if (string.IsNullOrWhiteSpace(FirstName) ||
-                string.IsNullOrWhiteSpace(LastName) ||
+            if(UserType_para=="Driver")
+            {
+                if (string.IsNullOrWhiteSpace(FirstName) ||
                 string.IsNullOrWhiteSpace(Age) ||
                 string.IsNullOrWhiteSpace(Address) ||
-                string.IsNullOrWhiteSpace(Mobile))
-            {
-                ErrorMessage = "All fields are required";
+                string.IsNullOrWhiteSpace(Mobile) ||
+                string.IsNullOrWhiteSpace(VehicleNo) ||
+                string.IsNullOrWhiteSpace(DrivingLicense))
+                {
+                    ErrorMessage = "All fields are required";
 
-                return;
+                    return;
+                }
             }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(FirstName) ||
+               string.IsNullOrWhiteSpace(Age) ||
+               string.IsNullOrWhiteSpace(Address) ||
+               string.IsNullOrWhiteSpace(Mobile))
+                {
+                    ErrorMessage = "All fields are required";
+
+                    return;
+                }
+            }
+
+           
 
             if (Password != ConfirmPassword)
             {
@@ -58,21 +86,65 @@ namespace BookRide.ViewModels
 
             await Task.Delay(1500); // Simulate API call
 
-            var driver=new Drivers {Id= int.Parse(Mobile), Address= Address, Age = int.Parse(Age), FirstName = FirstName, LastName = LastName, Password = Password,VehicleNo=VehicleNo,AadharCard=AadharCard,DrivingLicense=DrivingLicense };
-            await _db.SaveAsync($"Drivers/{driver.Id}", driver);
-            await Shell.Current.DisplayAlert(
-                "Success",
-                "Registration completed successfully",
-                "OK");
+            try
+            {
+                var users = new Users
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile };
+
+                var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
+                if(usr!=null)
+                {
+                    ErrorMessage = "User with this mobile number already exists";
+                    await Shell.Current.DisplayAlert(
+                  "Alert",
+                  "User with this mobile number already exists",
+                  "OK");
+                    return;
+                }   
+
+                await _db.SaveAsync($"Users/{users.UserId}", users);
+                await Shell.Current.DisplayAlert(
+                    "Success",
+                    "Registration completed successfully",
+                    "OK");
+                //await Shell.Current.GoToAsync(nameof(MainPage));
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"Registration failed: {ex.Message}";
+                return;
+            }
+
+           
 
             // Navigate to Login
-          //await Shell.Current.GoToAsync("..");
+            //await Shell.Current.GoToAsync("..");
+          //await Shell.Current.GoToAsync(nameof(MainPage));
         }
 
         [RelayCommand]
         private async Task GoToLoginAsync()
         {
-            await Shell.Current.GoToAsync("..");
+            //await Shell.Current.GoToAsync("..");
+            await Shell.Current.GoToAsync(nameof(RegisterPage));
+            //await Shell.Current.GoToAsync(nameof(MainPage));
+        }
+
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        {
+            if (query.TryGetValue("UserType", out var userTypes))
+            {
+                UserType_para = userTypes as string;
+                if(UserType_para=="Driver")
+                {
+                    IsDriver = true;
+                }
+                else
+                {
+                    IsDriver = false;
+                }
+                   
+            }
         }
     }
 }

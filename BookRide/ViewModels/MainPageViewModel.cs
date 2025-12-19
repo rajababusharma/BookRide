@@ -1,4 +1,7 @@
-﻿using BookRide.Views;
+﻿using BookRide.eNum;
+using BookRide.Models;
+using BookRide.Services;
+using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -6,11 +9,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.System;
 
 namespace BookRide.ViewModels
 {
     public partial class MainPageViewModel : ObservableObject
     {
+        private readonly RealtimeDatabaseService _db;
+
         [ObservableProperty]
         private string username;
 
@@ -26,6 +32,11 @@ namespace BookRide.ViewModels
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsNotBusy => !IsBusy;
 
+        public MainPageViewModel()
+        {
+            _db = new RealtimeDatabaseService();
+        }
+
         [RelayCommand]
         private async Task LoginAsync()
         {
@@ -34,15 +45,43 @@ namespace BookRide.ViewModels
 
             await Task.Delay(1500); // simulate API call
 
-            if (Username != "admin" || Password != "1234")
+            if (string.IsNullOrWhiteSpace(Username) ||
+                string.IsNullOrWhiteSpace(Password))
             {
-                ErrorMessage = "Invalid username or password";
+                ErrorMessage = "Username and Password are required";
                 IsBusy = false;
                 return;
             }
 
+            var usr = await _db.GetAsync<Users>($"Users/{Username}");
+            if (usr != null)
+            {
+
+                if (Username != usr.UserId|| Password != usr.Password)
+                {
+                    ErrorMessage = "Invalid username or password";
+                    IsBusy = false;
+                    return;
+                }
+            }
+
             // Navigate to home page
             IsBusy = false;
+
+            if(usr.UserType.Equals(eNumUserType.Driver.ToString()))
+            {
+                    await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
+                {
+                    { "CurrentUser", usr }
+                });
+            }
+            {
+                    await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                {
+                    { "CurrentUser", usr }
+                });
+            }
+          
         }
 
         [RelayCommand]

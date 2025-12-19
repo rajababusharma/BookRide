@@ -35,5 +35,23 @@ namespace BookRide.Services
 
             return items.Select(i => i.Object).ToList();
         }
+
+
+        // Get a single record by key
+        // 🔹 Retrieve Single Node
+        public async Task<T> GetAsync<T>(string path)
+        {
+            return await _firebase
+                .Child(path)
+                .OnceSingleAsync<T>();
+        }
+
+        // 🔹 Delete
+        public async Task DeleteAsync(string path)
+        {
+            await _firebase
+                .Child(path)
+                .DeleteAsync();
+        }
     }
 }

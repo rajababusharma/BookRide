@@ -9,9 +9,11 @@ namespace BookRide
             InitializeComponent();
             // Register routes for navigation
             Routing.RegisterRoute(nameof(MainPage),typeof(MainPage));
-            Routing.RegisterRoute(nameof(RegisterPage), typeof(RegisterPage));
             Routing.RegisterRoute(nameof(DriverRegistration),typeof(Views.DriverRegistration));
-            Routing.RegisterRoute(nameof(TravellerRegistration), typeof(Views.TravellerRegistration));
+            Routing.RegisterRoute(nameof(RegisterPage),typeof(Views.RegisterPage));
+            Routing.RegisterRoute(nameof(DriverProfilePage),typeof(DriverProfilePage));
+            Routing.RegisterRoute(nameof(TravellerProfilePage),typeof(TravellerProfilePage) );
+
         }
     }
 }

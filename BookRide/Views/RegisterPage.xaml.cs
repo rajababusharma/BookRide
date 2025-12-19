@@ -10,4 +10,10 @@ public partial class RegisterPage : ContentPage
         InitializeComponent();
 	
 	}
+
+    protected override  bool OnBackButtonPressed()
+    {
+         Shell.Current.GoToAsync(nameof(MainPage));
+        return base.OnBackButtonPressed();
+    }
 }

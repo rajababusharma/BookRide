@@ -53,24 +53,24 @@
 
             <!-- vehical -->
             <Entry
-  Placeholder="VehicleNo"
+  Placeholder="VehicleNo" IsVisible="{Binding IsDriver}"
   Text="{Binding VehicleNo}" />
 
             <!-- Aadhar -->
             <Entry
-Placeholder="Aadhar No"
-Text="{Binding Aadhar}"/>
+Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric"
+Text="{Binding AadharCard}"/>
 
             <!-- Driving License -->
             <Entry
-Placeholder="Driving License"
+Placeholder="Driving License" IsVisible="{Binding IsDriver}"
 Text="{Binding DrivingLicense}"/>
 
             <!-- Mobile -->
             <Entry
              Placeholder="Mobile Number"
              Text="{Binding Mobile}"
-             Keyboard="Telephone"
+             Keyboard="Numeric"
              MaxLength="10" />
 
             <!-- Password -->

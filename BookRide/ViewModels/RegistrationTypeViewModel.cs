@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace BookRide.ViewModels
 {
@@ -15,13 +16,28 @@ namespace BookRide.ViewModels
         private async Task DriverAsync()
         {
             // Navigate to Driver Registration Page
-            await Shell.Current.GoToAsync(nameof(DriverRegistration));
+            //  await Shell.Current.GoToAsync(nameof(DriverRegistration));
+
+            string userType = "Driver";
+            // await Shell.Current.GoToAsync($"DriverRegistration?UserType={UserType}");
+            await Shell.Current.GoToAsync(nameof(DriverRegistration),
+                    new Dictionary<string, object>
+                    {
+                        ["UserType"] = userType
+                    });
         }
         [RelayCommand]
         private async Task TravellerAsync()
         {
             // Navigate to Traveller Registration Page
-            await Shell.Current.GoToAsync(nameof(TravellerRegistration));
+         // await Shell.Current.GoToAsync(nameof(DriverRegistration));userType
+            string userType = "Traveller";
+            await Shell.Current.GoToAsync(nameof(DriverRegistration),
+                    new Dictionary<string, object>
+                    {
+                        ["UserType"] = userType
+                    });
         }
+
     }
 }
