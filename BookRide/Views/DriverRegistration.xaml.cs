@@ -11,10 +11,7 @@ public partial class DriverRegistration : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
-        // Custom logic before navigating back
-        Shell.Current.GoToAsync("..");
+        return base.OnBackButtonPressed();
 
-        // true = we handled it, stop default behavior
-        return true;
     }
 }

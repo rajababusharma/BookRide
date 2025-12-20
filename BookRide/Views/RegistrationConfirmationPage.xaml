@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BookRide.Views.RegistrationConfirmationPage"
+             Title="Registration Confirmation">
+    <VerticalStackLayout VerticalOptions="CenterAndExpand">
+        <Label 
+            Text="You have successfully completed the regstration."
+            VerticalOptions="Center" 
+            HorizontalOptions="Center" />
+
+        <!-- Login Button -->
+        <Button
+  Text="Go To Login"
+  Command="{Binding BackToLoginCommand}" HorizontalOptions="Center" WidthRequest="200"
+  BackgroundColor="#0066CC"
+  TextColor="White"
+  HeightRequest="48"
+  CornerRadius="8" />
+
+    </VerticalStackLayout>
+</ContentPage>

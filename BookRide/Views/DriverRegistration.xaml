@@ -66,6 +66,22 @@ Text="{Binding AadharCard}"/>
 Placeholder="Driving License" IsVisible="{Binding IsDriver}"
 Text="{Binding DrivingLicense}"/>
 
+            <!-- Vehical Type -->
+            <Picker IsVisible="{Binding IsDriver}"  SelectedItem="{Binding SelectedVehicle}"  Title="Select a vehicle">>
+                <Picker.ItemsSource>
+                    <x:Array Type="{x:Type x:String}">
+                        <x:String>Car</x:String>
+                        <x:String>Bike</x:String>
+                        <x:String>Scooty</x:String>
+                        <x:String>Truck</x:String>
+                        <x:String>Bus</x:String>
+                        <x:String>Auto Rickshaw</x:String>
+                        <x:String>Tampo</x:String>
+                        <x:String>Others</x:String>
+                    </x:Array>
+                </Picker.ItemsSource>
+            </Picker>
+
             <!-- Mobile -->
             <Entry
              Placeholder="Mobile Number"

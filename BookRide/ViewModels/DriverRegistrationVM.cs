@@ -37,6 +37,8 @@ namespace BookRide.ViewModels
         [ObservableProperty] private string errorMessage;
         [ObservableProperty] private bool isDriver;
 
+        [ObservableProperty] private string selectedVehicle;
+
         public DriverRegistrationVM()
         {
             _db = new RealtimeDatabaseService();
@@ -89,7 +91,7 @@ namespace BookRide.ViewModels
             try
             {
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile };
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -107,7 +109,7 @@ namespace BookRide.ViewModels
                     "Success",
                     "Registration completed successfully",
                     "OK");
-                //await Shell.Current.GoToAsync(nameof(MainPage));
+                await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
             }
             catch (Exception ex)
             {
@@ -125,9 +127,9 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task GoToLoginAsync()
         {
-            //await Shell.Current.GoToAsync("..");
-            await Shell.Current.GoToAsync(nameof(RegisterPage));
+           // await Shell.Current.GoToAsync("..");
             //await Shell.Current.GoToAsync(nameof(MainPage));
+            await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)

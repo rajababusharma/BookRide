@@ -7,11 +7,11 @@ namespace BookRide
         public App(AppShell shell)
         {
             InitializeComponent();
-            MainPage = shell;
+           // MainPage = shell;
 
             // Navigate to Login page on app start
-            Shell.Current.GoToAsync($"//{nameof(MainPage)}");
-          //  MainPage = new AppShell();
+            //  Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+            MainPage = new AppShell();
         }
     }
 }

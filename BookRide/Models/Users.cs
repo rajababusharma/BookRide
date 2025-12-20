@@ -23,5 +23,7 @@ namespace BookRide.Models
         public  string DrivingLicense { get; set; }
         public  string UserType { get; set; }
         public  int CreditPoint { get; set; } = 30;
+
+        public string VehicleType { get; set; }
     }
 }

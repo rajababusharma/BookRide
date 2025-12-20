@@ -9,8 +9,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Windows.System;
-
 namespace BookRide.ViewModels
 {
     public partial class MainPageViewModel : ObservableObject
@@ -75,11 +73,16 @@ namespace BookRide.ViewModels
                     { "CurrentUser", usr }
                 });
             }
+            else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
             {
-                    await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
                 {
                     { "CurrentUser", usr }
                 });
+            }
+            else
+            {
+                ErrorMessage = "Unknown user type";
             }
           
         }
@@ -95,9 +98,11 @@ namespace BookRide.ViewModels
 
 
             // Navigate to register page
-
-            await Shell.Current.GoToAsync(nameof(RegisterPage));
             IsBusy = false;
+            await Shell.Current.GoToAsync(nameof(RegisterPage));
+
+          //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
+
         }
 
         [RelayCommand]

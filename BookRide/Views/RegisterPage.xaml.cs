@@ -13,7 +13,7 @@ public partial class RegisterPage : ContentPage
 
     protected override  bool OnBackButtonPressed()
     {
-         Shell.Current.GoToAsync(nameof(MainPage));
-        return base.OnBackButtonPressed();
+        Shell.Current.GoToAsync("..");
+        return true;
     }
 }
