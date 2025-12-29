@@ -4,14 +4,17 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:BookRide"
-    Shell.FlyoutBehavior="Flyout"
+    Shell.FlyoutBehavior="Disabled"
     Title="Book Ride">
 
     <ShellContent
         Title="Login"
         Icon="car.png"
         ContentTemplate="{DataTemplate local:MainPage}"
-        Route="MainPage" />
+        Route="MainPage">
+
+      
+    </ShellContent>
 
     <!--<ShellContent
      Title="Register Type"
@@ -36,5 +39,5 @@
   Icon="car.png"
   ContentTemplate="{DataTemplate local:TravellerProfilePage}"
   Route="TravellerProfilePage" />-->
-
+  
 </Shell>

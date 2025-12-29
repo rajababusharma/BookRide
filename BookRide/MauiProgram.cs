@@ -1,5 +1,11 @@
-﻿using BookRide.Views;
+﻿using BookRide.Interfaces;
+using BookRide.Views;
 using Microsoft.Extensions.Logging;
+using Microsoft.Maui.Controls.Hosting;
+using Microsoft.Maui.Controls.Maps;
+using Microsoft.Extensions.DependencyInjection;
+using BookRide.Services;
+
 
 namespace BookRide
 {
@@ -35,7 +41,13 @@ namespace BookRide
             builder.Services.AddTransient<Views.RegistrationConfirmationPage>();
             builder.Services.AddTransient<ViewModels.ConfirmRegistrationVM>();
 
+            //#if ANDROID
+            // builder.Services.AddTransient<ITest, Platforms.Android.Implementations.Test>();
+            //#endif
+
             return builder.Build();
         }
+       
+     
     }
 }

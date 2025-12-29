@@ -61,29 +61,39 @@ namespace BookRide.ViewModels
                     IsBusy = false;
                     return;
                 }
-            }
-
-            // Navigate to home page
-            IsBusy = false;
-
-            if(usr.UserType.Equals(eNumUserType.Driver.ToString()))
-            {
-                    await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
+                else
                 {
-                    { "CurrentUser", usr }
-                });
-            }
-            else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
-            {
-                await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
-                {
-                    { "CurrentUser", usr }
-                });
+                    if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
+                    {
+                        await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
+                        {
+                            { "CurrentUser", usr }
+                        });
+                    }
+                    else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
+                    {
+                        await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                        {
+                            { "CurrentUser", usr }
+                        });
+                    }
+                    else
+                    {
+                        ErrorMessage = "Unknown user type";
+                    }
+                }
             }
             else
             {
-                ErrorMessage = "Unknown user type";
+                ErrorMessage = "User does not exist.";
+                IsBusy = false;
+                return;
             }
+
+                // Navigate to home page
+                IsBusy = false;
+
+           
           
         }
 
@@ -100,8 +110,8 @@ namespace BookRide.ViewModels
             // Navigate to register page
             IsBusy = false;
             await Shell.Current.GoToAsync(nameof(RegisterPage));
-
-          //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
+           // await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
+            //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
 
         }
 

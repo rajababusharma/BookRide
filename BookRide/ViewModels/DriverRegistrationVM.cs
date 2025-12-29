@@ -1,13 +1,16 @@
-﻿using BookRide.Models;
+﻿using BookRide.Interfaces;
+using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.Maui.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +18,12 @@ namespace BookRide.ViewModels
 {
     public partial  class DriverRegistrationVM : ObservableObject,IQueryAttributable
     {
-        private readonly RealtimeDatabaseService _db;
        
+        private readonly ITest _test;
+        private readonly RealtimeDatabaseService _db;
+        [ObservableProperty]
+        private bool isBusy;
+
         [ObservableProperty] private string firstName;
         [ObservableProperty] private string lastName;
         [ObservableProperty] private string age;
@@ -38,17 +45,38 @@ namespace BookRide.ViewModels
         [ObservableProperty] private bool isDriver;
 
         [ObservableProperty] private string selectedVehicle;
+        private double latitude;
+        private double longitude;
 
         public DriverRegistrationVM()
         {
             _db = new RealtimeDatabaseService();
+         
         }
+
+        //public DriverRegistrationVM(ITest service)
+        //{
+        //    _test = service;
+
+        //    _db = new RealtimeDatabaseService();
+
+        //}
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
         [RelayCommand]
+        private async Task Pay()
+        {
+
+            var data = _test.GetValue();
+            ErrorMessage = data;
+
+        }
+
+        [RelayCommand]
         private async Task RegisterAsync()
         {
+            IsBusy = true;
             ErrorMessage = string.Empty;
 
             if(UserType_para=="Driver")
@@ -61,7 +89,7 @@ namespace BookRide.ViewModels
                 string.IsNullOrWhiteSpace(DrivingLicense))
                 {
                     ErrorMessage = "All fields are required";
-
+                    IsBusy = false;
                     return;
                 }
             }
@@ -73,7 +101,7 @@ namespace BookRide.ViewModels
                string.IsNullOrWhiteSpace(Mobile))
                 {
                     ErrorMessage = "All fields are required";
-
+                    IsBusy = false;
                     return;
                 }
             }
@@ -83,6 +111,7 @@ namespace BookRide.ViewModels
             if (Password != ConfirmPassword)
             {
                 ErrorMessage = "Passwords do not match";
+                IsBusy = false;
                 return;
             }
 
@@ -90,8 +119,9 @@ namespace BookRide.ViewModels
 
             try
             {
+              
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle };
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude=latitude,Longitude=longitude };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -101,6 +131,7 @@ namespace BookRide.ViewModels
                   "Alert",
                   "User with this mobile number already exists",
                   "OK");
+                    IsBusy = false;
                     return;
                 }   
 
@@ -109,19 +140,72 @@ namespace BookRide.ViewModels
                     "Success",
                     "Registration completed successfully",
                     "OK");
-                await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
+                IsBusy = false;
+                //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
+
+                await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage), true, new Dictionary<string, object>
+                        {
+                            { "CurrentUser", users }
+                        });
+
             }
             catch (Exception ex)
             {
                 ErrorMessage = $"Registration failed: {ex.Message}";
+                IsBusy = false;
                 return;
             }
 
-           
 
+            IsBusy = false;
             // Navigate to Login
             //await Shell.Current.GoToAsync("..");
-          //await Shell.Current.GoToAsync(nameof(MainPage));
+            //await Shell.Current.GoToAsync(nameof(MainPage));
+        }
+
+        private CancellationTokenSource _cancelTokenSource;
+        private bool _isCheckingLocation;
+
+        public async Task GetCurrentLocation()
+        {
+            try
+            {
+                _isCheckingLocation = true;
+
+                GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
+
+                _cancelTokenSource = new CancellationTokenSource();
+
+                Location location = await Geolocation.Default.GetLocationAsync(request, _cancelTokenSource.Token);
+
+                if (location != null)
+                    latitude = location.Latitude;
+                longitude = location.Longitude;
+
+                Console.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
+               
+
+            }
+            // Catch one of the following exceptions:
+            //   FeatureNotSupportedException
+            //   FeatureNotEnabledException
+            //   PermissionException
+            catch (Exception ex)
+            {
+                // Unable to get location
+           
+            }
+            finally
+            {
+                _isCheckingLocation = false;
+               
+            }
+        }
+
+        public void CancelRequest()
+        {
+            if (_isCheckingLocation && _cancelTokenSource != null && _cancelTokenSource.IsCancellationRequested == false)
+                _cancelTokenSource.Cancel();
         }
 
         [RelayCommand]
@@ -148,5 +232,7 @@ namespace BookRide.ViewModels
                    
             }
         }
+
+        
     }
 }

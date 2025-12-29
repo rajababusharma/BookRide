@@ -3,20 +3,44 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.RegistrationConfirmationPage"
              Title="Registration Confirmation">
-    <VerticalStackLayout VerticalOptions="CenterAndExpand">
-        <Label 
+    <VerticalStackLayout VerticalOptions="Center">
+        <Label FontSize="Subtitle" Margin="10,20,0,20"
             Text="You have successfully completed the regstration."
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
+        <Label Margin="10,20,0,20"
+         Text="Please scan below QR code to pay the registration fee and get credit points within 12 hours to start receiving the booking calls."
+         VerticalOptions="Center" 
+         HorizontalOptions="Center" />
 
+
+
+        <Image Source="{Binding QrCode}" Aspect="AspectFit"
+               WidthRequest="200" 
+               HeightRequest="200"
+               HorizontalOptions="Center"
+               Margin="0,20,0,0"/>
+
+       
+        <HorizontalStackLayout Margin="10,20,0,20" HorizontalOptions="Center">
+            <Label
+Text="Share the payment screenshot here."
+VerticalOptions="Center"  />
+
+            <Image Source="whatsapp.png" HeightRequest="100" WidthRequest="100">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Command="{Binding UploadImageCommand}" />
+                </Image.GestureRecognizers>
+            </Image>
+        </HorizontalStackLayout>
         <!-- Login Button -->
         <Button
-  Text="Go To Login"
-  Command="{Binding BackToLoginCommand}" HorizontalOptions="Center" WidthRequest="200"
-  BackgroundColor="#0066CC"
-  TextColor="White"
-  HeightRequest="48"
-  CornerRadius="8" />
+        Text="Go To Login"
+        Command="{Binding BackToLoginCommand}" HorizontalOptions="Center" WidthRequest="200"
+        BackgroundColor="#0066CC"
+        TextColor="White"
+        HeightRequest="48"
+        CornerRadius="8" />
 
     </VerticalStackLayout>
 </ContentPage>
