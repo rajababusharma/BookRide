@@ -1,4 +1,5 @@
-﻿using BookRide.Models;
+﻿using BookRide.Interfaces;
+using BookRide.Models;
 using BookRide.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,15 +15,29 @@ namespace BookRide.ViewModels
 {
     public partial class TravellerProfileVM : ObservableObject, IQueryAttributable
     {
-        private readonly RealtimeDatabaseService _db;
+        private RealtimeDatabaseService _db;
+        private ILocation _locationService;
+        public ObservableCollection<string> Districts { get; }
+      
 
         [ObservableProperty]
         public ObservableCollection<Users> usersList = new();
+
+        public List<Location> _nearbyLocationsTask;
 
         [ObservableProperty]
         public Users user;
         [ObservableProperty]
         public string hi="Hi";
+        [ObservableProperty]
+        public string selectedDistrict;
+        partial void  OnSelectedDistrictChanged(string value)
+        {
+            if (value == null) return;
+            Console.WriteLine($"Selected: {value}");
+
+            LoadUsersByDistrictAsync(value);
+        }
 
         [RelayCommand]
         public async void Call(string phoneNumber)
@@ -56,66 +71,80 @@ namespace BookRide.ViewModels
 
         public TravellerProfileVM()
         {
+
+            Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _db = new RealtimeDatabaseService();
-            LoadUsersAsync();
+          //  _locationService = new LocationService();
+             LoadUsersByDistrictAsync("");
         }
 
-        private async Task LoadUsersAsync()
+        public async Task LoadUsersByDistrictAsync(string district)
         {
-            // check internet connectivity first 
-            NetworkAccess accessType = Connectivity.Current.NetworkAccess;
-            if (accessType == NetworkAccess.Internet)
+            UsersList.Clear();
+            if (string.IsNullOrEmpty(district))
+
             {
-                // Connection to the internet is available
-                Console.WriteLine("Internet is connected!"); try
+                Task.Run(async () =>
                 {
-                    UsersList = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
                     {
-                        var userList = t.Result;
+                        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
                         return new ObservableCollection<Users>(userList);
                     });
-                }
-                catch (System.AggregateException exp)
-                {
-                    // Handle error
-                    await Shell.Current.DisplayAlert(
-                           "Error",
-                           exp.Message,
-                           "OK");
-                }
-                catch (Exception exp)
-                {
-                    // Handle error
-                    await Shell.Current.DisplayAlert(
-                           "Error",
-                           exp.Message,
-                           "OK");
-                }
-                // Update UI, enable features, etc.
-            }
-            else if (accessType == NetworkAccess.ConstrainedInternet)
-            {
-                // Limited internet (e.g., captive portal)
-                Console.WriteLine("Internet is limited.");
+                    UsersList = users;
+                }).GetAwaiter().GetResult();
             }
             else
             {
-                // No internet connection
-                Console.WriteLine("No internet connection.");
-                // Show an alert or disable features
-              
-                await Shell.Current.DisplayAlert(
-                         "Offline",
-                         "Please check your internet connection",
-                         "OK");
+                Task.Run(async () =>
+                {
+                    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    {
+                        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
+                        return new ObservableCollection<Users>(userList);
+                    });
+                    UsersList = users;
+                }).GetAwaiter().GetResult();
             }
-         
-
+           
         }
+
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Users;
         }
+
+        public async Task<List<Location>> GetLocationsWithinRadiusAsync()
+        {
+            var currentLocation = await _locationService.GetCurrentLocationAsync();
+            if (currentLocation == null)
+            {
+                return new List<Location>();
+            }
+
+            List<Location> targetLocations = new List<Location>();
+            foreach (var usr in usersList)
+            {
+                targetLocations.Add(usr.Location);
+            }
+            var locationsInRadius = new List<Location>();
+            double radiusKm = 5.0;
+
+            foreach (var location in targetLocations)
+            {
+                // Calculate the distance in kilometers
+                double distance = currentLocation.CalculateDistance(location, DistanceUnits.Kilometers);
+
+                if (distance <= radiusKm)
+                {
+                    locationsInRadius.Add(location);
+                }
+            }
+
+            return locationsInRadius;
+        }
+
+       
     }
 }

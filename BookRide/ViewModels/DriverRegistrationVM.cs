@@ -1,4 +1,5 @@
-﻿using BookRide.Interfaces;
+﻿using BookRide.eNum;
+using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
@@ -7,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Devices.Sensors;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -18,7 +20,9 @@ namespace BookRide.ViewModels
 {
     public partial  class DriverRegistrationVM : ObservableObject,IQueryAttributable
     {
-       
+      
+        public ObservableCollection<string> States { get; }
+        public ObservableCollection<string> Districts { get; }
         private readonly ITest _test;
         private readonly RealtimeDatabaseService _db;
         [ObservableProperty]
@@ -45,13 +49,18 @@ namespace BookRide.ViewModels
         [ObservableProperty] private bool isDriver;
 
         [ObservableProperty] private string selectedVehicle;
-        private double latitude;
-        private double longitude;
+        [ObservableProperty]
+        private string selectedDistrict;
+
+        private double latitude { get; set; }= 0.0;
+        private double longitude { get; set; }= 0.0;
+
 
         public DriverRegistrationVM()
         {
             _db = new RealtimeDatabaseService();
-         
+            States = new ObservableCollection<string>(IndiaStates.All);
+            Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -86,7 +95,7 @@ namespace BookRide.ViewModels
                 string.IsNullOrWhiteSpace(Address) ||
                 string.IsNullOrWhiteSpace(Mobile) ||
                 string.IsNullOrWhiteSpace(VehicleNo) ||
-                string.IsNullOrWhiteSpace(DrivingLicense))
+                string.IsNullOrWhiteSpace(DrivingLicense) || string.IsNullOrWhiteSpace(SelectedVehicle))
                 {
                     ErrorMessage = "All fields are required";
                     IsBusy = false;
@@ -121,7 +130,7 @@ namespace BookRide.ViewModels
             {
               
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude=latitude,Longitude=longitude };
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude=latitude,Longitude=longitude,District=SelectedDistrict,RegistrationDate=DateTime.Now };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -143,10 +152,9 @@ namespace BookRide.ViewModels
                 IsBusy = false;
                 //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
 
-                await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage), true, new Dictionary<string, object>
-                        {
-                            { "CurrentUser", users }
-                        });
+                await Shell.Current.GoToAsync(nameof(ConfirmPage));
+
+               
 
             }
             catch (Exception ex)
@@ -161,51 +169,6 @@ namespace BookRide.ViewModels
             // Navigate to Login
             //await Shell.Current.GoToAsync("..");
             //await Shell.Current.GoToAsync(nameof(MainPage));
-        }
-
-        private CancellationTokenSource _cancelTokenSource;
-        private bool _isCheckingLocation;
-
-        public async Task GetCurrentLocation()
-        {
-            try
-            {
-                _isCheckingLocation = true;
-
-                GeolocationRequest request = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
-
-                _cancelTokenSource = new CancellationTokenSource();
-
-                Location location = await Geolocation.Default.GetLocationAsync(request, _cancelTokenSource.Token);
-
-                if (location != null)
-                    latitude = location.Latitude;
-                longitude = location.Longitude;
-
-                Console.WriteLine($"Latitude: {location.Latitude}, Longitude: {location.Longitude}, Altitude: {location.Altitude}");
-               
-
-            }
-            // Catch one of the following exceptions:
-            //   FeatureNotSupportedException
-            //   FeatureNotEnabledException
-            //   PermissionException
-            catch (Exception ex)
-            {
-                // Unable to get location
-           
-            }
-            finally
-            {
-                _isCheckingLocation = false;
-               
-            }
-        }
-
-        public void CancelRequest()
-        {
-            if (_isCheckingLocation && _cancelTokenSource != null && _cancelTokenSource.IsCancellationRequested == false)
-                _cancelTokenSource.Cancel();
         }
 
         [RelayCommand]
@@ -233,6 +196,5 @@ namespace BookRide.ViewModels
             }
         }
 
-        
     }
 }

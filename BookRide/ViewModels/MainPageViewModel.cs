@@ -33,6 +33,7 @@ namespace BookRide.ViewModels
         public MainPageViewModel()
         {
             _db = new RealtimeDatabaseService();
+           // _db.DeleteAllAsync();
         }
 
         [RelayCommand]

@@ -14,87 +14,113 @@
              Text="Create Account"
              FontSize="28"
              FontAttributes="Bold"
-             HorizontalOptions="Center"
-             TextColor="#333" />
+             HorizontalOptions="Center" />
 
             <Label
              Text="Please fill the details below"
              FontSize="14"
-             HorizontalOptions="Center"
-             TextColor="#666" />
+             HorizontalOptions="Center" />
 
-            <!-- First Name -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <!-- First Name -->
+                <Entry
              Placeholder="First Name"
              Text="{Binding FirstName}" />
-
+            </Border>
             <!-- Last Name -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
              Placeholder="Last Name"
              Text="{Binding LastName}" />
-
+            </Border>
             <!-- Age -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
              Placeholder="Age"
              Text="{Binding Age}"
              Keyboard="Numeric" />
-
+            </Border>
             <!-- Full Address -->
-            <Editor
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Editor
              Placeholder="Full Address"
              Text="{Binding Address}"
              AutoSize="TextChanges"
              HeightRequest="100" />
-
+            </Border>
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Picker
+    Title="Select District"  SelectedItem="{Binding SelectedDistrict}"
+    ItemsSource="{Binding Districts}" />
+            </Border>
             <!-- vehical -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+StrokeShape="RoundRectangle 12">
+                <Entry
   Placeholder="VehicleNo" IsVisible="{Binding IsDriver}"
   Text="{Binding VehicleNo}" />
-
+            </Border>
             <!-- Aadhar -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+StrokeShape="RoundRectangle 12">
+                <Entry
 Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric"
 Text="{Binding AadharCard}"/>
-
+            </Border>
             <!-- Driving License -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+StrokeShape="RoundRectangle 12">
+                <Entry
 Placeholder="Driving License" IsVisible="{Binding IsDriver}"
 Text="{Binding DrivingLicense}"/>
-
-            <!-- Vehical Type -->
-            <Picker IsVisible="{Binding IsDriver}"  SelectedItem="{Binding SelectedVehicle}"  Title="Select a vehicle">>
-                <Picker.ItemsSource>
-                    <x:Array Type="{x:Type x:String}">
-                        <x:String>Car</x:String>
-                        <x:String>Bike</x:String>
-                        <x:String>Scooty</x:String>
-                        <x:String>Truck</x:String>
-                        <x:String>Bus</x:String>
-                        <x:String>AutoRickshaw</x:String>
-                        <x:String>Tempo</x:String>
-                    </x:Array>
-                </Picker.ItemsSource>
-            </Picker>
-
+            </Border>
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+StrokeShape="RoundRectangle 12">
+                <!-- Vehical Type -->
+                <Picker IsVisible="{Binding IsDriver}"  SelectedItem="{Binding SelectedVehicle}"  Title="Select a vehicle">>
+                    <Picker.ItemsSource>
+                        <x:Array Type="{x:Type x:String}">
+                            <x:String>Car</x:String>
+                            <x:String>Bike</x:String>
+                            <x:String>Scooty</x:String>
+                            <x:String>Truck</x:String>
+                            <x:String>Bus</x:String>
+                            <x:String>AutoRickshaw</x:String>
+                            <x:String>Tempo</x:String>
+                        </x:Array>
+                    </Picker.ItemsSource>
+                </Picker>
+            </Border>
             <!-- Mobile -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
              Placeholder="Mobile Number"
              Text="{Binding Mobile}"
              Keyboard="Numeric"
              MaxLength="10" />
-
+            </Border>
             <!-- Password -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
              Placeholder="Password"
              Text="{Binding Password}"
              IsPassword="True" />
-
+            </Border>
             <!-- Confirm Password -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
              Placeholder="Confirm Password"
              Text="{Binding ConfirmPassword}"
              IsPassword="True" />
-
+            </Border>
             <!-- Validation Message --><!--
             <Label
              Text="{Binding ErrorMessage}"

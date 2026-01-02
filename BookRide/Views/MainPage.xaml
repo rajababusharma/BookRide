@@ -2,8 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.MainPage"
-             Title="Login"
-             BackgroundColor="#F5F7FA">
+             Title="Login">
 
     <ScrollView>
         <VerticalStackLayout
@@ -17,28 +16,32 @@
                 Text="Welcome To BookRide"
                 FontSize="28"
                 FontAttributes="Bold"
-                HorizontalOptions="Center"
-                TextColor="#333" />
+                HorizontalOptions="Center" />
 
             <Label
                 Text="Login to continue"
                 FontSize="14"
-                HorizontalOptions="Center"
-                TextColor="#666" />
-
+                HorizontalOptions="Center" />
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                
+           
             <!-- Username -->
             <Entry
                 Placeholder="Email or Username"
                 Text="{Binding Username}"
                 Keyboard="Email"
                 ClearButtonVisibility="WhileEditing" />
-
+            </Border>
             <!-- Password -->
-            <Entry
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
                 Placeholder="Password"
                 Text="{Binding Password}"
                 IsPassword="True"
                 ClearButtonVisibility="WhileEditing" />
+            </Border>
 
             <!-- Error Message -->
             <Label
@@ -83,7 +86,11 @@
                         Command="{Binding ForgotPasswordCommand}" />
                 </Label.GestureRecognizers>
             </Label>
-
+            <Label
+                Text="Designed and developed by IntelliCS Technologies."
+                HorizontalTextAlignment="Center"
+                TextColor="Blue" />
+            <Image Source="intellics.png" HeightRequest="100" HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>
 

@@ -53,5 +53,10 @@ namespace BookRide.Services
                 .Child(path)
                 .DeleteAsync();
         }
+
+        public async Task DeleteAllAsync()
+        {
+            await _firebase.Child("/").DeleteAsync();
+        }
     }
 }

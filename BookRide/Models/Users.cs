@@ -22,9 +22,13 @@ namespace BookRide.Models
         public string AadharCard { get; set; }
         public  string DrivingLicense { get; set; }
         public  string UserType { get; set; }
-        public  int CreditPoint { get; set; } = 30;
+        public  int CreditPoint { get; set; } = 60;
         public string VehicleType { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
+        public string State { get; set; }= "Uttar Pradesh";
+        public string District { get; set; } = "Fatehpur";
+        public DateTime RegistrationDate { get; set; }
+        public Location Location { get; set; }
     }
 }

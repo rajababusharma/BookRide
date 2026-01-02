@@ -4,42 +4,61 @@
              x:Class="BookRide.Views.DriverProfilePage"
           
              Title="Home">
-    <VerticalStackLayout>
+   
+        <VerticalStackLayout>
+      
+            <Border Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
+                <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
+            </Border>
+        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="BlueViolet">
+                <Label.Text>
+                    <MultiBinding StringFormat="{}{0} {1}">
+                        <Binding Path="User.FirstName"/>
+                        <Binding Path="User.LastName"/>
+                    </MultiBinding>
+                </Label.Text>
+            </Label>
+            <Label HorizontalOptions="Center" VerticalOptions="Center" TextColor="Green">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Total Credit Point: " />
+                        <!-- Binds to the property and displays the value in a different span -->
+                        <Span Text="{Binding User.CreditPoint}" FontAttributes="Bold" />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
 
-        <Border Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
-                        <Image Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
-                    </Border>
-        <Label  FontSize="Title" FontAttributes="Bold" Grid.Row="0" HorizontalTextAlignment="Center">
-            <Label.Text>
-                <MultiBinding StringFormat="{}{0} {1}">
-                    <Binding Path="User.FirstName"/>
-                    <Binding Path="User.LastName"/>
-                </MultiBinding>
-            </Label.Text>
-        </Label>
+        <Border Stroke="Gray" StrokeThickness="1"    StrokeShape="RoundRectangle 10" >
+            <Grid Grid.Column="1" Margin="20,20,0,10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-        <Grid Grid.Column="1" Margin="20,20,0,10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+                <Label FontAttributes="Bold" Text="Phone Number:" Grid.Row="0" Grid.Column="0"/>
+                <Label FontAttributes="Bold" Text="Driving License:" Grid.Row="1" Grid.Column="0"/>
+                <Label FontAttributes="Bold" Text="Address:" Grid.Row="2" Grid.Column="0"/>
+                <Label FontAttributes="Bold" Text="District:" Grid.Row="3" Grid.Column="0"/>
+                <Label FontAttributes="Bold" Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
+                <Label FontAttributes="Bold" Text="{Binding User.DrivingLicense}" Grid.Row="1" Grid.Column="1"/>
+             
+                <Label FontAttributes="Bold" Text="{Binding User.Address}" Grid.Row="2" Grid.Column="1"/>
+                <Label FontAttributes="Bold" Text="{Binding User.District}" Grid.Row="3" Grid.Column="1"/>
 
-            <Label Text="Phone Number:" Grid.Row="0" Grid.Column="0"/>
-            <Label Text="Driving License:" Grid.Row="1" Grid.Column="0"/>
-            <Label Text="Vehicle Type:" Grid.Row="2" Grid.Column="0"/>
-            <Label Text="Address:" Grid.Row="3" Grid.Column="0"/>
-            <Label Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
-            <Label Text="{Binding User.DrivingLicense}" Grid.Row="1" Grid.Column="1"/>
-            <Label Text="{Binding User.User.VehicleType}" Grid.Row="2" Grid.Column="1"/>
-            <Label Text="{Binding User.Address}" Grid.Row="3" Grid.Column="1"/>
-
-        </Grid>
-     
+            </Grid>
+        </Border>
+        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,20,0,0">
+            <!--<Button Text="Update Address" FontSize="Small" Command="{Binding OpenPopupCommand}"></Button>-->
+            <Button Text="Add Credit Points" Command="{Binding AddCreditCommand}"></Button>
+        </HorizontalStackLayout>
+      
     </VerticalStackLayout>
+
 </ContentPage>

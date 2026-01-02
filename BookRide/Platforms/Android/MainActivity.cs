@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.OS;
 using BookRide.Interfaces;
 using BookRide.Platforms.Android.Implementations;
+using Microsoft.Maui.Controls;
 
 namespace BookRide
 {
@@ -14,7 +15,18 @@ namespace BookRide
         {
             base.OnActivityResult(requestCode, resultCode, data);
 
-           
-        }
+            // Display the status code alert
+
+
+            //MainThread.BeginInvokeOnMainThread(async () =>
+            //{
+            //    // Access the current main page of the application
+                
+            //      //  await  DisplayAlert("Result", "An activity result was received.", "OK");
+            //      await Shell.Current.DisplayAlert("Result", $"An activity result was received.{resultCode}", "OK");
+
+            //});
+
+            }
     }
 }

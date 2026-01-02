@@ -2,6 +2,7 @@
 using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Maui.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,20 +61,29 @@ namespace BookRide.ViewModels
                 return null;
             }
         }
+
+
         [RelayCommand]
         public async Task UploadImageAsync()
         {
             try
             {
-                var photo = await PickImageAsync();
-                if (photo == null)
+                // var photo = await PickImageAsync();
+                var result = await FilePicker.Default.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select Image",
+                    FileTypes = FilePickerFileType.Images
+                });
+
+               
+                if (result == null)
                 {
                     return;
                 }
            
                 // 1. Define the filename and path where the image will be stored temporarily
-                string fileName = photo.FileName;
-                string file = Path.Combine(FileSystem.CacheDirectory, fileName);
+                string SelectedFilePath = result.FullPath;
+              //  string file = Path.Combine(FileSystem.CacheDirectory, fileName);
 
                 // NOTE: Replace this with your actual image data (e.g., from a byte array, stream, or resource)
                 // This example assumes you have an image source and save it to the file path.
@@ -81,17 +91,18 @@ namespace BookRide.ViewModels
                 // For a real app, you would load your image into a byte array or stream and write it.
                 // Example: await File.WriteAllBytesAsync(file, yourImageByteArray);
                 // We'll simulate by creating a dummy file:
-                if (!File.Exists(file))
+                if (!File.Exists(SelectedFilePath))
                 {
-                    await File.WriteAllTextAsync(file, "This is a dummy image file content.");
-                    // In a real app, ensure you save a valid image format (JPEG, PNG, etc.)
+                    await Shell.Current.DisplayAlert("Select File", "Please pick a file first.", "OK");
+                    return;
                 }
 
+                var file = new ShareFile(SelectedFilePath);
                 // 2. Use the .NET MAUI Share API to request sharing
                 await Share.Default.RequestAsync(new ShareFileRequest
                 {
                     Title = "Share Image via WhatsApp",
-                    File = new ShareFile(file)
+                    File = file
                 });
             }
             catch (Exception ex)
@@ -103,26 +114,34 @@ namespace BookRide.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            User = query["CurrentUser"] as Users;
-            if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Car.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Tempo.ToString())))
+            try
             {
-              
-                QrCode = ImageSource.FromFile("car_tempo.png");
+                User = query["CurrentUser"] as Users;
+                if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Car.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Tempo.ToString())))
+                {
+
+                    QrCode = ImageSource.FromFile("car_tempo.png");
+                }
+                if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.AutoRickshaw.ToString())))
+                {
+
+                    QrCode = ImageSource.FromFile("for_motor_autorickshaw.png");
+                }
+                if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Bike.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Scooty.ToString())))
+                {
+                    QrCode = ImageSource.FromFile("bike.png");
+
+                }
+                if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Bus.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Truck.ToString())))
+                {
+                    QrCode = ImageSource.FromFile("bus_truck.png");
+                }
             }
-            if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.AutoRickshaw.ToString())))
+            catch (Exception ex)
             {
+                Console.WriteLine($"Error in ApplyQueryAttributes: {ex.Message}");
+            }
                
-                QrCode = ImageSource.FromFile("for_motor_autorickshaw.png");
-            }
-            if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Bike.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Scooty.ToString())))
-            {
-                QrCode = ImageSource.FromFile("bike.png");
-              
-            }
-            if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Bus.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Truck.ToString())))
-            {
-                QrCode = ImageSource.FromFile("bus_truck.png");
-            }
         }
 
 
