@@ -33,7 +33,9 @@ namespace BookRide.ViewModels
         public MainPageViewModel()
         {
             _db = new RealtimeDatabaseService();
-           // _db.DeleteAllAsync();
+            // _db.DeleteAllAsync();
+      
+
         }
 
         [RelayCommand]
@@ -64,8 +66,14 @@ namespace BookRide.ViewModels
                 }
                 else
                 {
+
+                   
+
+             
+
                     if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
                     {
+                                          
                         await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
                         {
                             { "CurrentUser", usr }
@@ -106,14 +114,10 @@ namespace BookRide.ViewModels
 
             await Task.Delay(1500); // simulate API call
 
-
-
-            // Navigate to register page
+            // Navigate to terms and conditions page
             IsBusy = false;
-            await Shell.Current.GoToAsync(nameof(RegisterPage));
-           // await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
-            //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
-
+           // await Shell.Current.GoToAsync(nameof(RegisterPage));
+            await Shell.Current.GoToAsync(nameof(TermsConditionsPage));
         }
 
         [RelayCommand]

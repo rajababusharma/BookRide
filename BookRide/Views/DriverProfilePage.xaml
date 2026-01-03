@@ -3,11 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.DriverProfilePage"
           
-             Title="Home">
+             Title="Reserve a Taxi">
    
         <VerticalStackLayout>
       
-            <Border Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
+            <Border Margin="10" Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
                 <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
             </Border>
         <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="BlueViolet">
@@ -28,7 +28,7 @@
                 </Label.FormattedText>
             </Label>
 
-        <Border Stroke="Gray" StrokeThickness="1"    StrokeShape="RoundRectangle 10" >
+        <Border Stroke="Gray" StrokeThickness="1" Margin="0,20,0,0"   StrokeShape="RoundRectangle 10" >
             <Grid Grid.Column="1" Margin="20,20,0,10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

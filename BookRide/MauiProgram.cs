@@ -1,6 +1,8 @@
 ﻿using BookRide.Interfaces;
 using BookRide.Services;
 using BookRide.Views;
+using CommunityToolkit.Maui;
+using CommunityToolkit.Mvvm;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using CommunityToolkit.Mvvm;
@@ -38,7 +40,7 @@ namespace BookRide
             builder.Services.AddTransient<ViewModels.DriverRegistrationVM>();
             builder.Services.AddTransient<ViewModels.TravellerProfileVM>();
             builder.Services.AddTransient<ViewModels.DriverProfileVM>();
-            builder.Services.AddTransient<ViewModels.ConfirmRegistrationVM>();
+            builder.Services.AddTransient<ViewModels.RechargeCreditVM>();
 
             
 
@@ -49,18 +51,20 @@ namespace BookRide
             builder.Services.AddTransient<Views.DriverRegistration>();        
             builder.Services.AddTransient<Views.DriverProfilePage>();
             builder.Services.AddTransient<Views.TravellerProfilePage>();
-            builder.Services.AddTransient<Views.RegistrationConfirmationPage>();
+            builder.Services.AddTransient<Views.RechargeCreditPage>();
           builder.Services.AddTransient<Views.ConfirmPage>();
+            builder.Services.AddTransient<Views.TermsConditionsPage>();
 
             // Register Services
             builder.Services.AddSingleton<ILocation, LocationService>();
             builder.Services.AddSingleton<IUsers, UserService>();
+            builder.Services.AddTransient<IWhatsAppConnect, WhatsappConnectService>();
             //#if ANDROID
             // builder.Services.AddTransient<ITest, Platforms.Android.Implementations.Test>();
             //#endif
 
 #if ANDROID
-                        builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
+            builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
 #elif IOS
 
 

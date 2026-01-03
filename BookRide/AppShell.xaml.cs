@@ -14,8 +14,9 @@ namespace BookRide
             Routing.RegisterRoute(nameof(DriverRegistration), typeof(Views.DriverRegistration));
             Routing.RegisterRoute(nameof(DriverProfilePage),typeof(DriverProfilePage));
             Routing.RegisterRoute(nameof(TravellerProfilePage),typeof(TravellerProfilePage) );
-            Routing.RegisterRoute(nameof(RegistrationConfirmationPage), typeof(RegistrationConfirmationPage));
+            Routing.RegisterRoute(nameof(RechargeCreditPage), typeof(RechargeCreditPage));
             Routing.RegisterRoute(nameof(ConfirmPage), typeof(ConfirmPage) );
+            Routing.RegisterRoute(nameof(TermsConditionsPage), typeof(TermsConditionsPage) );
 
         }
     }

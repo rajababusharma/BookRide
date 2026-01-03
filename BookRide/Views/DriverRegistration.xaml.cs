@@ -13,21 +13,7 @@ public partial class DriverRegistration : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
-        Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
-        //  return base.OnBackButtonPressed();
+        Shell.Current.GoToAsync("..//..//..");
         return true;
-    }
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        //Task.Run(async () =>
-        //{
-        //    if (BindingContext is DriverRegistrationVM vm)
-        //    {
-        //       // await vm.GetCurrentLocationAsync();
-               
-        //    }
-        //}); // <-- Moved closing parenthesis here to properly close Task.Run
     }
 }

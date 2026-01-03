@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.TravellerProfilePage"
-             Title="Book Your Ride Here">
+             Title="Reserve a Taxi">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
@@ -61,15 +61,21 @@
 
                                 <HorizontalStackLayout Grid.Row="1" Grid.Column="1">
                                 <Label Text="{Binding Mobile}"/>
-                                <Image Source="call.png" WidthRequest="30" HeightRequest="30" Margin="10,0,0,0" VerticalOptions="CenterAndExpand">
+                                <Image Source="call.png" WidthRequest="30" HeightRequest="30" Margin="10,0,0,0">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
                             Path=BindingContext.CallCommand}" CommandParameter="{Binding Mobile}" />
                                     </Image.GestureRecognizers>
                                 </Image>
+                                    <Image Source="whatsapp.png" WidthRequest="30" HeightRequest="30" Margin="10,0,0,0" >
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
+Path=BindingContext.WhatsappConnectCommand}" CommandParameter="{Binding Mobile}" />
+                                        </Image.GestureRecognizers>
+                                    </Image>
 
 
-                            </HorizontalStackLayout>
+                                </HorizontalStackLayout>
 
                             <Label Text="{Binding DrivingLicense}" Grid.Row="2" Grid.Column="1"/>
                             <Label Text="{Binding VehicleType}" Grid.Row="3" Grid.Column="1"/>

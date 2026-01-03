@@ -17,6 +17,7 @@ namespace BookRide.ViewModels
     {
         private RealtimeDatabaseService _db;
         private ILocation _locationService;
+        private readonly IWhatsAppConnect _whatsAppConnect;
         public ObservableCollection<string> Districts { get; }
       
 
@@ -37,6 +38,32 @@ namespace BookRide.ViewModels
             Console.WriteLine($"Selected: {value}");
 
             LoadUsersByDistrictAsync(value);
+        }
+        [RelayCommand]
+        public async void WhatsappConnect(string phoneNumber)
+        {
+            if (phoneNumber != null && phoneNumber.Length == 10)
+            {
+                try
+                {
+                     _whatsAppConnect.WhatsappConnect("+91" + phoneNumber, $"Hello, my name is {User.FirstName} " + $" {User.LastName}" + " and I want to connect with you.");
+                }
+                catch (Exception exp)
+                {
+                    // Handle error
+                    await Shell.Current.DisplayAlert(
+                           "Error",
+                           exp.Message,
+                           "OK");
+                }
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert(
+                          "Error",
+                          "Incorrect phone number",
+                          "OK");
+            }
         }
 
         [RelayCommand]
@@ -69,9 +96,9 @@ namespace BookRide.ViewModels
             }
         }
 
-        public TravellerProfileVM()
+        public TravellerProfileVM(IWhatsAppConnect whatsApp)
         {
-
+            _whatsAppConnect = whatsApp;
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _db = new RealtimeDatabaseService();
           //  _locationService = new LocationService();

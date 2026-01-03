@@ -61,6 +61,8 @@ namespace BookRide.ViewModels
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
+
+           
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -154,7 +156,7 @@ namespace BookRide.ViewModels
 
                 await Shell.Current.GoToAsync(nameof(ConfirmPage));
 
-               
+
 
             }
             catch (Exception ex)

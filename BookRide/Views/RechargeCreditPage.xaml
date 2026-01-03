@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="BookRide.Views.RegistrationConfirmationPage"
+             x:Class="BookRide.Views.RechargeCreditPage"
              Title="Add Credit Points">
     <VerticalStackLayout>
         
@@ -17,18 +17,23 @@
                HorizontalOptions="Center"
                Margin="0,20,0,0"/>
 
-       
-        <HorizontalStackLayout Margin="10,20,0,20" HorizontalOptions="Center">
+        <FlexLayout Direction="Row"
+                Wrap="Wrap"
+                AlignItems="Stretch"
+                JustifyContent="SpaceEvenly"
+                Padding="10">
             <Label
-Text="Share the payment screenshot here."
+Text="Connect to WhatsApp after payment and Share the payment screenshot here to get credit points."
 VerticalOptions="Center"  />
 
-            <Image Source="whatsapp.png" HeightRequest="100" WidthRequest="100">
+            <Image Source="whatsapp.png" HeightRequest="50" WidthRequest="50">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding UploadImageCommand}" />
                 </Image.GestureRecognizers>
             </Image>
-        </HorizontalStackLayout>
+           
+        </FlexLayout>
+
         <!-- Login Button -->
         <Button
         Text="Go To Login"

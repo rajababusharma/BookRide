@@ -134,6 +134,7 @@ StrokeShape="RoundRectangle 12">
     TextColor="Red"
    
     FontSize="13" />
+            
 
             <!-- Register Button -->
             <Button

@@ -5,11 +5,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:BookRide"
     Shell.FlyoutBehavior="Disabled"
-    Title="Book Ride">
+    Title="Reserve a Taxi">
 
     <ShellContent
         Title="Login"
-        Icon="car.png"
+        Icon="icon.png"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage">
 

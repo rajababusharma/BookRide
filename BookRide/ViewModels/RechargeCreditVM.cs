@@ -8,10 +8,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BookRide.Interfaces;
 
 namespace BookRide.ViewModels
 {
-    public partial class ConfirmRegistrationVM : ObservableObject, IQueryAttributable
+    public partial class RechargeCreditVM : ObservableObject, IQueryAttributable
     {
         [ObservableProperty]
         private Users user;
@@ -19,16 +20,17 @@ namespace BookRide.ViewModels
         // the property to bind image to UI
         [ObservableProperty]
         private ImageSource qrCode;
-
-        public ConfirmRegistrationVM()
+       private readonly IWhatsAppConnect _whatsAppConnect;
+        public RechargeCreditVM(IWhatsAppConnect whatsApp)
         {
-            
+            _whatsAppConnect = whatsApp;
         }
 
         [RelayCommand]
-        private async Task BackToLogin()
+        private void BackToLogin()
         {
-            await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+           // await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
+             Shell.Current.GoToAsync("..//..");
         }
 
         private async Task<FileResult> PickImageAsync()
@@ -68,42 +70,10 @@ namespace BookRide.ViewModels
         {
             try
             {
-                // var photo = await PickImageAsync();
-                var result = await FilePicker.Default.PickAsync(new PickOptions
-                {
-                    PickerTitle = "Select Image",
-                    FileTypes = FilePickerFileType.Images
-                });
+                
+                _whatsAppConnect.WhatsappConnect("918693849475", $"Hello, my name is {User.FirstName}"+$" {User.LastName}"+" and I have done the payment and sharing the payment screenshot with you. "+ $"You can call me on {User.Mobile} if any query");
 
-               
-                if (result == null)
-                {
-                    return;
-                }
-           
-                // 1. Define the filename and path where the image will be stored temporarily
-                string SelectedFilePath = result.FullPath;
-              //  string file = Path.Combine(FileSystem.CacheDirectory, fileName);
 
-                // NOTE: Replace this with your actual image data (e.g., from a byte array, stream, or resource)
-                // This example assumes you have an image source and save it to the file path.
-                // For demonstration, we just write some placeholder data, you'd put your image bytes here.
-                // For a real app, you would load your image into a byte array or stream and write it.
-                // Example: await File.WriteAllBytesAsync(file, yourImageByteArray);
-                // We'll simulate by creating a dummy file:
-                if (!File.Exists(SelectedFilePath))
-                {
-                    await Shell.Current.DisplayAlert("Select File", "Please pick a file first.", "OK");
-                    return;
-                }
-
-                var file = new ShareFile(SelectedFilePath);
-                // 2. Use the .NET MAUI Share API to request sharing
-                await Share.Default.RequestAsync(new ShareFileRequest
-                {
-                    Title = "Share Image via WhatsApp",
-                    File = file
-                });
             }
             catch (Exception ex)
             {
@@ -111,6 +81,65 @@ namespace BookRide.ViewModels
                 await Shell.Current.DisplayAlert("Error", $"Unable to share file: {ex.Message}", "OK");
             }
         }
+        //public async Task UploadImageAsync()
+        //{
+        //    try
+        //    {
+        //        // var photo = await PickImageAsync();
+        //        var result = await FilePicker.Default.PickAsync(new PickOptions
+        //        {
+        //            PickerTitle = "Select Image",
+        //            FileTypes = FilePickerFileType.Images
+        //        });
+
+
+        //        if (result == null)
+        //        {
+        //            return;
+        //        }
+
+        //        // 1. Define the filename and path where the image will be stored temporarily
+        //        string SelectedFilePath = result.FullPath;
+        //      //  string file = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+        //        // NOTE: Replace this with your actual image data (e.g., from a byte array, stream, or resource)
+        //        // This example assumes you have an image source and save it to the file path.
+        //        // For demonstration, we just write some placeholder data, you'd put your image bytes here.
+        //        // For a real app, you would load your image into a byte array or stream and write it.
+        //        // Example: await File.WriteAllBytesAsync(file, yourImageByteArray);
+        //        // We'll simulate by creating a dummy file:
+        //        if (!File.Exists(SelectedFilePath))
+        //        {
+        //            await Shell.Current.DisplayAlert("Select File", "Please pick a file first.", "OK");
+        //            return;
+        //        }
+
+
+
+        //        var file = new ShareFile(SelectedFilePath);
+        //        // 2. Use the .NET MAUI Share API to request sharing
+        //        await Share.Default.RequestAsync(new ShareFileRequest
+        //        {
+        //            Title = "Share Image via WhatsApp",
+        //            File = file
+        //        });
+
+        //        // Example in your MAUI code-behind or ViewModel
+        //        async void OpenWhatsApp(string phoneNumber, string message)
+        //        {
+        //            var uri = new Uri($"whatsapp://send?phone={phoneNumber}&text={Uri.EscapeDataString(message)}");
+        //            await Launcher.OpenAsync(uri);
+        //        }
+        //        // Call it: OpenWhatsApp("15551234567", "Hello from my MAUI App!");
+
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Log or display the exception
+        //        await Shell.Current.DisplayAlert("Error", $"Unable to share file: {ex.Message}", "OK");
+        //    }
+        //}
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
