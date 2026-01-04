@@ -6,21 +6,21 @@
 
     <ScrollView>
         <VerticalStackLayout
-            Padding="30"
-            Spacing="20"
+            Padding="10"
+            Spacing="10"
             VerticalOptions="Center">
 
             <!-- App Logo / Title -->
             <Image Source="car.png" HeightRequest="100" HorizontalOptions="Center" />
             <Label
                 Text="Welcome To Reserve a Taxi"
-                FontSize="28"
+                FontSize="24"
                 FontAttributes="Bold"
                 HorizontalOptions="Center" />
 
             <Label
                 Text="Login to continue"
-                FontSize="14"
+                FontSize="14" TextColor="Black" FontAttributes="Bold"
                 HorizontalOptions="Center" />
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">

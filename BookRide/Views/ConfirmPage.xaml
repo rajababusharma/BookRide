@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.ConfirmPage"
              Title="Registration Confirmation">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+            IsVisible="False" 
+            IsEnabled="False" />
+    </Shell.BackButtonBehavior>
     <VerticalStackLayout>
         <Label FontSize="Subtitle" Margin="10,20,0,20"
             Text="You have successfully completed the regstration."

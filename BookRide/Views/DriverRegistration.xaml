@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              x:Class="BookRide.Views.DriverRegistration"
              Title="Register Here">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+            IsVisible="False" 
+            IsEnabled="False" />
+    </Shell.BackButtonBehavior>
 
     <ScrollView>
         <VerticalStackLayout
@@ -69,8 +75,17 @@ StrokeShape="RoundRectangle 12">
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
                 <Entry
-Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric"
-Text="{Binding AadharCard}"/>
+Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric" MaxLength="12"
+Text="{Binding AadharCard}">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior
+         x:Name="AadharNumberValidator"
+         RegexPattern="^\d{12}$"
+         Flags="ValidateOnValueChanged"
+         InvalidStyle="{StaticResource InvalidEntryStyle}"
+         ValidStyle="{StaticResource ValidEntryStyle}" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
             <!-- Driving License -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
@@ -100,10 +115,19 @@ StrokeShape="RoundRectangle 12">
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Entry
-             Placeholder="Mobile Number"
-             Text="{Binding Mobile}"
-             Keyboard="Numeric"
-             MaxLength="10" />
+                    Placeholder="Mobile Number"
+                    Text="{Binding Mobile}"
+                    Keyboard="Numeric"
+                    MaxLength="10">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior
+                            x:Name="PhoneNumberValidator"
+                            RegexPattern="^\d{10}$"
+                            Flags="ValidateOnValueChanged"
+                            InvalidStyle="{StaticResource InvalidEntryStyle}"
+                            ValidStyle="{StaticResource ValidEntryStyle}" />
+                    </Entry.Behaviors>
+                </Entry>
             </Border>
             <!-- Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"

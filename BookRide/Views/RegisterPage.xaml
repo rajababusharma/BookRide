@@ -3,6 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.RegisterPage"
              Title="Select User Type">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+            IsVisible="False" 
+            IsEnabled="False" />
+    </Shell.BackButtonBehavior>
+    
     <Grid Padding="20" RowSpacing="15">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
@@ -37,7 +43,7 @@
                 <TapGestureRecognizer Command="{Binding TravellerCommand}"/>
             </Border.GestureRecognizers>
             <VerticalStackLayout Spacing="10">
-                <Image Source="traveller.png" HeightRequest="200" HorizontalOptions="Center" />
+                <Image Source="passenger.png" HeightRequest="200" HorizontalOptions="Center" Background="Transparent" />
                 <Label
           Text="Traveller"
           FontSize="24"

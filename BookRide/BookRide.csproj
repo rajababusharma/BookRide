@@ -99,13 +99,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="Resources\AppIcon\icon.png" />
-	  <None Remove="Resources\Images\car.png" />
-	  <None Remove="Resources\Splash\splash.svg" />
+	  <MauiImage Remove="Resources\Images\picker.png" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiSplashScreen Include="Resources\Splash\splash.svg" />
+	  <None Remove="Resources\AppIcon\icon.png" />
+	  <None Remove="Resources\Images\car.png" />
+	  <None Remove="Resources\Images\picker.png" />
+	  <None Remove="Resources\Splash\splash.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -146,6 +147,10 @@
 	  <MauiXaml Update="Views\TravellerProfilePage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiSplashScreen Include="Resources\Splash\passenger_t.png" Color="#FFFFFF" />
 	</ItemGroup>
 
 </Project>

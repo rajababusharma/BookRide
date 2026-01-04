@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.RechargeCreditPage"
              Title="Add Credit Points">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+            IsVisible="False" 
+            IsEnabled="False" />
+    </Shell.BackButtonBehavior>
     <VerticalStackLayout>
         
         <Label Margin="10,10,0,20"
@@ -26,7 +31,7 @@
 Text="Connect to WhatsApp after payment and Share the payment screenshot here to get credit points."
 VerticalOptions="Center"  />
 
-            <Image Source="whatsapp.png" HeightRequest="50" WidthRequest="50">
+            <Image Source="whatsapp.png" HeightRequest="70" WidthRequest="70">
                 <Image.GestureRecognizers>
                     <TapGestureRecognizer Command="{Binding UploadImageCommand}" />
                 </Image.GestureRecognizers>

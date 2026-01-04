@@ -2,15 +2,19 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.DriverProfilePage"
-          
              Title="Reserve a Taxi">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+            IsVisible="False" 
+            IsEnabled="False" />
+    </Shell.BackButtonBehavior>
    
         <VerticalStackLayout>
       
             <Border Margin="10" Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
                 <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
             </Border>
-        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="BlueViolet">
+        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="Blue">
                 <Label.Text>
                     <MultiBinding StringFormat="{}{0} {1}">
                         <Binding Path="User.FirstName"/>
@@ -18,18 +22,18 @@
                     </MultiBinding>
                 </Label.Text>
             </Label>
-            <Label HorizontalOptions="Center" VerticalOptions="Center" TextColor="Green">
+        <Label HorizontalOptions="Center" TextColor="Black" FontAttributes="Bold">
                 <Label.FormattedText>
                     <FormattedString>
-                        <Span Text="Total Credit Point: " />
+                    <Span Text="Total Credit Point: "  TextColor="Black" FontAttributes="Bold"/>
                         <!-- Binds to the property and displays the value in a different span -->
-                        <Span Text="{Binding User.CreditPoint}" FontAttributes="Bold" />
+                    <Span Text="{Binding User.CreditPoint}"  TextColor="Black" FontAttributes="Bold" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
 
         <Border Stroke="Gray" StrokeThickness="1" Margin="0,20,0,0"   StrokeShape="RoundRectangle 10" >
-            <Grid Grid.Column="1" Margin="20,20,0,10">
+            <Grid Margin="20,20,0,10" RowSpacing="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
