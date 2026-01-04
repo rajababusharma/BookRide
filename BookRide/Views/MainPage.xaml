@@ -78,7 +78,7 @@ StrokeShape="RoundRectangle 12">
 
             <!-- Forgot Password -->
             <Label
-                Text="Forgot Password?"
+                Text="Forgot Password?" FontSize="18" FontAttributes="Italic"
                 TextColor="#0066CC"
                 HorizontalOptions="Center">
                 <Label.GestureRecognizers>

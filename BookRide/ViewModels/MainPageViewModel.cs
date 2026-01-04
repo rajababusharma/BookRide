@@ -123,10 +123,7 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task ForgotPasswordAsync()
         {
-            await Shell.Current.DisplayAlert(
-                "Forgot Password",
-                "Password recovery flow here",
-                "OK");
+            await Shell.Current.GoToAsync(nameof(RecoverPasswordPage));
         }
     }
 }
