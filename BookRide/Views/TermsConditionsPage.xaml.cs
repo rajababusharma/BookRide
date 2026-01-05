@@ -1,10 +1,13 @@
+using BookRide.ViewModels;
+
 namespace BookRide.Views;
 
 public partial class TermsConditionsPage : ContentPage
 {
-	public TermsConditionsPage()
+    public TermsConditionsPage(TermsConditionVM vM)
 	{
-		InitializeComponent();
+		BindingContext = vM;
+        InitializeComponent();
 	}
 
     private void btnregister_Clicked(object sender, EventArgs e)
@@ -19,4 +22,5 @@ public partial class TermsConditionsPage : ContentPage
 			Shell.Current.DisplayAlert("Alert", "Please select terms and conditions first", "OK");
 		}
     }
+
 }

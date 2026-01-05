@@ -42,6 +42,7 @@ namespace BookRide
             builder.Services.AddTransient<ViewModels.DriverProfileVM>();
             builder.Services.AddTransient<ViewModels.RechargeCreditVM>();
             builder.Services.AddTransient<ViewModels.RecoverPasswordVM>();
+            builder.Services.AddTransient<ViewModels.TermsConditionVM>();
 
 
 
@@ -56,6 +57,7 @@ namespace BookRide
           builder.Services.AddTransient<Views.ConfirmPage>();
             builder.Services.AddTransient<Views.TermsConditionsPage>();
             builder.Services.AddTransient<Views.RecoverPasswordPage>();
+            builder.Services.AddTransient<Views.UserGuidePage>();
 
             // Register Services
             builder.Services.AddSingleton<ILocation, LocationService>();

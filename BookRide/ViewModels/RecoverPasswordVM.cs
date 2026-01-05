@@ -76,6 +76,7 @@ namespace BookRide.ViewModels
                 {
                     // Handle case where user is not found
                     Console.WriteLine("User with the provided mobile number not found.");
+                    await Shell.Current.DisplayAlert("Alert", "User with the provided mobile number not found.", "Ok");
                     IsBusy = false;
                     IsReadOnly = false;
                 }

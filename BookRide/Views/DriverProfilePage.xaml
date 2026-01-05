@@ -14,7 +14,7 @@
             <Border Margin="10" Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
                 <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
             </Border>
-        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center" TextColor="Blue">
+        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center">
                 <Label.Text>
                     <MultiBinding StringFormat="{}{0} {1}">
                         <Binding Path="User.FirstName"/>

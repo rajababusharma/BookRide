@@ -31,21 +31,21 @@
 StrokeShape="RoundRectangle 12">
                 <!-- First Name -->
                 <Entry
-             Placeholder="First Name"
+             Placeholder="First Name" ClearButtonVisibility="WhileEditing"
              Text="{Binding FirstName}" />
             </Border>
             <!-- Last Name -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Entry
-             Placeholder="Last Name"
+             Placeholder="Last Name" ClearButtonVisibility="WhileEditing"
              Text="{Binding LastName}" />
             </Border>
             <!-- Age -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Entry
-             Placeholder="Age"
+             Placeholder="Age" ClearButtonVisibility="WhileEditing"
              Text="{Binding Age}"
              Keyboard="Numeric" />
             </Border>
@@ -58,6 +58,15 @@ StrokeShape="RoundRectangle 12">
              AutoSize="TextChanges"
              HeightRequest="100" />
             </Border>
+
+            <!-- Place/Location -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
+             Placeholder="Place/Location" ClearButtonVisibility="WhileEditing"
+             Text="{Binding Place_Location}"
+             Keyboard="Numeric" />
+            </Border>
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Picker
@@ -67,14 +76,14 @@ StrokeShape="RoundRectangle 12">
             <!-- vehical -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
   Placeholder="VehicleNo" IsVisible="{Binding IsDriver}"
-  Text="{Binding VehicleNo}" />
+  Text="{Binding VehicleNo}" /> 
             </Border>
             <!-- Aadhar -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
 Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric" MaxLength="12"
 Text="{Binding AadharCard}">
                     <Entry.Behaviors>
@@ -90,7 +99,7 @@ Text="{Binding AadharCard}">
             <!-- Driving License -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
 Placeholder="Driving License" IsVisible="{Binding IsDriver}"
 Text="{Binding DrivingLicense}"/>
             </Border>
@@ -114,7 +123,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Mobile -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
                     Placeholder="Mobile Number"
                     Text="{Binding Mobile}"
                     Keyboard="Numeric"
@@ -132,7 +141,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
              Placeholder="Password"
              Text="{Binding Password}"
              IsPassword="True" />
@@ -140,7 +149,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Confirm Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <Entry ClearButtonVisibility="WhileEditing"
              Placeholder="Confirm Password"
              Text="{Binding ConfirmPassword}"
              IsPassword="True" />

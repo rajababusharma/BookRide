@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.MainPage"
              Title="Reserve a Taxi">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Clicked="toolbar_guide_Clicked" Text="Guide"
+                     Order="Primary"
+                     Priority="0" />
+    </ContentPage.ToolbarItems>
 
     <ScrollView>
         <VerticalStackLayout
@@ -36,17 +41,37 @@ StrokeShape="RoundRectangle 12">
             <!-- Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry
+                <!--<Entry
                 Placeholder="Password"
                 Text="{Binding Password}"
                 IsPassword="True"
-                ClearButtonVisibility="WhileEditing" />
+                ClearButtonVisibility="WhileEditing" />-->
+
+
+
+                    <Grid ColumnDefinitions="*,Auto">
+
+                    <Entry  Text="{Binding Password}"
+                        x:Name="passwordEntry"
+                        IsPassword="True"
+                        Placeholder="Enter Password" />
+
+                    <Image Grid.Column="1"
+                        x:Name="toggleIcon"
+                        Source="eye_off.png"
+                        HeightRequest="24"
+                        WidthRequest="24"
+                        VerticalOptions="Center">   
+                        <Image.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnTogglePasswordClicked" />
+                            </Image.GestureRecognizers>
+                        </Image>
+                    </Grid>
             </Border>
             <!-- Loading Indicator -->
             <ActivityIndicator
      IsRunning="{Binding IsBusy}"
-     IsVisible="{Binding IsBusy}"
-     Color="#0066CC" />
+     IsVisible="{Binding IsBusy}" />
             <!-- Error Message -->
             <Label
                 Text="{Binding ErrorMessage}"
@@ -58,38 +83,32 @@ StrokeShape="RoundRectangle 12">
             <Button
                 Text="Login"
                 Command="{Binding LoginCommand}"
-                IsEnabled="{Binding IsNotBusy}"
-                BackgroundColor="#0066CC"
-                TextColor="White"
-                CornerRadius="8"
-                HeightRequest="48" />
+                IsEnabled="{Binding IsNotBusy}" />
 
             <!-- register Button -->
             <Button
      Text="New user? Register here"
      Command="{Binding RegisterCommand}"
      IsEnabled="{Binding IsNotBusy}"
-     BackgroundColor="#0066CC"
-     TextColor="White"
-     CornerRadius="8"
-     HeightRequest="48" />
+     CornerRadius="8" />
 
            
 
             <!-- Forgot Password -->
             <Label
-                Text="Forgot Password?" FontSize="18" FontAttributes="Italic"
-                TextColor="#0066CC"
-                HorizontalOptions="Center">
+                Text="Forgot Password? Click Here" FontSize="18" FontAttributes="Italic"
+                HorizontalTextAlignment="Center">
                 <Label.GestureRecognizers>
                     <TapGestureRecognizer
                         Command="{Binding ForgotPasswordCommand}" />
                 </Label.GestureRecognizers>
             </Label>
             <Label
-                Text="Designed and developed by IntelliCS Technologies."
-                HorizontalTextAlignment="Center"
-                TextColor="Blue" />
+                Text="Designed and developed by" FontSize="Small"
+                HorizontalTextAlignment="Center" />
+            <Label
+      Text="IntelliCS Technologies" FontSize="Large"
+      HorizontalTextAlignment="Center" />
             <Image Source="intellics.png" HeightRequest="100" HorizontalOptions="Center" />
         </VerticalStackLayout>
     </ScrollView>

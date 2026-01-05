@@ -18,6 +18,7 @@ namespace BookRide
             Routing.RegisterRoute(nameof(ConfirmPage), typeof(ConfirmPage) );
             Routing.RegisterRoute(nameof(TermsConditionsPage), typeof(TermsConditionsPage) );
             Routing.RegisterRoute(nameof(RecoverPasswordPage), typeof(RecoverPasswordPage));
+            Routing.RegisterRoute(nameof(UserGuidePage), typeof(UserGuidePage) );
 
         }
     }

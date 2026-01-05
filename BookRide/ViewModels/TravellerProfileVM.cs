@@ -24,14 +24,15 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         public ObservableCollection<Users> usersList = new();
 
-        public List<Location> _nearbyLocationsTask;
-
         [ObservableProperty]
         public Users user;
         [ObservableProperty]
         public string hi="Hi";
         [ObservableProperty]
         public string selectedDistrict;
+        private readonly GeolocationRequest _geolocationRequest;
+
+        private Location currentLocation;
         partial void  OnSelectedDistrictChanged(string value)
         {
             if (value == null) return;
@@ -101,77 +102,110 @@ namespace BookRide.ViewModels
             _whatsAppConnect = whatsApp;
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _db = new RealtimeDatabaseService();
-          //  _locationService = new LocationService();
-             LoadUsersByDistrictAsync("");
+            _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
+           
+        }
+
+        public async Task InitializeAsync()
+        {
+            // async work
+            currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
+
+           await LoadUsersByDistrictAsync("");
+            //  await LoadDataAsync();
         }
 
         public async Task LoadUsersByDistrictAsync(string district)
         {
-            UsersList.Clear();
-            if (string.IsNullOrEmpty(district))
+            try
+                {
+                UsersList.Clear();
+                if (string.IsNullOrEmpty(district))
 
-            {
-                Task.Run(async () =>
                 {
-                    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    Task.Run(async () =>
                     {
-                        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
-                        return new ObservableCollection<Users>(userList);
-                    });
-                    UsersList = users;
-                }).GetAwaiter().GetResult();
+                        var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                        {
+                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
+                            return new ObservableCollection<Users>(userList);
+                        });
+
+                        UsersList = await GetLocationsWithinRadiusAsync(users);
+                    }).GetAwaiter().GetResult();
+                }
+                else
+                {
+                    Task.Run(async () =>
+                    {
+                        var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                        {
+                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
+                            return new ObservableCollection<Users>(userList);
+                        });
+                        UsersList = await GetLocationsWithinRadiusAsync(users);
+                    }).GetAwaiter().GetResult();
+                }
+
             }
-            else
-            {
-                Task.Run(async () =>
+            catch (Exception ex)
                 {
-                    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    // Handle exceptions related to geolocation
+                    // Console.WriteLine($"Error obtaining location: {ex.Message}");
+                    await Shell.Current.DisplayAlert(
+                              "Error",
+                              $"Error obtaining location: {ex.Message}",
+                              "OK");
+                }
+          
+        }
+
+        public async Task<ObservableCollection<Users>> GetLocationsWithinRadiusAsync(ObservableCollection<Users> users)
+        {
+            try
+            {
+                 
+                    if (currentLocation == null)
                     {
-                        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
-                        return new ObservableCollection<Users>(userList);
-                    });
-                    UsersList = users;
-                }).GetAwaiter().GetResult();
+                        return users;
+                    }
+
+
+                    double radiusKm = 5.0;
+
+                    foreach (var usr in users)
+                    {
+                        if (usr.Location != null)
+                        {
+                            // Calculate the distance in kilometers
+                            double distance = currentLocation.CalculateDistance(usr.Location, DistanceUnits.Kilometers);
+                            if (distance <= radiusKm)
+                            {
+                                UsersList.Add(usr);
+                            }
+                         }
+                        else
+                        {
+                        UsersList.Add(usr);
+                        }
+                    }
+
+                    return UsersList;
+                
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions related to geolocation
+               // Console.WriteLine($"Error obtaining location: {ex.Message}");
+               
+                return users; // Return the original list if location cannot be obtained
+
             }
            
         }
-
-
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Users;
         }
-
-        public async Task<List<Location>> GetLocationsWithinRadiusAsync()
-        {
-            var currentLocation = await _locationService.GetCurrentLocationAsync();
-            if (currentLocation == null)
-            {
-                return new List<Location>();
-            }
-
-            List<Location> targetLocations = new List<Location>();
-            foreach (var usr in usersList)
-            {
-                targetLocations.Add(usr.Location);
-            }
-            var locationsInRadius = new List<Location>();
-            double radiusKm = 5.0;
-
-            foreach (var location in targetLocations)
-            {
-                // Calculate the distance in kilometers
-                double distance = currentLocation.CalculateDistance(location, DistanceUnits.Kilometers);
-
-                if (distance <= radiusKm)
-                {
-                    locationsInRadius.Add(location);
-                }
-            }
-
-            return locationsInRadius;
-        }
-
-       
     }
 }

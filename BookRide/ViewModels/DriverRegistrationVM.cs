@@ -49,20 +49,19 @@ namespace BookRide.ViewModels
         [ObservableProperty] private bool isDriver;
 
         [ObservableProperty] private string selectedVehicle;
+        [ObservableProperty] private string place_Location;
         [ObservableProperty]
         private string selectedDistrict;
 
-        private double latitude { get; set; }= 0.0;
-        private double longitude { get; set; }= 0.0;
-
+        private readonly GeolocationRequest _geolocationRequest;
 
         public DriverRegistrationVM()
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
+            _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
 
-           
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -130,9 +129,9 @@ namespace BookRide.ViewModels
 
             try
             {
-              
+              var location = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude=latitude,Longitude=longitude,District=SelectedDistrict,RegistrationDate=DateTime.Now };
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude= location.Latitude, Longitude= location.Longitude, Location=location,District=SelectedDistrict,RegistrationDate=DateTime.Now,Place_Location=Place_Location };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)

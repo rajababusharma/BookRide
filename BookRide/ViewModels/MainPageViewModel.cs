@@ -44,66 +44,68 @@ namespace BookRide.ViewModels
             IsBusy = true;
             ErrorMessage = string.Empty;
 
-            await Task.Delay(1500); // simulate API call
-
-            if (string.IsNullOrWhiteSpace(Username) ||
-                string.IsNullOrWhiteSpace(Password))
+            try
             {
-                ErrorMessage = "Username and Password are required";
-                IsBusy = false;
-                return;
-            }
-
-            var usr = await _db.GetAsync<Users>($"Users/{Username}");
-            if (usr != null)
-            {
-
-                if (Username != usr.UserId|| Password != usr.Password)
+                if (string.IsNullOrWhiteSpace(Username) ||
+               string.IsNullOrWhiteSpace(Password))
                 {
-                    ErrorMessage = "Invalid username or password";
+                    ErrorMessage = "Username and Password are required";
                     IsBusy = false;
                     return;
                 }
-                else
+
+                var usr = await _db.GetAsync<Users>($"Users/{Username}");
+                if (usr != null)
                 {
 
-                   
-
-             
-
-                    if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
+                    if (Username != usr.UserId || Password != usr.Password)
                     {
-                                          
-                        await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
-                        {
-                            { "CurrentUser", usr }
-                        });
-                    }
-                    else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
-                    {
-                        await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
-                        {
-                            { "CurrentUser", usr }
-                        });
+                        ErrorMessage = "Invalid username or password";
+                        IsBusy = false;
+                        return;
                     }
                     else
                     {
-                        ErrorMessage = "Unknown user type";
+
+                        if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
+                        {
+
+                            await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
+                        {
+                            { "CurrentUser", usr }
+                        });
+                        }
+                        else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
+                        {
+                            await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                        {
+                            { "CurrentUser", usr }
+                        });
+                        }
+                        else
+                        {
+                            ErrorMessage = "Unknown user type";
+                        }
                     }
                 }
-            }
-            else
-            {
-                ErrorMessage = "User does not exist.";
-                IsBusy = false;
-                return;
-            }
+                else
+                {
+                    ErrorMessage = "User does not exist.";
+                    IsBusy = false;
+                    return;
+                }
 
                 // Navigate to home page
                 IsBusy = false;
-
+            }
+            catch (Exception ex)
+            {
+                ErrorMessage = $"An error occurred: {ex.Message}";
+                await Shell.Current.DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+                IsBusy = false;
+                return;
+            }
            
-          
         }
 
         [RelayCommand]

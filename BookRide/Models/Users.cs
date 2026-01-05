@@ -30,5 +30,6 @@ namespace BookRide.Models
         public string District { get; set; } = "Fatehpur";
         public DateTime RegistrationDate { get; set; }
         public Location Location { get; set; }
+        public string Place_Location { get; set; }
     }
 }

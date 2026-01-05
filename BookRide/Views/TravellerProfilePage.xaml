@@ -19,23 +19,16 @@
             </Label.Text>
         </Label>
         <Label Margin="20,0,10,10" FontSize="Subtitle"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
-        <Border Stroke="Black" StrokeThickness="1" Margin="10" StrokeShape="RoundRectangle 10">
-            <Grid>
+       
 
-                <Picker x:Name="pkrdistrict" TitleColor="Black"   HorizontalOptions="Fill"
+                <Picker x:Name="pkrdistrict"   HorizontalOptions="Fill"
                   VerticalOptions="Center"
-                  Margin="10,0,36,0"
-                  BackgroundColor="White"
+                  Margin="10,0,10,0"
                 Title="Click Here To Select City"  SelectedItem="{Binding SelectedDistrict}"
                 ItemsSource="{Binding Districts}" />
-                <Image Source="dropdown.png" WidthRequest="24"
-                HeightRequest="24" Margin="10,0,20,0"
-                HorizontalOptions="End"
-                VerticalOptions="Center"
-                InputTransparent="False"></Image>
+              
+   
 
-            </Grid>
-        </Border>
         <!-- Dropdown icon overlayed on the right. Use a small margin from the edge. -->
       
 
@@ -56,12 +49,13 @@
                                 <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
                                     <RowDefinition Height="*"/>
+                                    <RowDefinition Height="*"/>
                                 </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Label  Grid.Row="0" Grid.ColumnSpan="2" FontSize="Title" FontAttributes="Bold" TextColor="Blue">
+                            <Label  Grid.Row="0" Grid.ColumnSpan="2" FontSize="Title" FontAttributes="Bold">
                                 <Label.Text>
                                     <MultiBinding StringFormat="{}{0} {1}">
                                         <Binding Path="FirstName" />
@@ -74,20 +68,23 @@
                             <Label Text="Vehicle Type:" Grid.Row="3" Grid.Column="0"/>
                             <Label Text="Address:" Grid.Row="4" Grid.Column="0"/>
                                 <Label Text="District:" Grid.Row="5" Grid.Column="0"/>
+                                <Label Text="Land Mark:" Grid.Row="6" Grid.Column="0"/>
                                 <Label Text="{Binding Mobile}" Grid.Row="1" Grid.Column="1"/>
                                
                             <Label Text="{Binding DrivingLicense}" Grid.Row="2" Grid.Column="1"/>
                             <Label Text="{Binding VehicleType}" Grid.Row="3" Grid.Column="1"/>
                             <Label Text="{Binding Address}" Grid.Row="4" Grid.Column="1"/>
                             <Label Text="{Binding District}" Grid.Row="5" Grid.Column="1"/>
-                                <Label Text="Call Or connect with WhatsApp to reserve a Taxi" Grid.Row="6" Grid.ColumnSpan="2" FontAttributes="Bold" TextColor="Blue" FontSize="Medium"/>
-                                <Image HorizontalOptions="Start" Grid.Row="7" Grid.Column="0" Source="call.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0">
+                                <Label Text="{Binding Place_Location}" Grid.Row="6" Grid.Column="1"/>
+                            
+                                <Label Text="Call Or connect with WhatsApp to reserve a Taxi" Grid.Row="7" Grid.ColumnSpan="2" FontAttributes="Bold" FontSize="Medium"/>
+                                <Image HorizontalOptions="Start" Grid.Row="8" Grid.Column="0" Source="call.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
                             Path=BindingContext.CallCommand}" CommandParameter="{Binding Mobile}" />
                                     </Image.GestureRecognizers>
                                 </Image>
-                                <Image HorizontalOptions="Start"  Grid.Row="7" Grid.Column="1" Source="whatsapp.png" WidthRequest="70" HeightRequest="70" Margin="10,0,0,0" >
+                                <Image HorizontalOptions="Start" Aspect="AspectFill"  Grid.Row="8" Grid.Column="1" Source="whatsapp.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0" >
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
 Path=BindingContext.WhatsappConnectCommand}" CommandParameter="{Binding Mobile}" />

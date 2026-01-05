@@ -13,7 +13,7 @@
     <ScrollView>
     <VerticalStackLayout Margin="10" Spacing="10">
         <Label 
-            Text="Terms and Conditions" FontSize="Large" TextColor="Blue" FontAttributes="Bold"
+            Text="Terms and Conditions" FontSize="Large" FontAttributes="Bold"
             HorizontalOptions="Center" />
         <Label 
      Text="Last Updated: 01/01/2026" FontSize="Default"
@@ -102,17 +102,33 @@ Any disputes shall be subject to the jurisdiction of the city/state courts." Fon
                 <Label Text="16. Contact Us" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
             <Label Text="For support or legal inquiries:" FontSize="Body" />
             <Label Text="* Email: rekharajababu7124@gmail.com" FontSize="Body" />
+        
             <Label Text="* Phone: +91-8693849475" FontSize="Body" />
             <Label Text="* Address: IntelliCS Technologies besides Shiv Temple near Andauli Pulia, Gazipur Road, Fatehpur U.P, Pin: 212601" FontSize="Body" />
-
+            <Label HorizontalOptions="Center">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="To know more about us, "/>
+                        <Span Text="click here"
+                  TextColor="Blue"
+                  TextDecorations="Underline">
+                            <Span.GestureRecognizers>
+                                
+                                <TapGestureRecognizer Command="{Binding OpenWebsiteCommand}"
+                                          CommandParameter="https://intellicstechnology.godaddysites.com/"/>
+                            </Span.GestureRecognizers>
+                        </Span>
+                        <Span Text=" to visit the website."/>
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
             <HorizontalStackLayout>
                 <CheckBox
-x:Name="chkAgree"
-HorizontalOptions="Center" />
+x:Name="chkAgree" />
                 <Label
                     Text="I have read and agree to the Terms and Conditions"
                     VerticalOptions="Center"
-                    FontSize="Body" />
+                    FontSize="Micro" />
             </HorizontalStackLayout>
             <Button x:Name="btnregister" Clicked="btnregister_Clicked" Text="Proceed"></Button>
         </VerticalStackLayout>
