@@ -1,5 +1,6 @@
 ﻿using BookRide.ViewModels;
 using BookRide.Views;
+using System.Threading.Tasks;
 
 namespace BookRide
 {
@@ -12,11 +13,12 @@ namespace BookRide
             InitializeComponent();
         }
 
-
-        private async void toolbar_guide_Clicked(object sender, EventArgs e)
+        override protected async void OnAppearing()
         {
-            await Shell.Current.GoToAsync(nameof(UserGuidePage));
+            
+            base.OnAppearing();
         }
+
 
         private void OnTogglePasswordClicked(object sender, EventArgs e)
         {

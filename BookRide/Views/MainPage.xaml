@@ -4,7 +4,7 @@
              x:Class="BookRide.MainPage"
              Title="Reserve a Taxi">
     <ContentPage.ToolbarItems>
-        <ToolbarItem Clicked="toolbar_guide_Clicked" Text="Guide"
+        <ToolbarItem Command="{Binding OpenEmbeddedPdfCommand}" Text="Guide"
                      Order="Primary"
                      Priority="0" />
     </ContentPage.ToolbarItems>

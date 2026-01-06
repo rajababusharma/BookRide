@@ -29,9 +29,9 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task TravellerAsync()
         {
-            // Navigate to Traveller Registration Page
+            // Navigate to Traveler Registration Page
          // await Shell.Current.GoToAsync(nameof(DriverRegistration));userType
-            string userType = "Traveller";
+            string userType = "Traveler";
             await Shell.Current.GoToAsync(nameof(DriverRegistration),
                     new Dictionary<string, object>
                     {

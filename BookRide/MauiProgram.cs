@@ -68,7 +68,11 @@ namespace BookRide
             //#endif
 
 #if ANDROID
-            builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
+            builder.Services.AddSingleton<ILocationService, Platforms.Android.Implementations.LocationServiceStarter>();
+#endif
+
+#if ANDROID
+                        builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
 #elif IOS
 
 

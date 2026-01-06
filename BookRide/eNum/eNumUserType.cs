@@ -8,7 +8,7 @@ namespace BookRide.eNum
 {
     public enum eNumUserType
     {
-        Traveller,
+        Traveler,
         Driver
     }
 }

@@ -126,9 +126,10 @@ Any disputes shall be subject to the jurisdiction of the city/state courts." Fon
                 <CheckBox
 x:Name="chkAgree" />
                 <Label
-                    Text="I have read and agree to the Terms and Conditions"
+                    Text="Yes, I have read and consent to the terms and conditions*"
                     VerticalOptions="Center"
-                    FontSize="Micro" />
+                    FontSize="Micro">
+                </Label>
             </HorizontalStackLayout>
             <Button x:Name="btnregister" Clicked="btnregister_Clicked" Text="Proceed"></Button>
         </VerticalStackLayout>

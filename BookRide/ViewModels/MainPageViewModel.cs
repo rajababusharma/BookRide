@@ -29,13 +29,32 @@ namespace BookRide.ViewModels
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsNotBusy => !IsBusy;
-
-        public MainPageViewModel()
+        private readonly Interfaces.ILocationService _locationService;
+        public MainPageViewModel(Interfaces.ILocationService locationService)
         {
+            _locationService = locationService;
             _db = new RealtimeDatabaseService();
             // _db.DeleteAllAsync();
       
 
+        }
+       public async Task StartTracking(Users users)
+        {
+            try
+            {
+                if (await LocationPermissionHelper.EnsurePermissionsAsync())
+                {
+                    _locationService.Start(users);
+                }
+            }
+            catch (Exception ex)
+            {
+                // displaying an error alert message
+                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+            }
+           
+           
+                
         }
 
         [RelayCommand]
@@ -66,16 +85,19 @@ namespace BookRide.ViewModels
                     }
                     else
                     {
+                       
 
                         if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
                         {
+                            // starting a location tracking service
+                            await StartTracking(usr);
 
                             await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
                         {
                             { "CurrentUser", usr }
                         });
                         }
-                        else if (usr.UserType.Equals(eNumUserType.Traveller.ToString()))
+                        else if (usr.UserType.Equals(eNumUserType.Traveler.ToString()))
                         {
                             await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
                         {
@@ -127,5 +149,23 @@ namespace BookRide.ViewModels
         {
             await Shell.Current.GoToAsync(nameof(RecoverPasswordPage));
         }
+
+        [RelayCommand]
+        public async Task OpenEmbeddedPdfAsync()
+        {
+            using var stream = await FileSystem.OpenAppPackageFileAsync("guidance.pdf");
+
+            var filePath = Path.Combine(FileSystem.CacheDirectory, "guidance.pdf");
+
+            using var fileStream = File.Create(filePath);
+            await stream.CopyToAsync(fileStream);
+
+            await Launcher.Default.OpenAsync(
+                new OpenFileRequest
+                {
+                    File = new ReadOnlyFile(filePath)
+                });
+        }
+
     }
 }

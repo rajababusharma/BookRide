@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace BookRide.Models
 {
+    [Serializable]
     public class Users
     {
         
@@ -31,5 +32,10 @@ namespace BookRide.Models
         public DateTime RegistrationDate { get; set; }
         public Location Location { get; set; }
         public string Place_Location { get; set; }
+
+        public static implicit operator Users(string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

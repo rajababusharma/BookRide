@@ -16,7 +16,7 @@ namespace BookRide.ViewModels
     public partial class TravellerProfileVM : ObservableObject, IQueryAttributable
     {
         private RealtimeDatabaseService _db;
-        private ILocation _locationService;
+      
         private readonly IWhatsAppConnect _whatsAppConnect;
         public ObservableCollection<string> Districts { get; }
       
