@@ -88,9 +88,9 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
-           
 
-           
+
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
 
             IsBusy = true;
             // check internet connectivity first 
@@ -193,10 +193,10 @@ namespace BookRide.ViewModels
                  {
                       try
                       {
-                        if (await LocationPermissionHelper.EnsurePermissionsAsync())
-                        {
-                            _foregroundService.Start(users);
-                        }
+                       await LocationPermissionHelper.HasPermissionsAsync();
+
+                        _foregroundService.Start(users);
+                       
 
                     }
                       catch (Exception ex)

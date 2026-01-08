@@ -108,7 +108,6 @@
 	  <None Remove="Resources\AppIcon\logo_icon.png" />
 	  <None Remove="Resources\Images\car.png" />
 	  <None Remove="Resources\Images\picker.png" />
-	  <None Remove="Resources\Splash\splash.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -158,7 +157,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiSplashScreen Include="Resources\Splash\passenger_t.png" Color="#FFFFFF" />
+	  <MauiSplashScreen Include="Resources\Splash\splash.png" Color="#FFFFFF" />
 	</ItemGroup>
 
 </Project>

@@ -43,19 +43,18 @@ namespace BookRide.ViewModels
         }
        public async Task StartTracking(Users users)
         {
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             try
             {
-                if (await LocationPermissionHelper.EnsurePermissionsAsync())
-                {
+               
                     // start forground service to decrease credit point for driver daily and to update location
                     if (users.UserType == "Driver" && users.CreditPoint > 0)
                     {
                         try
                         {
-                            if (await LocationPermissionHelper.EnsurePermissionsAsync())
-                            {
+                           
                                 _foregroundService.Start(users);
-                            }
+                           
 
                         }
                         catch (Exception ex)
@@ -69,7 +68,7 @@ namespace BookRide.ViewModels
                         _foregroundService.Stop();
 
                     }
-                }
+                
             }
             catch (Exception ex)
             {
@@ -121,6 +120,7 @@ namespace BookRide.ViewModels
 
                         if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
                         {
+                            await LocationPermissionHelper.HasPermissionsAsync();
                             // starting a location tracking service
                             await StartTracking(usr);
 

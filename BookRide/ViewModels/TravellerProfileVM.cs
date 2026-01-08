@@ -113,17 +113,17 @@ namespace BookRide.ViewModels
         {
             try
             {
+                await LocationPermissionHelper.CheckGPSLocationEnableAsync();
                 // async work
-                if (await LocationPermissionHelper.EnsurePermissionsAsync())
-                {
-                    currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
+                await LocationPermissionHelper.HasPermissionsAsync();
 
-                }
+                currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
 
                 await LoadUsersByDistrictAsync("");
             }
             catch (Exception ex)
             {
+                await LoadUsersByDistrictAsync("");
                 // Handle exceptions related to geolocation
                 // Console.WriteLine($"Error obtaining location: {ex.Message}");
                 await Shell.Current.DisplayAlert(
@@ -229,17 +229,6 @@ namespace BookRide.ViewModels
                         driverLocation.Course = course ?? double.NaN;
                         driverLocation.VerticalAccuracy = vertical ?? double.NaN;
 
-                       
-
-                        //var location = new Location(
-                        //                            usr.Latitude, usr.Longitude, usr.Altitude ?? double.NaN
-                        //                        )
-                        //{
-                        //    Accuracy = usr.Accuracy,
-                        //    Timestamp = DateTimeOffset.UtcNow
-                        //};
-
-                        //  Location location = new(usr.Latitude, usr.Longitude, usr.Altitude, usr.Accuracy, usr.Timestamp);
                         // Calculate the distance in kilometers
                         double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
                             if (distance <= radiusKm)

@@ -1,4 +1,5 @@
-﻿using BookRide.ViewModels;
+﻿using BookRide.Services;
+using BookRide.ViewModels;
 using BookRide.Views;
 using System.Threading.Tasks;
 
@@ -15,7 +16,8 @@ namespace BookRide
 
         override protected async void OnAppearing()
         {
-            
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
+            await  LocationPermissionHelper.HasPermissionsAsync();
             base.OnAppearing();
         }
 
