@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Locations;
 using Android.OS;
 using BookRide.Models;
 using BookRide.Services;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static Android.Graphics.ImageDecoder;
 
 namespace BookRide.Platforms.Android.Implementations
 {
@@ -52,16 +54,32 @@ namespace BookRide.Platforms.Android.Implementations
                 {
                     var request = new GeolocationRequest(
                         GeolocationAccuracy.Medium,
-                        TimeSpan.FromSeconds(30));
+                        TimeSpan.FromSeconds(60));
 
                     var location = await Geolocation.GetLocationAsync(request);
 
                     if (location != null)
                     {
                         _db ??= new RealtimeDatabaseService();
-                        user.Latitude = location.Latitude;
-                        user.Longitude = location.Longitude;
-                        user.Location = location;
+
+                        var lat = location.Latitude;
+                        var lon = location.Longitude;
+                        var alt = location?.Altitude;
+                        var acc = location?.Accuracy;
+                        var time = location?.Timestamp;
+                        var vertical = location?.VerticalAccuracy;
+                        var speed = location?.Speed;
+                        var course = location?.Course;
+
+                        user.Latitude = lat;
+                        user.Longitude = lon;
+                        user.Altitude = alt;
+                        user.Accuracy = acc;
+                        user.Timestamp = time?.DateTime ?? DateTime.Now;
+                        user.Vertical = vertical;
+                        user.Speed = speed;
+                        user.Course = course;
+                       
                         _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
                         // TODO: Save or upload location
                         Console.WriteLine(
@@ -73,7 +91,7 @@ namespace BookRide.Platforms.Android.Implementations
                     Console.WriteLine(ex.Message);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(50), token);
+                await Task.Delay(TimeSpan.FromMinutes(60), token);
             }
         }
 

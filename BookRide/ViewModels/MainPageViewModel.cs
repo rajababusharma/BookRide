@@ -1,4 +1,5 @@
 ﻿using BookRide.eNum;
+using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
@@ -29,13 +30,15 @@ namespace BookRide.ViewModels
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsNotBusy => !IsBusy;
-        private readonly Interfaces.ILocationService _locationService;
-        public MainPageViewModel(Interfaces.ILocationService locationService)
+        private readonly Interfaces.IForegroundService _foregroundService;
+       private readonly INetworkService _networkService;
+        public MainPageViewModel(Interfaces.IForegroundService foregroundService, INetworkService networkService)
         {
-            _locationService = locationService;
+            _foregroundService = foregroundService;
             _db = new RealtimeDatabaseService();
+            _networkService = networkService;
             // _db.DeleteAllAsync();
-      
+
 
         }
        public async Task StartTracking(Users users)
@@ -44,7 +47,28 @@ namespace BookRide.ViewModels
             {
                 if (await LocationPermissionHelper.EnsurePermissionsAsync())
                 {
-                    _locationService.Start(users);
+                    // start forground service to decrease credit point for driver daily and to update location
+                    if (users.UserType == "Driver" && users.CreditPoint > 0)
+                    {
+                        try
+                        {
+                            if (await LocationPermissionHelper.EnsurePermissionsAsync())
+                            {
+                                _foregroundService.Start(users);
+                            }
+
+                        }
+                        catch (Exception ex)
+                        {
+                            // Handle exceptions related to starting the service
+                            System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                        }
+                    }
+                    else if (users.UserType == "Driver" && users.CreditPoint <= 0)
+                    {
+                        _foregroundService.Stop();
+
+                    }
                 }
             }
             catch (Exception ex)
@@ -62,6 +86,14 @@ namespace BookRide.ViewModels
         {
             IsBusy = true;
             ErrorMessage = string.Empty;
+            // check internet connectivity first 
+           
+            if (!_networkService.HasInternet())
+            {
+                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                IsBusy = false;
+                return;
+            }
 
             try
             {

@@ -25,13 +25,18 @@ namespace BookRide.Models
         public  string UserType { get; set; }
         public  int CreditPoint { get; set; } = 60;
         public string VehicleType { get; set; }
-        public double Latitude { get; set; }
-        public double Longitude { get; set; }
         public string State { get; set; }= "Uttar Pradesh";
         public string District { get; set; } = "Fatehpur";
         public DateTime RegistrationDate { get; set; }
-        public Location Location { get; set; }
-        public string Place_Location { get; set; }
+
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public double? Altitude { get; set; }
+        public double? Accuracy { get; set; }
+        public DateTime Timestamp { get; set; }
+        public double? Vertical { get; set; }
+        public double? Speed { get; set; }
+        public double? Course { get; set; }
 
         public static implicit operator Users(string v)
         {

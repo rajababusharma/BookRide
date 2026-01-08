@@ -1,4 +1,5 @@
-﻿using BookRide.Models;
+﻿using BookRide.Interfaces;
+using BookRide.Models;
 using BookRide.Services;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -36,9 +37,12 @@ namespace BookRide.ViewModels
 
         private Users Users;
 
-        public RecoverPasswordVM()
+        private readonly INetworkService _networkService;
+
+        public RecoverPasswordVM(INetworkService networkService)
         {
             _db = new RealtimeDatabaseService();
+            _networkService = networkService;
             isPasswordVisible = false;
             isReadOnly = false;
             IsVisible = true;
@@ -47,7 +51,17 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RecoverPasswordAsync()
         {
+           
             IsBusy = true;
+            // check internet connectivity first 
+
+            if (!_networkService.HasInternet())
+            {
+                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+               // ErrorMessage = "No internet connection. Please check your connection and try again.";
+                IsBusy = false;
+                return;
+            }
             try
             {
                 if (string.IsNullOrWhiteSpace(Mobile))
@@ -94,6 +108,13 @@ namespace BookRide.ViewModels
         private async Task ChangePasswordAsync()
         {
             IsBusy = true;
+            if (!_networkService.HasInternet())
+            {
+                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                // ErrorMessage = "No internet connection. Please check your connection and try again.";
+                IsBusy = false;
+                return;
+            }
             if (string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword))
             {
                 // Handle empty password fields

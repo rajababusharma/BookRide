@@ -17,28 +17,12 @@ namespace BookRide.ViewModels
 {
     public partial class DriverProfileVM : ObservableObject, IQueryAttributable
     {
-        private readonly RealtimeDatabaseService _db;
+
         [ObservableProperty]
         public Users user;
         public DriverProfileVM() 
         {
-            _db = new RealtimeDatabaseService();
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                // Start a timer to deduct credit points every hour
-                // Repeating timer that runs on the UI thread (MAUI)
-                Application.Current?.Dispatcher.StartTimer(TimeSpan.FromHours(2), () =>
-                {
-                    // runs on main thread — safe to update observable properties
-                    if (user.CreditPoint > 0)
-                    {
-                        user.CreditPoint -= 1;
-                        // avoid .Wait() on async; fire-and-forget safely:
-                        _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
-                    }
-                    return true; // keep repeating
-                });
-            });
+           
         }
 
         [RelayCommand]

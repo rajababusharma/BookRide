@@ -60,19 +60,22 @@ namespace BookRide
             builder.Services.AddTransient<Views.UserGuidePage>();
 
             // Register Services
-            builder.Services.AddSingleton<ILocation, LocationService>();
+
             builder.Services.AddSingleton<IUsers, UserService>();
             builder.Services.AddTransient<IWhatsAppConnect, WhatsappConnectService>();
+            builder.Services.AddSingleton<INetworkService, NetworkService>();
+
             //#if ANDROID
             // builder.Services.AddTransient<ITest, Platforms.Android.Implementations.Test>();
             //#endif
 
 #if ANDROID
-            builder.Services.AddSingleton<ILocationService, Platforms.Android.Implementations.LocationServiceStarter>();
+            builder.Services.AddSingleton<IForegroundService, Platforms.Android.Implementations.LocationServiceStarter>();
+            builder.Services.AddSingleton<IForegroundService, Platforms.Android.Implementations.UpdateCreditPointStarter>();
 #endif
 
 #if ANDROID
-                        builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
+            builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();
 #elif IOS
 
 

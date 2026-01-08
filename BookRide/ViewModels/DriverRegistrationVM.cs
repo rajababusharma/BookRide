@@ -49,19 +49,21 @@ namespace BookRide.ViewModels
         [ObservableProperty] private bool isDriver;
 
         [ObservableProperty] private string selectedVehicle;
-        [ObservableProperty] private string place_Location;
+
         [ObservableProperty]
         private string selectedDistrict;
 
         private readonly GeolocationRequest _geolocationRequest;
-
-        public DriverRegistrationVM()
+        private readonly Interfaces.IForegroundService _foregroundService;
+        private readonly INetworkService _networkService;
+        public DriverRegistrationVM(IForegroundService foregroundService, INetworkService networkService)
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
-
+            _foregroundService = foregroundService;
+            _networkService = networkService;
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -86,7 +88,19 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
+           
+
+           
+
             IsBusy = true;
+            // check internet connectivity first 
+            if (!_networkService.HasInternet())
+            {
+                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                // ErrorMessage = "No internet connection. Please check your connection and try again.";
+                IsBusy = false;
+                return;
+            }
             ErrorMessage = string.Empty;
 
             if(UserType_para=="Driver")
@@ -125,13 +139,35 @@ namespace BookRide.ViewModels
                 return;
             }
 
-            await Task.Delay(1500); // Simulate API call
-
+          //  await Task.Delay(1500); // Simulate API call
+    
             try
             {
               var location = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
+
+
+                var lat = location.Latitude;
+                var lon = location.Longitude;
+                var alt = location?.Altitude;
+                var acc = location?.Accuracy;
+                var time = location?.Timestamp;
+                var vertical = location?.VerticalAccuracy;
+                var speed = location?.Speed;
+                var course = location?.Course;
+
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,Latitude= location.Latitude, Longitude= location.Longitude, Location=location,District=SelectedDistrict,RegistrationDate=DateTime.Now,Place_Location=Place_Location };
+                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
+                    Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, 
+                    UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,
+                    Latitude= lat, 
+                    Longitude= lon, 
+                    Altitude = alt,
+                    Accuracy =acc,
+                    Timestamp = time?.DateTime ?? DateTime.Now,
+                    Vertical= vertical,
+                    Speed= speed,
+                    Course= course,
+                    District =SelectedDistrict,RegistrationDate=DateTime.Now };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -143,14 +179,38 @@ namespace BookRide.ViewModels
                   "OK");
                     IsBusy = false;
                     return;
-                }   
-
+                }
+           
                 await _db.SaveAsync($"Users/{users.UserId}", users);
                 await Shell.Current.DisplayAlert(
                     "Success",
                     "Registration completed successfully",
                     "OK");
                 IsBusy = false;
+
+                // start forground service to decrease credit point for driver daily and to update location
+                if (UserType_para == "Driver" && users.CreditPoint>0)
+                 {
+                      try
+                      {
+                        if (await LocationPermissionHelper.EnsurePermissionsAsync())
+                        {
+                            _foregroundService.Start(users);
+                        }
+
+                    }
+                      catch (Exception ex)
+                      {
+                            // Handle exceptions related to starting the service
+                            System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                      }
+                }
+                else if(UserType_para == "Driver" && users.CreditPoint<=0)
+                {
+                    _foregroundService.Stop();
+                   
+                }
+
                 //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
 
                 await Shell.Current.GoToAsync(nameof(ConfirmPage));

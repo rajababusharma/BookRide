@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BookRide.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace BookRide.Interfaces
 {
-    public interface ILocation
+    public interface IForegroundService
     {
-        Task<Location> GetCurrentLocationAsync();
+        void Start(Users users);
+        void Stop();
     }
 }

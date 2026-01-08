@@ -19,7 +19,8 @@ namespace BookRide.ViewModels
       
         private readonly IWhatsAppConnect _whatsAppConnect;
         public ObservableCollection<string> Districts { get; }
-      
+        [ObservableProperty]
+        private bool isBusy;
 
         [ObservableProperty]
         public ObservableCollection<Users> usersList = new();
@@ -31,6 +32,8 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         public string selectedDistrict;
         private readonly GeolocationRequest _geolocationRequest;
+
+        private readonly INetworkService _networkService;
 
         private Location currentLocation;
         partial void  OnSelectedDistrictChanged(string value)
@@ -97,26 +100,52 @@ namespace BookRide.ViewModels
             }
         }
 
-        public TravellerProfileVM(IWhatsAppConnect whatsApp)
+        public TravellerProfileVM(IWhatsAppConnect whatsApp, INetworkService networkService)
         {
             _whatsAppConnect = whatsApp;
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _db = new RealtimeDatabaseService();
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
-           
+            _networkService = networkService;
         }
 
         public async Task InitializeAsync()
         {
-            // async work
-            currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
+            try
+            {
+                // async work
+                if (await LocationPermissionHelper.EnsurePermissionsAsync())
+                {
+                    currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
 
-           await LoadUsersByDistrictAsync("");
+                }
+
+                await LoadUsersByDistrictAsync("");
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions related to geolocation
+                // Console.WriteLine($"Error obtaining location: {ex.Message}");
+                await Shell.Current.DisplayAlert(
+                              "Error",
+                              $"Error obtaining location: {ex.Message}",
+                              "OK");
+            }
+          
             //  await LoadDataAsync();
         }
 
         public async Task LoadUsersByDistrictAsync(string district)
         {
+            IsBusy = true;
+            // check internet connectivity first 
+            if (!_networkService.HasInternet())
+            {
+                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                // ErrorMessage = "No internet connection. Please check your connection and try again.";
+                IsBusy = false;
+                return;
+            }
             try
                 {
                 UsersList.Clear();
@@ -147,12 +176,15 @@ namespace BookRide.ViewModels
                     }).GetAwaiter().GetResult();
                 }
 
+                IsBusy = false;
+
             }
             catch (Exception ex)
                 {
                     // Handle exceptions related to geolocation
                     // Console.WriteLine($"Error obtaining location: {ex.Message}");
-                    await Shell.Current.DisplayAlert(
+                    IsBusy = false;
+                await Shell.Current.DisplayAlert(
                               "Error",
                               $"Error obtaining location: {ex.Message}",
                               "OK");
@@ -175,10 +207,41 @@ namespace BookRide.ViewModels
 
                     foreach (var usr in users)
                     {
-                        if (usr.Location != null)
+                        if (usr.Latitude != null && usr.Longitude!=null)
                         {
-                            // Calculate the distance in kilometers
-                            double distance = currentLocation.CalculateDistance(usr.Location, DistanceUnits.Kilometers);
+                        var lat = usr.Latitude;
+                        var lon = usr.Longitude;
+                        var alt = usr?.Altitude;
+                        var acc = usr?.Accuracy;
+                        var time = usr?.Timestamp;
+                        var vertical = usr?.Vertical;
+                        var speed = usr?.Speed;
+                        var course = usr?.Course;
+
+                        // Create a Location object for the user's location
+                        Location driverLocation = new Location();
+                        driverLocation.Latitude = lat;
+                        driverLocation.Longitude = lon;
+                        driverLocation.Altitude = alt ?? double.NaN;
+                        driverLocation.Accuracy = acc ?? double.NaN;
+                        driverLocation.Timestamp = DateTimeOffset.UtcNow;
+                        driverLocation.Speed = speed ?? double.NaN;
+                        driverLocation.Course = course ?? double.NaN;
+                        driverLocation.VerticalAccuracy = vertical ?? double.NaN;
+
+                       
+
+                        //var location = new Location(
+                        //                            usr.Latitude, usr.Longitude, usr.Altitude ?? double.NaN
+                        //                        )
+                        //{
+                        //    Accuracy = usr.Accuracy,
+                        //    Timestamp = DateTimeOffset.UtcNow
+                        //};
+
+                        //  Location location = new(usr.Latitude, usr.Longitude, usr.Altitude, usr.Accuracy, usr.Timestamp);
+                        // Calculate the distance in kilometers
+                        double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
                             if (distance <= radiusKm)
                             {
                                 UsersList.Add(usr);

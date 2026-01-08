@@ -14,13 +14,20 @@ namespace BookRide.Services
 
         public RealtimeDatabaseService()
         {
+            //_firebase = new FirebaseClient(
+            //    "https://bookride-f497d-default-rtdb.firebaseio.com/");
+
             _firebase = new FirebaseClient(
-                "https://bookride-f497d-default-rtdb.firebaseio.com/");
+               "https://reserve-a-taxi-default-rtdb.firebaseio.com/");
+
+            
         }
 
         // Save or Update
         public async Task SaveAsync<T>(string path, T data)
         {
+           
+            // If the path already exists, this will overwrite the data
             await _firebase
                 .Child(path)
                 .PutAsync(data);
@@ -29,6 +36,7 @@ namespace BookRide.Services
         // Get all records under a node
         public async Task<List<T>> GetAllAsync<T>(string path)
         {
+
             var items = await _firebase
                 .Child(path)
                 .OnceAsync<T>();

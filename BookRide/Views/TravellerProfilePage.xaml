@@ -20,17 +20,20 @@
         </Label>
         <Label Margin="20,0,10,10" FontSize="Subtitle"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
 
-        <Border Stroke="Gray" StrokeThickness="1" Margin="0,0,0,10">
-            <Picker x:Name="pkrdistrict"   HorizontalOptions="Fill"
+       
+            <Picker x:Name="pkrdistrict"   HorizontalOptions="Fill" HorizontalTextAlignment="Center"
                   VerticalOptions="Center"
                   Margin="10,0,10,0"
-                Title="Click Here To Select City"  SelectedItem="{Binding SelectedDistrict}"
+                Title="Click Here To Select City" TitleColor="Black" FontSize="Large" FontAttributes="Bold"  SelectedItem="{Binding SelectedDistrict}"
                 ItemsSource="{Binding Districts}" />
 
-        </Border>
-
-        <!-- Dropdown icon overlayed on the right. Use a small margin from the edge. -->
       
+
+        <!-- Loading Indicator -->
+        <ActivityIndicator
+IsRunning="{Binding IsBusy}"
+IsVisible="{Binding IsBusy}" />
+
 
         <Border Stroke="Gray" StrokeThickness="1" Grid.Row="3">
         <CollectionView 

@@ -58,15 +58,7 @@ StrokeShape="RoundRectangle 12">
              AutoSize="TextChanges"
              HeightRequest="100" />
             </Border>
-
-            <!-- Place/Location -->
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
-StrokeShape="RoundRectangle 12">
-                <Entry
-             Placeholder="Place/Location" ClearButtonVisibility="WhileEditing"
-             Text="{Binding Place_Location}"
-             Keyboard="Numeric" />
-            </Border>
+            
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Picker
