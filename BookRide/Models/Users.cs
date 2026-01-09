@@ -38,9 +38,9 @@ namespace BookRide.Models
         public double? Speed { get; set; }
         public double? Course { get; set; }
 
-        public static implicit operator Users(string v)
-        {
-            throw new NotImplementedException();
-        }
+        //public static implicit operator Users(string v)
+        //{
+        //    throw new NotImplementedException();
+        //}
     }
 }

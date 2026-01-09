@@ -1,5 +1,4 @@
-﻿using BookRide.eNum;
-using BookRide.Interfaces;
+﻿using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
@@ -15,6 +14,11 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+#if ANDROID
+using Android.Content;
+using Application = Android.App.Application;
+using BookRide.Platforms.Android.Implementations;
+#endif
 
 namespace BookRide.ViewModels
 {
@@ -54,16 +58,17 @@ namespace BookRide.ViewModels
         private string selectedDistrict;
 
         private readonly GeolocationRequest _geolocationRequest;
-        private readonly Interfaces.IForegroundService _foregroundService;
+
         private readonly INetworkService _networkService;
-        public DriverRegistrationVM(IForegroundService foregroundService, INetworkService networkService)
+        public DriverRegistrationVM(INetworkService networkService)
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
-            _foregroundService = foregroundService;
+      
             _networkService = networkService;
+           
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -167,7 +172,8 @@ namespace BookRide.ViewModels
                     Vertical= vertical,
                     Speed= speed,
                     Course= course,
-                    District =SelectedDistrict,RegistrationDate=DateTime.Now };
+                    District =SelectedDistrict,
+                    RegistrationDate=DateTime.Now };
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -191,25 +197,33 @@ namespace BookRide.ViewModels
                 // start forground service to decrease credit point for driver daily and to update location
                 if (UserType_para == "Driver" && users.CreditPoint>0)
                  {
-                      try
+                    
+                    try
                       {
-                       await LocationPermissionHelper.HasPermissionsAsync();
+#if ANDROID
+                        var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
+                        intent_loc.PutExtra("USERID", users.Mobile);
+                        Application.Context.StartForegroundService(intent_loc);
+#endif
 
-                        _foregroundService.Start(users);
-                       
+#if ANDROID
+                        var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
+                        intent_credit.PutExtra("USERID", users.Mobile);
+                        Application.Context.StartForegroundService(intent_credit);
+#endif
+                        // await LocationPermissionHelper.HasPermissionsAsync();
+
+                        // _foregroundService.Start(users.Mobile);
+
 
                     }
-                      catch (Exception ex)
+                    catch (Exception ex)
                       {
                             // Handle exceptions related to starting the service
-                            System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                          //  System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
                       }
                 }
-                else if(UserType_para == "Driver" && users.CreditPoint<=0)
-                {
-                    _foregroundService.Stop();
-                   
-                }
+               
 
                 //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
 

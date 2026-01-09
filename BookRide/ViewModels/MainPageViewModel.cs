@@ -10,6 +10,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+#if ANDROID
+using Android.Content;
+using Application = Android.App.Application;
+using BookRide.Platforms.Android.Implementations;
+#endif
 namespace BookRide.ViewModels
 {
     public partial class MainPageViewModel : ObservableObject
@@ -30,18 +36,19 @@ namespace BookRide.ViewModels
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsNotBusy => !IsBusy;
-        private readonly Interfaces.IForegroundService _foregroundService;
-       private readonly INetworkService _networkService;
-        public MainPageViewModel(Interfaces.IForegroundService foregroundService, INetworkService networkService)
+
+        private readonly INetworkService _networkService;
+        public MainPageViewModel(INetworkService networkService)
         {
-            _foregroundService = foregroundService;
+           // _foregroundService = foregroundService;
             _db = new RealtimeDatabaseService();
             _networkService = networkService;
+         //   _creditPointService = creditPointService;
             // _db.DeleteAllAsync();
 
 
         }
-       public async Task StartTracking(Users users)
+        public async Task StartTracking(Users users)
         {
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             try
@@ -52,28 +59,49 @@ namespace BookRide.ViewModels
                     {
                         try
                         {
-                           
-                                _foregroundService.Start(users);
-                           
+                           //_creditPointService.Start(users.Mobile);
+                           //_foregroundService.Start(users.Mobile);
+#if ANDROID
+                        var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
+                        intent_loc.PutExtra("USERID", users.Mobile);
+                        Application.Context.StartForegroundService(intent_loc);
+#endif
 
-                        }
-                        catch (Exception ex)
+#if ANDROID
+                        var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
+                        intent_credit.PutExtra("USERID", users.Mobile);
+                        Application.Context.StartForegroundService(intent_credit);
+#endif
+
+                    }
+                    catch (Exception ex)
                         {
                             // Handle exceptions related to starting the service
-                            System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                           // System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
                         }
                     }
                     else if (users.UserType == "Driver" && users.CreditPoint <= 0)
                     {
-                        _foregroundService.Stop();
 
-                    }
-                
+#if ANDROID
+                    var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
+                    intent_loc.SetAction(HourlyLocationService.ACTION_STOP_LOCATION);
+                    Application.Context.StartForegroundService(intent_loc);
+#endif
+
+#if ANDROID
+                    var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
+                    intent_credit.SetAction(DailyBasisCreditPointService.ACTION_STOP_CREDIT);
+                    Application.Context.StartForegroundService(intent_credit);
+#endif
+
+                }
+
             }
             catch (Exception ex)
             {
                 // displaying an error alert message
-                await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+              //  await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
             }
            
            

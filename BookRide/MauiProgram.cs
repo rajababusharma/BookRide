@@ -70,9 +70,14 @@ namespace BookRide
             //#endif
 
 #if ANDROID
-            builder.Services.AddSingleton<IForegroundService, Platforms.Android.Implementations.LocationServiceStarter>();
-            builder.Services.AddSingleton<IForegroundService, Platforms.Android.Implementations.UpdateCreditPointStarter>();
+            builder.Services.AddSingleton<Platforms.Android.Implementations.HourlyLocationService>();
+            builder.Services.AddSingleton<Platforms.Android.Implementations.DailyBasisCreditPointService>();
 #endif
+
+            //#if ANDROID
+            //            builder.Services.AddSingleton<IForegroundService, Platforms.Android.Implementations.LocationServiceStarter>();
+            //            builder.Services.AddSingleton<ICreditPointService, Platforms.Android.Implementations.UpdateCreditPointStarter>();
+            //#endif
 
 #if ANDROID
             builder.Services.AddTransient<IUpiPaymentService, Platforms.Android.Implementations.RazorpayUpiService>();

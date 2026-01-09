@@ -22,12 +22,12 @@
                     </MultiBinding>
                 </Label.Text>
             </Label>
-        <Label HorizontalOptions="Center" TextColor="Black" FontAttributes="Bold">
+        <Label HorizontalOptions="Center" FontAttributes="Bold">
                 <Label.FormattedText>
                     <FormattedString>
-                    <Span Text="Total Credit Point: "  TextColor="Black" FontAttributes="Bold"/>
+                    <Span Text="Total Credit Point: "   FontAttributes="Bold"/>
                         <!-- Binds to the property and displays the value in a different span -->
-                    <Span Text="{Binding User.CreditPoint}"  TextColor="Black" FontAttributes="Bold" />
+                    <Span Text="{Binding User.CreditPoint}"  FontAttributes="Bold" />
                     </FormattedString>
                 </Label.FormattedText>
             </Label>

@@ -3,6 +3,7 @@ using Android.Content;
 using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
+using AndroidX.Core.App;
 using BookRide.Models;
 using BookRide.Services;
 using System;
@@ -15,39 +16,64 @@ using static Android.Graphics.ImageDecoder;
 
 namespace BookRide.Platforms.Android.Implementations
 {
-    [Service(
+    [Service
+        ( Name = "com.companyname.bookride.HourlyLocationService",
     ForegroundServiceType = ForegroundService.TypeLocation,
     Exported = false
 )]
     public class HourlyLocationService : Service
     {
         CancellationTokenSource _cts;
+        public const string ACTION_STOP_LOCATION = "ACTION_STOP_LOCATION_SERVICE";
 
-        RealtimeDatabaseService _db;
-        public override IBinder OnBind(Intent intent) => null;
+        private readonly RealtimeDatabaseService _db;
+        public HourlyLocationService()
+        {
+            _db = new RealtimeDatabaseService();
+        }
+
+        public override void OnCreate()
+        {
+            base.OnCreate();
+            _cts = new CancellationTokenSource();
+         
+        }
+      
 
         public override StartCommandResult OnStartCommand(
             Intent intent,
             StartCommandFlags flags,
             int startId)
         {
-          
+            if (intent?.Action == ACTION_STOP_LOCATION)
+            {
+                StopService();
+                return StartCommandResult.NotSticky;
+            }
             StartForeground(1001, CreateNotification());
-            _cts = new CancellationTokenSource();
-          //  _ = RunHourlyLocationAsync(_cts.Token);
-            _ = Task.Run(() => RunHourlyLocationAsync(intent, _cts.Token));
+          //  _cts = new CancellationTokenSource();
+     
+          //  _ = Task.Run(() => RunHourlyLocationAsync(intent, _cts.Token));
+          Task.Run(async() =>
+          { 
+              await RunHourlyLocationAsync(intent, _cts.Token); 
+          });
+
             return StartCommandResult.Sticky;
         }
 
         async Task RunHourlyLocationAsync(Intent intent, CancellationToken token)
         {
-            var json = intent?.GetStringExtra("USER");
+            var id = intent?.GetStringExtra("USERID");
 
-           Users user = null;
-            if (!string.IsNullOrEmpty(json))
-            {
-                user = JsonSerializer.Deserialize<Users>(json);
-            }
+            // if intent value is a model object use this
+           // var json = intent?.GetStringExtra("USER");
+            //Users user = null;
+            //if (!string.IsNullOrEmpty(json))
+            //{
+            //    user = JsonSerializer.Deserialize<Users>(json);
+            //}
+
             while (!token.IsCancellationRequested)
             {
                 try
@@ -57,11 +83,11 @@ namespace BookRide.Platforms.Android.Implementations
                         TimeSpan.FromSeconds(60));
 
                     var location = await Geolocation.GetLocationAsync(request);
+                    var user = await _db.GetAsync<Users>($"Users/{id}");
 
                     if (location != null)
                     {
-                        _db ??= new RealtimeDatabaseService();
-
+                       
                         var lat = location.Latitude;
                         var lon = location.Longitude;
                         var alt = location?.Altitude;
@@ -75,7 +101,7 @@ namespace BookRide.Platforms.Android.Implementations
                         user.Longitude = lon;
                         user.Altitude = alt;
                         user.Accuracy = acc;
-                        user.Timestamp = time?.DateTime ?? DateTime.Now;
+                        user.Timestamp = DateTime.Now;
                         user.Vertical = vertical;
                         user.Speed = speed;
                         user.Course = course;
@@ -91,37 +117,63 @@ namespace BookRide.Platforms.Android.Implementations
                     Console.WriteLine(ex.Message);
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(60), token);
+                await Task.Delay(TimeSpan.FromMinutes(1), token);
             }
         }
 
+
+        public override IBinder OnBind(Intent intent) => null;
         public override void OnDestroy()
         {
             _cts?.Cancel();
             base.OnDestroy();
         }
 
-        Notification CreateNotification()
+       private Notification CreateNotification()
         {
             var channelId = "location_service_channel";
-            var manager = (NotificationManager)GetSystemService(NotificationService);
+            //var manager = (NotificationManager)GetSystemService(NotificationService);
+
+            //if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
+            //{
+            //    var channel = new NotificationChannel(
+            //        channelId,
+            //        "Location Tracking",
+            //        NotificationImportance.Low);
+
+            //    manager.CreateNotificationChannel(channel);
+            //}
 
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
                 var channel = new NotificationChannel(
                     channelId,
-                    "Location Tracking",
+                    "Background Service",
                     NotificationImportance.Low);
 
+                var manager = GetSystemService(NotificationService) as NotificationManager;
                 manager.CreateNotificationChannel(channel);
             }
 
-            return new Notification.Builder(this, channelId)
-                .SetContentTitle("Location Service Running")
-                .SetContentText("Fetching location every hour")
-                .SetSmallIcon(Resource.Drawable.notification_bg)
-                .SetOngoing(true)
-                .Build();
+            //return new Notification.Builder(this, channelId)
+            //    .SetContentTitle("Location Service Running")
+            //    .SetContentText("Fetching location every hour")
+            //    .SetSmallIcon(Resource.Drawable.notification_bg)
+            //    .SetOngoing(true)
+            //    .Build();
+
+            return new NotificationCompat.Builder(this, channelId)
+            .SetContentTitle("Service Running")
+            .SetContentText("Background task is active")
+            .SetSmallIcon(Resource.Drawable.car)
+            .Build();
+        }
+
+        void StopService()
+        {
+            _cts.Cancel();
+            StopForeground(true); // remove notification
+            StopSelf();
         }
     }
 }
