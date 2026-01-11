@@ -54,13 +54,15 @@ namespace BookRide.ViewModels
 
         [ObservableProperty] private string selectedVehicle;
 
-        [ObservableProperty]
-        private string selectedDistrict;
-
+        [ObservableProperty] private string selectedDistrict;
+        [ObservableProperty] private string aadharImagePath;
+       
         private readonly GeolocationRequest _geolocationRequest;
 
         private readonly INetworkService _networkService;
-        public DriverRegistrationVM(INetworkService networkService)
+
+        private readonly ICurrentAddress _currentAddress;
+        public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress)
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
@@ -68,7 +70,8 @@ namespace BookRide.ViewModels
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
       
             _networkService = networkService;
-           
+            _currentAddress = currentAddress;
+
         }
 
         //public DriverRegistrationVM(ITest service)
@@ -160,11 +163,13 @@ namespace BookRide.ViewModels
                 var speed = location?.Speed;
                 var course = location?.Course;
 
+                var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
+
                 var users = new Users
                 { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
                     Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, 
-                    UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,
-                    Latitude= lat, 
+                    UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,CurrentAddress=currentloc,
+                    Latitude = lat, 
                     Longitude= lon, 
                     Altitude = alt,
                     Accuracy =acc,
@@ -173,7 +178,8 @@ namespace BookRide.ViewModels
                     Speed= speed,
                     Course= course,
                     District =SelectedDistrict,
-                    RegistrationDate=DateTime.Now };
+                    RegistrationDate=DateTime.Now,
+                AadharImageURL= AadharImagePath};
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -195,7 +201,7 @@ namespace BookRide.ViewModels
                 IsBusy = false;
 
                 // start forground service to decrease credit point for driver daily and to update location
-                if (UserType_para == "Driver" && users.CreditPoint>0)
+                if (UserType_para == "Driver")
                  {
                     
                     try

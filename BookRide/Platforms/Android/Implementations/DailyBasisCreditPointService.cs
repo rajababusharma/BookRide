@@ -20,12 +20,20 @@ namespace BookRide.Platforms.Android.Implementations
     public class DailyBasisCreditPointService : Service
     {
         CancellationTokenSource _cts;
-        public const string ACTION_STOP_CREDIT = "ACTION_STOP_CREDIT_SERVICE";
+      
 
         RealtimeDatabaseService _db;
         public DailyBasisCreditPointService()
         {
             _db = new RealtimeDatabaseService();
+          
+        }
+
+        public override void OnCreate()
+        {
+            base.OnCreate();
+            _cts = new CancellationTokenSource();
+
         }
 
         public override IBinder OnBind(Intent intent) => null;
@@ -34,14 +42,10 @@ namespace BookRide.Platforms.Android.Implementations
             StartCommandFlags flags,
             int startId)
         {
-            if (intent?.Action == ACTION_STOP_CREDIT)
-            {
-                StopService();
-                return StartCommandResult.NotSticky;
-            }
+           
             StartForeground(1002, CreateNotification());
             
-            _cts = new CancellationTokenSource();
+        //    _cts = new CancellationTokenSource();
             //  _ = RunHourlyLocationAsync(_cts.Token);
             _ = Task.Run(() => RunHourlyCreditPointAsync(intent, _cts.Token));
             return StartCommandResult.Sticky;
@@ -63,22 +67,31 @@ namespace BookRide.Platforms.Android.Implementations
             {
                 try
                 {
-                   
-
-                   // _db ??= new RealtimeDatabaseService();
+                                  
                     var user = await _db.GetAsync<Users>($"Users/{id}");
-                    user.CreditPoint -= 1;
-                    // TODO: Save or upload user credit point
-                    _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
+                    if(user.CreditPoint>0)
+                    {
+                        user.CreditPoint -= 1;
+                        // TODO: Save or upload user credit point
+                        _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
 
-                    
+                    }
+                    else
+                    {
+                       // stop service if credit point is zero
+                        StopForeground(true);
+                       
+                    }
+
+
+
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(2), token);
+                await Task.Delay(TimeSpan.FromSeconds(90), token);
             }
         }
 
@@ -106,7 +119,7 @@ namespace BookRide.Platforms.Android.Implementations
             return new Notification.Builder(this, channelId)
                 .SetContentTitle("Credit Point Service Running")
                 .SetContentText("Updating credit point every day")
-                .SetSmallIcon(Resource.Drawable.notification_bg)
+                .SetSmallIcon(Resource.Drawable.car)
                 .SetOngoing(true)
                 .Build();
         }

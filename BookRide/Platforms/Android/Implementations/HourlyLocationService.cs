@@ -4,6 +4,7 @@ using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
 using AndroidX.Core.App;
+using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
 using System;
@@ -27,11 +28,22 @@ namespace BookRide.Platforms.Android.Implementations
         public const string ACTION_STOP_LOCATION = "ACTION_STOP_LOCATION_SERVICE";
 
         private readonly RealtimeDatabaseService _db;
+       
+        private ICurrentAddress? _currentAddress;
+
+        // Public parameterless constructor required by Android runtime (resolves XA4213)
         public HourlyLocationService()
         {
             _db = new RealtimeDatabaseService();
+            _currentAddress=new CurrentAddressService();
+          
         }
-
+        //public HourlyLocationService(ICurrentAddress currentAddress)
+        //{
+           
+        //   // _currentAddress = currentAddress;
+        //}
+        
         public override void OnCreate()
         {
             base.OnCreate();
@@ -45,11 +57,11 @@ namespace BookRide.Platforms.Android.Implementations
             StartCommandFlags flags,
             int startId)
         {
-            if (intent?.Action == ACTION_STOP_LOCATION)
-            {
-                StopService();
-                return StartCommandResult.NotSticky;
-            }
+            //if (intent?.Action == ACTION_STOP_LOCATION)
+            //{
+            //    StopService();
+            //    return StartCommandResult.NotSticky;
+            //}
             StartForeground(1001, CreateNotification());
           //  _cts = new CancellationTokenSource();
      
@@ -82,35 +94,52 @@ namespace BookRide.Platforms.Android.Implementations
                         GeolocationAccuracy.Medium,
                         TimeSpan.FromSeconds(60));
 
-                    var location = await Geolocation.GetLocationAsync(request);
+                 
                     var user = await _db.GetAsync<Users>($"Users/{id}");
-
-                    if (location != null)
+                    if (user.CreditPoint > 0)
                     {
-                       
-                        var lat = location.Latitude;
-                        var lon = location.Longitude;
-                        var alt = location?.Altitude;
-                        var acc = location?.Accuracy;
-                        var time = location?.Timestamp;
-                        var vertical = location?.VerticalAccuracy;
-                        var speed = location?.Speed;
-                        var course = location?.Course;
+                        var location = await Geolocation.GetLocationAsync(request);
+                        if (location != null)
+                        {
 
-                        user.Latitude = lat;
-                        user.Longitude = lon;
-                        user.Altitude = alt;
-                        user.Accuracy = acc;
-                        user.Timestamp = DateTime.Now;
-                        user.Vertical = vertical;
-                        user.Speed = speed;
-                        user.Course = course;
-                       
-                        _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
-                        // TODO: Save or upload location
-                        Console.WriteLine(
-                            $"Lat:{location.Latitude}, Lng:{location.Longitude}");
+                            var lat = location.Latitude;
+                            var lon = location.Longitude;
+                            var alt = location?.Altitude;
+                            var acc = location?.Accuracy;
+                            var time = location?.Timestamp;
+                            var vertical = location?.VerticalAccuracy;
+                            var speed = location?.Speed;
+                            var course = location?.Course;
+
+                            var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
+
+                            user.Latitude = lat;
+                            user.Longitude = lon;
+                            user.Altitude = alt;
+                            user.Accuracy = acc;
+                            user.Timestamp = DateTime.Now;
+                            user.Vertical = vertical;
+                            user.Speed = speed;
+                            user.Course = course;
+
+                            user.CurrentAddress = currentloc;
+
+
+
+                            _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
+                            // TODO: Save or upload location
+                            Console.WriteLine(
+                                $"Lat:{location.Latitude}, Lng:{location.Longitude}");
+                        }
+
                     }
+                    else
+                    {
+                        // stop service if credit point is zero
+                        StopForeground(true);
+
+                    }
+                   
                 }
                 catch (Exception ex)
                 {

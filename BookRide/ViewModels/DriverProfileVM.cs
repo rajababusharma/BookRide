@@ -20,6 +20,10 @@ namespace BookRide.ViewModels
 
         [ObservableProperty]
         public Users user;
+
+        [ObservableProperty]
+        public bool isVisible;
+
         public DriverProfileVM() 
         {
            
@@ -28,24 +32,48 @@ namespace BookRide.ViewModels
         [RelayCommand]
         public async Task AddCreditAsync()
         {
-            var navigationParameter = new Dictionary<string, object>
+            // Navigate to RechargeCreditPage with User as parameter if credit points are less than 1
+            if(User.CreditPoint < 1)
             {
-                { "CurrentUser", User }
-            };
-            await Shell.Current.GoToAsync(nameof(Views.RechargeCreditPage), navigationParameter);
+                //await Shell.Current.DisplayAlert(
+                //    "Insufficient Credit Points",
+                //    "Your credit points are insufficient. Please recharge to continue using our services.",
+                //    "OK");
+                        var navigationParameter = new Dictionary<string, object>
+                    {
+                        { "CurrentUser", User }
+                    };
+                await Shell.Current.GoToAsync(nameof(Views.RechargeCreditPage), navigationParameter);
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert(
+                    "Alert",
+                    $"You can add credit point when it reaches to zero",
+                    "OK");
+            }
+
         }
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Users;
-            if(User.CreditPoint<5)
+            if (User.CreditPoint > 0)
             {
-               Shell.Current.DisplayAlert(
-                  "Info",
-                   $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-                  "OK");
+                IsVisible = false;
             }
-           
+            else
+            {
+                IsVisible = true;
+            }
+            //if(User.CreditPoint<5)
+            //{
+            //   Shell.Current.DisplayAlert(
+            //      "Info",
+            //       $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
+            //      "OK");
+            //}
+
         }
     }
 }

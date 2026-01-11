@@ -40,6 +40,7 @@
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -50,18 +51,19 @@
                 <Label FontAttributes="Bold" Text="Driving License:" Grid.Row="1" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="Address:" Grid.Row="2" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="District:" Grid.Row="3" Grid.Column="0"/>
+                <Label FontAttributes="Bold" Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
                 <Label FontAttributes="Bold" Text="{Binding User.DrivingLicense}" Grid.Row="1" Grid.Column="1"/>
              
                 <Label FontAttributes="Bold" Text="{Binding User.Address}" Grid.Row="2" Grid.Column="1"/>
                 <Label FontAttributes="Bold" Text="{Binding User.District}" Grid.Row="3" Grid.Column="1"/>
-
+                <Label FontAttributes="Bold" Text="{Binding User.CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
             </Grid>
         </Border>
-        <HorizontalStackLayout Spacing="10" HorizontalOptions="Center" Margin="0,20,0,0">
+
             <!--<Button Text="Update Address" FontSize="Small" Command="{Binding OpenPopupCommand}"></Button>-->
-            <Button Text="Add Credit Points" Command="{Binding AddCreditCommand}"></Button>
-        </HorizontalStackLayout>
+            <Button IsVisible="{Binding IsVisible}" Text="Add Credit Points" Command="{Binding AddCreditCommand}"></Button>
+
       
     </VerticalStackLayout>
 

@@ -55,7 +55,7 @@ namespace BookRide.ViewModels
             {
                
                     // start forground service to decrease credit point for driver daily and to update location
-                    if (users.UserType == "Driver" && users.CreditPoint > 0)
+                    if (users.UserType == "Driver")
                     {
                         try
                         {
@@ -80,22 +80,22 @@ namespace BookRide.ViewModels
                            // System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
                         }
                     }
-                    else if (users.UserType == "Driver" && users.CreditPoint <= 0)
-                    {
+//                    else if (users.UserType == "Driver" && users.CreditPoint <= 0)
+//                    {
 
-#if ANDROID
-                    var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
-                    intent_loc.SetAction(HourlyLocationService.ACTION_STOP_LOCATION);
-                    Application.Context.StartForegroundService(intent_loc);
-#endif
+//#if ANDROID
+//                    var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
+//                    intent_loc.SetAction(HourlyLocationService.ACTION_STOP_LOCATION);
+//                    Application.Context.StartForegroundService(intent_loc);
+//#endif
 
-#if ANDROID
-                    var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
-                    intent_credit.SetAction(DailyBasisCreditPointService.ACTION_STOP_CREDIT);
-                    Application.Context.StartForegroundService(intent_credit);
-#endif
+//#if ANDROID
+//                    var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
+//                    intent_credit.SetAction(DailyBasisCreditPointService.ACTION_STOP_CREDIT);
+//                    Application.Context.StartForegroundService(intent_credit);
+//#endif
 
-                }
+//                }
 
             }
             catch (Exception ex)

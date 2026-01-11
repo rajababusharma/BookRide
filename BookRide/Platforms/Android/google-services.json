@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1053930688516",
+    "project_id": "reserve-a-taxi-d161e",
+    "storage_bucket": "reserve-a-taxi-d161e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1053930688516:android:8bd29f3f9473f127f5a551",
+        "android_client_info": {
+          "package_name": "com.intellicstech.bookrides"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSTPu29r2kIr9n31eU12-QvWIbJs0e0lA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -16,6 +16,7 @@ namespace BookRide.Models
         public  string LastName { get; set; }
         public int Age { get; set; }
         public  string Address { get; set; }
+        public string? CurrentAddress { get; set; }
 
         public  string Mobile { get; set; }
         public  string Password { get; set; }
@@ -37,6 +38,8 @@ namespace BookRide.Models
         public double? Vertical { get; set; }
         public double? Speed { get; set; }
         public double? Course { get; set; }
+
+        public string? AadharImageURL { get; set; }
 
         //public static implicit operator Users(string v)
         //{

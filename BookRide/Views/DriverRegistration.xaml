@@ -152,6 +152,17 @@ StrokeShape="RoundRectangle 12">
              TextColor="Red"
              IsVisible="{Binding HasError}"
              FontSize="13" />-->
+            <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" />
+            <!--<Aadhar Card Upload -->
+                <HorizontalStackLayout Spacing="10">
+                <Button Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}"  CornerRadius="8"></Button>
+                <Entry
+                    Text="{Binding AadharImagePath}"
+                    IsReadOnly="True"
+                    HorizontalOptions="Fill" />
+            </HorizontalStackLayout>
+           
+
 
             <!-- Validation Message -->
             <Label
@@ -159,7 +170,12 @@ StrokeShape="RoundRectangle 12">
     TextColor="Red"
    
     FontSize="13" />
-            
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator
+IsRunning="{Binding IsBusy}"
+IsVisible="{Binding IsBusy}"
+Color="#0066CC" />
 
             <!-- Register Button -->
             <Button
@@ -170,11 +186,7 @@ StrokeShape="RoundRectangle 12">
              HeightRequest="48"
              CornerRadius="8" />
 
-            <!-- Loading Indicator -->
-            <ActivityIndicator
-     IsRunning="{Binding IsBusy}"
-     IsVisible="{Binding IsBusy}"
-     Color="#0066CC" />
+          
 
             <!-- Login Link -->
             <Label

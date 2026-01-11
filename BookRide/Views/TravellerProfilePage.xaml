@@ -68,17 +68,17 @@ IsVisible="{Binding IsBusy}" />
                             </Label>
                             <Label Text="Phone Number:" Grid.Row="1" Grid.Column="0"/>
                             <Label Text="Driving License:" Grid.Row="2" Grid.Column="0"/>
-                            <Label Text="Vehicle Type:" Grid.Row="3" Grid.Column="0"/>
-                            <Label Text="Address:" Grid.Row="4" Grid.Column="0"/>
+                                <Label Text="Vehicle Type:" Grid.Row="3" Grid.Column="0"/>
+
+                                <Label Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
                                 <Label Text="District:" Grid.Row="5" Grid.Column="0"/>
-                                <Label Text="Land Mark:" Grid.Row="6" Grid.Column="0"/>
                                 <Label Text="{Binding Mobile}" Grid.Row="1" Grid.Column="1"/>
                                
                             <Label Text="{Binding DrivingLicense}" Grid.Row="2" Grid.Column="1"/>
                             <Label Text="{Binding VehicleType}" Grid.Row="3" Grid.Column="1"/>
-                            <Label Text="{Binding Address}" Grid.Row="4" Grid.Column="1"/>
-                            <Label Text="{Binding District}" Grid.Row="5" Grid.Column="1"/>
-                                <Label Text="{Binding Place_Location}" Grid.Row="6" Grid.Column="1"/>
+                                <Label Text="{Binding CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
+                                <Label Text="{Binding District}" Grid.Row="5" Grid.Column="1"/>
+               
                             
                                 <Label Text="Call Or connect with WhatsApp to reserve a Taxi" Grid.Row="7" Grid.ColumnSpan="2" FontAttributes="Bold" FontSize="Medium"/>
                                 <Image HorizontalOptions="Start" Grid.Row="8" Grid.Column="0" Source="call.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0">
