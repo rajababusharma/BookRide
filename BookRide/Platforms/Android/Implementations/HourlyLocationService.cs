@@ -146,7 +146,7 @@ namespace BookRide.Platforms.Android.Implementations
                     Console.WriteLine(ex.Message);
                 }
 
-                await Task.Delay(TimeSpan.FromMinutes(1), token);
+                await Task.Delay(TimeSpan.FromMinutes(Constants.Constants.LocationService_Timer), token);
             }
         }
 
@@ -161,18 +161,7 @@ namespace BookRide.Platforms.Android.Implementations
        private Notification CreateNotification()
         {
             var channelId = "location_service_channel";
-            //var manager = (NotificationManager)GetSystemService(NotificationService);
-
-            //if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
-            //{
-            //    var channel = new NotificationChannel(
-            //        channelId,
-            //        "Location Tracking",
-            //        NotificationImportance.Low);
-
-            //    manager.CreateNotificationChannel(channel);
-            //}
-
+           
             if (Build.VERSION.SdkInt >= BuildVersionCodes.O)
             {
                 var channel = new NotificationChannel(
@@ -184,15 +173,9 @@ namespace BookRide.Platforms.Android.Implementations
                 manager.CreateNotificationChannel(channel);
             }
 
-            //return new Notification.Builder(this, channelId)
-            //    .SetContentTitle("Location Service Running")
-            //    .SetContentText("Fetching location every hour")
-            //    .SetSmallIcon(Resource.Drawable.notification_bg)
-            //    .SetOngoing(true)
-            //    .Build();
-
+           
             return new NotificationCompat.Builder(this, channelId)
-            .SetContentTitle("Service Running")
+            .SetContentTitle("Location Service Running")
             .SetContentText("Background task is active")
             .SetSmallIcon(Resource.Drawable.car)
             .Build();

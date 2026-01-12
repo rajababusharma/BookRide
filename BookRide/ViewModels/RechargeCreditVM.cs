@@ -16,14 +16,16 @@ namespace BookRide.ViewModels
     {
         [ObservableProperty]
         private Users user;
+        private readonly IFirebaseUpload _firebaseUpload;
 
         // the property to bind image to UI
         [ObservableProperty]
         private ImageSource qrCode;
        private readonly IWhatsAppConnect _whatsAppConnect;
-        public RechargeCreditVM(IWhatsAppConnect whatsApp)
+        public RechargeCreditVM(IWhatsAppConnect whatsApp, IFirebaseUpload firebaseUpload)
         {
             _whatsAppConnect = whatsApp;
+            _firebaseUpload = firebaseUpload;
         }
 
         [RelayCommand]
@@ -70,8 +72,16 @@ namespace BookRide.ViewModels
         {
             try
             {
-                
-                _whatsAppConnect.WhatsappConnect("918693849475", $"Hello, my name is {User.FirstName}"+" and I have done the payment and sharing the payment screenshot with you. "+ $"You can call me on {User.Mobile} if any query");
+                // Browse and pick an image
+                var photo = await PickImageAsync();
+                if (photo == null)
+                {
+                    return;
+                }
+                // Upload the image to Firebase and get the download URL
+                var imageStream = await photo.OpenReadAsync();
+                var imageUrl = await _firebaseUpload.UploadPaymentImagesToCloud(imageStream, User.UserId);
+                // _whatsAppConnect.WhatsappConnect("918693849475", $"Hello, my name is {User.FirstName}"+" and I have done the payment and sharing the payment screenshot with you. "+ $"You can call me on {User.Mobile} if any query");
 
 
             }

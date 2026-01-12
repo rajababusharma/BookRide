@@ -65,7 +65,8 @@ namespace BookRide
             builder.Services.AddTransient<IWhatsAppConnect, WhatsappConnectService>();
             builder.Services.AddSingleton<INetworkService, NetworkService>();
             builder.Services.AddSingleton<ICurrentAddress, CurrentAddressService>();
-       
+            builder.Services.AddTransient<IFirebaseUpload, UploadImage>();
+
 
             //#if ANDROID
             // builder.Services.AddTransient<ITest, Platforms.Android.Implementations.Test>();
@@ -87,8 +88,8 @@ namespace BookRide
 
 
 #elif WINDOWS
-                        
-                      
+
+
 #endif
 
 

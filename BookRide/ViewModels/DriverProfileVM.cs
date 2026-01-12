@@ -1,6 +1,7 @@
 ﻿using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
+using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Maui.Controls.Maps;
@@ -24,22 +25,34 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         public bool isVisible;
 
-        public DriverProfileVM() 
+        [ObservableProperty]
+        private bool isBusy;
+        [ObservableProperty]
+        private string? profileImageUrl;
+
+        [ObservableProperty]
+        private string isActive;
+
+        private readonly IFirebaseUpload _firebaseUpload;
+
+        private readonly RealtimeDatabaseService _db;
+        public DriverProfileVM(IFirebaseUpload firebaseUpload)
         {
-           
+            _firebaseUpload = firebaseUpload;
+            _db = new RealtimeDatabaseService();
         }
 
         [RelayCommand]
         public async Task AddCreditAsync()
         {
             // Navigate to RechargeCreditPage with User as parameter if credit points are less than 1
-            if(User.CreditPoint < 1)
+            if (User.CreditPoint < 1)
             {
                 //await Shell.Current.DisplayAlert(
                 //    "Insufficient Credit Points",
                 //    "Your credit points are insufficient. Please recharge to continue using our services.",
                 //    "OK");
-                        var navigationParameter = new Dictionary<string, object>
+                var navigationParameter = new Dictionary<string, object>
                     {
                         { "CurrentUser", User }
                     };
@@ -55,25 +68,89 @@ namespace BookRide.ViewModels
 
         }
 
-        public void ApplyQueryAttributes(IDictionary<string, object> query)
+        public async void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Users;
-            if (User.CreditPoint > 0)
+            ProfileImageUrl = User.ProfileImageUrl;
+            // check if user is active
+            if (User.IsActive && User.CreditPoint > 0)
             {
+                IsActive = "Active";
                 IsVisible = false;
+            }
+            else if (User.CreditPoint == 0)
+            {
+                // update IsActive info in the users profile
+                User.IsActive = false;
+                IsVisible = true;
+                await _db.SaveAsync<Users>($"Users/{User.UserId}", User);
+                IsActive = "Deactivated";
+               await Shell.Current.DisplayAlert(
+                   "Info",
+                    $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
+                   "OK");
+            }
+            else if (!User.IsActive)
+            {
+                IsActive = "Deactivated";
+               await Shell.Current.DisplayAlert(
+                   "Info",
+                    $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                   "OK");
             }
             else
             {
-                IsVisible = true;
+                IsActive = "Deactivated";
+               await Shell.Current.DisplayAlert(
+                   "Info",
+                    $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                   "OK");
             }
-            //if(User.CreditPoint<5)
-            //{
-            //   Shell.Current.DisplayAlert(
-            //      "Info",
-            //       $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-            //      "OK");
-            //}
+
+        }
+
+        // add profile photo command
+        [RelayCommand]
+        public async Task AddProfilePhotoAsync()
+        {
+            IsBusy = true;
+            var photo = await MediaPicker.Default.PickPhotoAsync();
+            if (photo == null)
+                return;
+            // Save the file into firebase storage and get the URL
+            var imageStream = await photo.OpenReadAsync();
+            var imageUrl = await _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId);
+            if (!string.IsNullOrEmpty(imageUrl))
+            {
+                User.ProfileImageUrl = imageUrl;
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ProfileImageUrl = imageUrl;
+                });
+               
+                await _db.SaveAsync<Users>($"Users/{User.UserId}", User);
+              //  await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
+
+               IsBusy = false;
+            }
+            else
+            {
+                await Shell.Current.DisplayAlert("Error", "Failed to upload profile photo.", "OK");
+                IsBusy = false;
+            }
+        }
+
+        [RelayCommand]
+        public async Task UpdateProfileAsync()
+        {
+
+            var navigationParameter = new Dictionary<string, object>
+                    {
+                        { "USER", User }
+                    };
+            await Shell.Current.GoToAsync(nameof(DriverRegistration), navigationParameter);
 
         }
     }
 }
+

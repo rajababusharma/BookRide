@@ -11,7 +11,7 @@
     </Shell.BackButtonBehavior>
 
     <ScrollView>
-    <VerticalStackLayout Margin="10" Spacing="10">
+    <VerticalStackLayout Margin="20,10,10,10" Spacing="10">
         <Label 
             Text="Terms and Conditions" FontSize="Large" FontAttributes="Bold"
             HorizontalOptions="Center" />
@@ -19,7 +19,7 @@
      Text="Last Updated: 01/01/2026" FontSize="Default"
      HorizontalOptions="Center" />
         <Label 
-Text="Welcome to Reserve a Taxi App. These Terms and Conditions govern your access to and use of the Reserve a Taxi mobile application and related services, including taxi booking and ride services.
+Text="Welcome to Taxi Ride App. These Terms and Conditions govern your access to and use of the Taxi Ride mobile application and related services, including taxi booking and ride services.
 By downloading, registering, or using this App, you agree to be bound by these Terms. If you do not agree, please do not use the App." FontSize="Body"
 HorizontalOptions="Center" />
             <Label Text="1. Definitions" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
@@ -36,7 +36,7 @@ HorizontalOptions="Center" />
             <Label Text="3. Services" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
             <Label Text="* The App acts as a technology platform to connect Users with Drivers." FontSize="Body" />
             <Label Text="* We do not provide transportation services directly." FontSize="Body" />
-            <Label Text="* Drivers are independent contractors and not employees of Reserve a Taxi app." FontSize="Body" />
+            <Label Text="* Drivers are independent contractors and not employees of Taxi Ride app." FontSize="Body" />
 
             <Label Text="4. User Responsibilities" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
             <Label Text="You agree to:" FontSize="Body" />
@@ -72,7 +72,7 @@ HorizontalOptions="Center" />
             <Label Text="* Harass passengers" FontSize="Body" />
 
             <Label Text="10. Limitation of Liability" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
-            <Label Text="Reserve a Taxi is not liable for:" FontSize="Body" />
+            <Label Text="Taxi Ride is not liable for:" FontSize="Body" />
             <Label Text="* Driver actions or omissions" FontSize="Body" />
             <Label Text="* Delays, cancellations, or accidents" FontSize="Body" />
             <Label Text="* Loss of personal belongings" FontSize="Body" />
@@ -83,7 +83,7 @@ HorizontalOptions="Center" />
             <Label Text="our personal data is handled in accordance with our Privacy Policy, which explains how we collect, use, and protect your information." FontSize="Body" />
 
                 <Label Text="12. Intellectual Property" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>
-            <Label Text="* All content, logos, and trademarks belong to Reserve a Taxi app." FontSize="Body" />
+            <Label Text="* All content, logos, and trademarks belong to Taxi Ride app." FontSize="Body" />
             <Label Text="* Unauthorized use or reproduction is prohibited." FontSize="Body" />
 
                 <Label Text="13. Termination" FontSize="Medium" TextColor="Blue" FontAttributes="Bold"/>

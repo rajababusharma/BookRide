@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.TravellerProfilePage"
-             Title="Reserve a Taxi">
+             Title="Taxi Ride">
     <Shell.BackButtonBehavior>
         <BackButtonBehavior 
             IsVisible="False" 
@@ -23,7 +23,7 @@
             <Picker x:Name="pkrdistrict"   HorizontalOptions="Fill" HorizontalTextAlignment="Center"
                   VerticalOptions="Center"
                   Margin="10,0,10,0"
-                Title="Click Here To Select City" TitleColor="Black" FontSize="Large" FontAttributes="Bold"  SelectedItem="{Binding SelectedDistrict}"
+                Title="Click Here To Select City" FontSize="Large" FontAttributes="Bold"  SelectedItem="{Binding SelectedDistrict}"
                 ItemsSource="{Binding Districts}" />
 
       
@@ -57,7 +57,10 @@ IsVisible="{Binding IsBusy}" />
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <Label  Grid.Row="0" Grid.ColumnSpan="2" FontSize="Title" FontAttributes="Bold">
+                                <Border StrokeShape="RoundRectangle 12" HeightRequest="110" WidthRequest="120" Grid.Row="0" Grid.Column="0" HorizontalOptions="Start" Stroke="Black" StrokeThickness="2">
+                                <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="110"   HorizontalOptions="Center"/>
+                                </Border>
+                                <Label  Grid.Row="0" Grid.Column="1" FontSize="Title" FontAttributes="Bold">
                                 <Label.Text>
                                     <MultiBinding StringFormat="{}{0} {1}">
                                         <Binding Path="FirstName" />
@@ -66,14 +69,14 @@ IsVisible="{Binding IsBusy}" />
                                 </Label.Text>
                             </Label>
                             <Label Text="Phone Number:" Grid.Row="1" Grid.Column="0"/>
-                            <Label Text="Driving License:" Grid.Row="2" Grid.Column="0"/>
+                            <Label Text="Vehicle No:" Grid.Row="2" Grid.Column="0"/>
                                 <Label Text="Vehicle Type:" Grid.Row="3" Grid.Column="0"/>
 
                                 <Label Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
                                 <Label Text="District:" Grid.Row="5" Grid.Column="0"/>
                                 <Label Text="{Binding Mobile}" Grid.Row="1" Grid.Column="1"/>
-                               
-                            <Label Text="{Binding DrivingLicense}" Grid.Row="2" Grid.Column="1"/>
+
+                                <Label Text="{Binding VehicleNo}" Grid.Row="2" Grid.Column="1"/>
                             <Label Text="{Binding VehicleType}" Grid.Row="3" Grid.Column="1"/>
                                 <Label Text="{Binding CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
                                 <Label Text="{Binding District}" Grid.Row="5" Grid.Column="1"/>

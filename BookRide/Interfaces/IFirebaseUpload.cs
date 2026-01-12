@@ -8,6 +8,8 @@ namespace BookRide.Interfaces
 {
     public interface IFirebaseUpload
     {
-        string UploadImage(string mobile);
+        Task<string> UploadProfieImagesToCloud(Stream filestream,string filename);
+        Task<string> UploadAadharImagesToCloud(Stream filestream, string filename);
+        Task<string> UploadPaymentImagesToCloud(Stream filestream, string filename);
     }
 }

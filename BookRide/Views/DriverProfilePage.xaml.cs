@@ -20,4 +20,10 @@ public partial class DriverProfilePage : ContentPage
         Shell.Current.GoToAsync("..");
         return true;
     }
+
+    override protected void OnAppearing()
+    {
+        base.OnAppearing();
+        
+    }
 }

@@ -83,15 +83,13 @@ namespace BookRide.Platforms.Android.Implementations
                        
                     }
 
-
-
                 }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
 
-                await Task.Delay(TimeSpan.FromSeconds(90), token);
+                await Task.Delay(TimeSpan.FromHours(Constants.Constants.CreditPointService_Timer), token);
             }
         }
 

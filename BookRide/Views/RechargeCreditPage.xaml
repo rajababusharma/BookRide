@@ -3,15 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.RechargeCreditPage"
              Title="Add Credit Points">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding BackToLoginCommand}" Text="Login"
+                  Order="Primary"
+                  Priority="0" />
+    </ContentPage.ToolbarItems>
     <Shell.BackButtonBehavior>
         <BackButtonBehavior 
             IsVisible="False" 
             IsEnabled="False" />
     </Shell.BackButtonBehavior>
-    <VerticalStackLayout>
+    <VerticalStackLayout Margin="20">
         
         <Label Margin="10,10,0,20"
-         Text="Scan below QR code to buy the credit points(30 days) and  start receiving the booking calls. Please share the screenshot of the payment reciept from your registered mobile number."
+         Text="Scan below QR code to buy the credit points(30 days) and  start receiving the booking calls. Please upload the screenshot of the payment reciept after payment done."
          HorizontalOptions="Center" />
 
 
@@ -28,25 +33,22 @@
                 JustifyContent="SpaceEvenly"
                 Padding="10">
             <Label
-Text="Connect to WhatsApp after payment and Share the payment screenshot here to get credit points."
+Text="Click Upload button to share the payment screenshot here to get credit points."
 VerticalOptions="Center"  />
 
-            <Image Source="whatsapp.png" HeightRequest="70" WidthRequest="70">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Command="{Binding UploadImageCommand}" />
-                </Image.GestureRecognizers>
-            </Image>
+            <Button Text="Upload" Command="{Binding UploadImageCommand}"></Button>
+           
            
         </FlexLayout>
 
-        <!-- Login Button -->
+        <!-- Login Button --><!--
         <Button
         Text="Go To Login"
         Command="{Binding BackToLoginCommand}" HorizontalOptions="Center" WidthRequest="200"
         BackgroundColor="#0066CC"
         TextColor="White"
         HeightRequest="48"
-        CornerRadius="8" />
+        CornerRadius="8" />-->
 
     </VerticalStackLayout>
 </ContentPage>

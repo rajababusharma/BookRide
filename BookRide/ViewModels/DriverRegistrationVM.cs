@@ -43,8 +43,8 @@ namespace BookRide.ViewModels
         [ObservableProperty] private string confirmPassword;
       
         [ObservableProperty] private string  vehicleNo;
-        [ObservableProperty] private string aadharCard;
-        [ObservableProperty] private string drivingLicense;
+        //[ObservableProperty] private string aadharCard;
+        //[ObservableProperty] private string drivingLicense;
 
         [ObservableProperty] private string userType;
         [ObservableProperty] private int creditPoint = 30;
@@ -65,7 +65,8 @@ namespace BookRide.ViewModels
         private readonly INetworkService _networkService;
 
         private readonly ICurrentAddress _currentAddress;
-        public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress)
+        private readonly IFirebaseUpload _firebaseUpload;
+        public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress,IFirebaseUpload firebaseUpload)
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
@@ -74,6 +75,7 @@ namespace BookRide.ViewModels
       
             _networkService = networkService;
             _currentAddress = currentAddress;
+            _firebaseUpload = firebaseUpload;
 
         }
 
@@ -121,7 +123,6 @@ namespace BookRide.ViewModels
                 string.IsNullOrWhiteSpace(Address) ||
                 string.IsNullOrWhiteSpace(Mobile) ||
                 string.IsNullOrWhiteSpace(VehicleNo) ||
-                string.IsNullOrWhiteSpace(AadharCard) ||
                 string.IsNullOrWhiteSpace(AadharImagePath) ||
                 string.IsNullOrWhiteSpace(SelectedVehicle))
                 {
@@ -172,8 +173,9 @@ namespace BookRide.ViewModels
 
                 var users = new Users
                 { FirstName = FirstName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
-                    Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, 
-                    UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,CurrentAddress=currentloc,
+                    Password = Password, VehicleNo = VehicleNo,
+                    UserType = UserType_para, CreditPoint = CreditPoint, 
+                    UserId=Mobile, VehicleType=SelectedVehicle,CurrentAddress=currentloc,
                     Latitude = lat, 
                     Longitude= lon, 
                     Altitude = alt,
@@ -186,17 +188,17 @@ namespace BookRide.ViewModels
                     RegistrationDate=DateTime.Now,
                 AadharImageURL= aadharImageURL};
 
-                var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
-                if(usr!=null)
-                {
-                    ErrorMessage = "User with this mobile number already exists";
-                    await Shell.Current.DisplayAlert(
-                  "Alert",
-                  "User with this mobile number already exists",
-                  "OK");
-                    IsBusy = false;
-                    return;
-                }
+                //var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
+                //if(usr!=null)
+                //{
+                //    ErrorMessage = "User with this mobile number already exists";
+                //    await Shell.Current.DisplayAlert(
+                //  "Alert",
+                //  "User with this mobile number already exists",
+                //  "OK");
+                //    IsBusy = false;
+                //    return;
+                //}
            
                 await _db.SaveAsync($"Users/{users.UserId}", users);
                 await Shell.Current.DisplayAlert(
@@ -280,13 +282,35 @@ namespace BookRide.ViewModels
                 }
                    
             }
+            if (query.TryGetValue("USER", out var usr))
+            {
+                Users user = usr as Users;
+                Mobile = user.Mobile;
+                FirstName = user.FirstName;
+                Age = user.Age.ToString();
+                Address = user.Address;
+                VehicleNo = user.VehicleNo;
+                SelectedDistrict = user.District;
+                SelectedVehicle = user.VehicleType;
+                UserType= user.UserType;
+                Password = user.Password;
+                ConfirmPassword= user.Password;
+                UserType_para =user.UserType;
+                if (UserType_para == "Driver")
+                {
+                    IsDriver = true;
+                }
+                else
+                {
+                    IsDriver = false;
+                }
+            }
         }
 
         [RelayCommand]
         public async Task UploadPhotoAsync()
         {
-            try
-            {
+           
                 var result = await FilePicker.Default.PickAsync(new PickOptions
                 {
                     PickerTitle = "Select Aadhar Card Image",
@@ -297,35 +321,31 @@ namespace BookRide.ViewModels
                
                     AadharImagePath = result.FileName;
                 var imageStream = await result.OpenReadAsync();
+                var imageurl = await _firebaseUpload.UploadAadharImagesToCloud(imageStream, Mobile);
+                aadharImageURL = imageurl;
+                //  var appid = Constants.Constants.Firebase_project_id;
 
-                var appid = Constants.Constants.Firebase_project_id;
+                ////  string bucket = $"{appid}.appspot.com";
+                // // string fileName = $"{Guid.NewGuid()}.jpg";
+                //  string fileName = $"{Mobile}_Aadhar_{DateTime.Now.Ticks}.jpg";
 
-              //  string bucket = $"{appid}.appspot.com";
-               // string fileName = $"{Guid.NewGuid()}.jpg";
-                string fileName = $"{Mobile}_Aadhar_{DateTime.Now.Ticks}.jpg";
+                //  var uploadUrl =
+                //      $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
+                //      $"?uploadType=media&name={Constants.Constants.Firebase_ImageLocation}/{fileName}";
 
-                var uploadUrl =
-                    $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
-                    $"?uploadType=media&name={Constants.Constants.Firebase_ImageLocation}/{fileName}";
+                //  using var httpClient = new HttpClient();
+                //  using var content = new StreamContent(imageStream);
 
-                using var httpClient = new HttpClient();
-                using var content = new StreamContent(imageStream);
+                //  content.Headers.ContentType =
+                //      new MediaTypeHeaderValue("image/jpeg");
 
-                content.Headers.ContentType =
-                    new MediaTypeHeaderValue("image/jpeg");
+                //  var response = await httpClient.PostAsync(uploadUrl, content);
+                //  response.EnsureSuccessStatusCode();
 
-                var response = await httpClient.PostAsync(uploadUrl, content);
-                response.EnsureSuccessStatusCode();
+                //  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ImageLocation}%2F{fileName}?alt=media";
+                //  aadharImageURL = downloadUrl;
 
-                var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ImageLocation}%2F{fileName}?alt=media";
-                aadharImageURL = downloadUrl;
-               
-            }
-            catch (Exception ex)
-            {
-                await Shell.Current.DisplayAlert("Error", $"Failed to pick image: {ex.Message}", "OK");
-                return;
-            }
+           
         }
 
     }

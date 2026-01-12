@@ -156,7 +156,7 @@ namespace BookRide.ViewModels
                     {
                         var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
                         {
-                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
+                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.IsActive && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
                             return new ObservableCollection<Users>(userList);
                         });
 

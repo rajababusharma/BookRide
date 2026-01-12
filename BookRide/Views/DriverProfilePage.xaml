@@ -2,20 +2,35 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.DriverProfilePage"
-             Title="Reserve a Taxi">
+             xmlns:local="clr-namespace:BookRide.Converters"
+             Title="Taxi Ride">
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Command="{Binding UpdateProfileCommand}" Text="Update Profile"
+               Order="Primary"
+               Priority="0" />
+    </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <local:StatusColorConverter x:Key="StatusColorConverter" />
+    </ContentPage.Resources>
+
     <Shell.BackButtonBehavior>
         <BackButtonBehavior 
             IsVisible="False" 
             IsEnabled="False" />
     </Shell.BackButtonBehavior>
-   
-        <VerticalStackLayout>
+    <ScrollView>
+        
+
+        <VerticalStackLayout Spacing="5">
       
-            <Border Margin="10" Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
-                <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
+            <Border Margin="5" Stroke="Black" StrokeThickness="2"    StrokeShape="RoundRectangle 15" HeightRequest="120" WidthRequest="120">
+            <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center"></Image>
             </Border>
-        <Label  FontSize="Title" Text="{Binding User.FirstName}" FontAttributes="Bold" HorizontalTextAlignment="Center">
+            <Label  FontSize="Medium" Text="{Binding IsActive}" TextColor="{Binding IsActive, Converter={StaticResource StatusColorConverter}}"   HorizontalTextAlignment="Center">
+            </Label>
+            <Label  FontSize="Title" Text="{Binding User.FirstName}" FontAttributes="Bold" HorizontalTextAlignment="Center">
         </Label>
+        <Button Text="Edit Photo" FontSize="Small" Command="{Binding AddProfilePhotoCommand}" HorizontalOptions="Center"></Button>
         <Label HorizontalOptions="Center" FontAttributes="Bold">
                 <Label.FormattedText>
                     <FormattedString>
@@ -25,8 +40,11 @@
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
-
-        <Border Stroke="Gray" StrokeThickness="1" Margin="0,20,0,0"   StrokeShape="RoundRectangle 10" >
+            <!-- Loading Indicator -->
+            <ActivityIndicator
+IsRunning="{Binding IsBusy}"
+IsVisible="{Binding IsBusy}" />
+            <Border Stroke="Gray" StrokeThickness="1" Margin="0,20,0,0"   StrokeShape="RoundRectangle 10" >
             <Grid Margin="20,20,0,10" RowSpacing="20">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
@@ -42,13 +60,11 @@
                 </Grid.ColumnDefinitions>
 
                 <Label FontAttributes="Bold" Text="Phone Number:" Grid.Row="0" Grid.Column="0"/>
-                <Label FontAttributes="Bold" Text="Driving License:" Grid.Row="1" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="Address:" Grid.Row="2" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="District:" Grid.Row="3" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
-                <Label FontAttributes="Bold" Text="{Binding User.DrivingLicense}" Grid.Row="1" Grid.Column="1"/>
-             
+
                 <Label FontAttributes="Bold" Text="{Binding User.Address}" Grid.Row="2" Grid.Column="1"/>
                 <Label FontAttributes="Bold" Text="{Binding User.District}" Grid.Row="3" Grid.Column="1"/>
                 <Label FontAttributes="Bold" Text="{Binding User.CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
@@ -56,9 +72,9 @@
         </Border>
 
             <!--<Button Text="Update Address" FontSize="Small" Command="{Binding OpenPopupCommand}"></Button>-->
-            <Button IsVisible="{Binding IsVisible}" Text="Add Credit Points" Command="{Binding AddCreditCommand}"></Button>
+            <Button IsVisible="{Binding IsVisible}" Text="Recharge Credit Points" Command="{Binding AddCreditCommand}"></Button>
+        <!--<Button Text="Update Profile" Command="{Binding UpdateProfileCommand}" ></Button>-->
 
-      
     </VerticalStackLayout>
-
+    </ScrollView>
 </ContentPage>

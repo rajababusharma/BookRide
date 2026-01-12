@@ -21,7 +21,7 @@
 		<Nullable>enable</Nullable>
 
 		<!-- Display name -->
-		<ApplicationTitle>BookRide</ApplicationTitle>
+		<ApplicationTitle>Taxi Ride</ApplicationTitle>
 
 		<!-- App Identifier -->
 		<ApplicationId>com.companyname.bookride</ApplicationId>
@@ -40,12 +40,15 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
-	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	  <ApplicationId>com.intellicstech.bookride</ApplicationId>
 	  <AndroidKeyStore>True</AndroidKeyStore>
 	  <AndroidSigningStorePass>8693849475</AndroidSigningStorePass>
 	  <AndroidSigningKeyAlias>bookride</AndroidSigningKeyAlias>
 	  <AndroidSigningKeyPass>8693849475</AndroidSigningKeyPass>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	  <AndroidLinkTool>r8</AndroidLinkTool>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
@@ -54,6 +57,9 @@
 	  <AndroidSigningStorePass>8693849475</AndroidSigningStorePass>
 	  <AndroidSigningKeyAlias>bookride</AndroidSigningKeyAlias>
 	  <AndroidSigningKeyPass>8693849475</AndroidSigningKeyPass>
+	  <AndroidUseAapt2>True</AndroidUseAapt2>
+	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
+	  <AndroidPackageFormat>aab</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">

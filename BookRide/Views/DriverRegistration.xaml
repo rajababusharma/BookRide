@@ -66,7 +66,7 @@ StrokeShape="RoundRectangle 12">
   Placeholder="VehicleNo" IsVisible="{Binding IsDriver}"
   Text="{Binding VehicleNo}" /> 
             </Border>
-            <!-- Aadhar -->
+            <!-- Aadhar --><!--
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
                 <Entry ClearButtonVisibility="WhileEditing"
@@ -81,14 +81,14 @@ Text="{Binding AadharCard}">
          ValidStyle="{StaticResource ValidEntryStyle}" />
                     </Entry.Behaviors>
                 </Entry>
-            </Border>
+            </Border>-->
             <!-- Driving License -->
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+            <!--<Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
                 <Entry ClearButtonVisibility="WhileEditing"
 Placeholder="Driving License" IsVisible="{Binding IsDriver}"
 Text="{Binding DrivingLicense}"/>
-            </Border>
+            </Border>-->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
 StrokeShape="RoundRectangle 12">
                 <!-- Vehical Type -->
@@ -146,16 +146,18 @@ StrokeShape="RoundRectangle 12">
              TextColor="Red"
              IsVisible="{Binding HasError}"
              FontSize="13" />-->
-            <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" />
+            <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"  IsVisible="{Binding IsDriver}"/>
             <!--<Aadhar Card Upload -->
 
-            <Button IsVisible="{Binding IsDriver}" Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}"  CornerRadius="8"></Button>
-            <Entry IsVisible="{Binding IsDriver}"
+            <Button IsVisible="{Binding IsDriver}" Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}" BackgroundColor="DarkGrey" CornerRadius="8"></Button>
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"  IsVisible="{Binding IsDriver}"
+StrokeShape="RoundRectangle 12">
+                <Entry IsVisible="{Binding IsDriver}"
                     Text="{Binding AadharImagePath}"
                     IsReadOnly="True"
                     HorizontalOptions="Fill" />
-      
-           
+
+            </Border>
 
 
             <!-- Validation Message -->
@@ -173,7 +175,7 @@ Color="#0066CC" />
 
             <!-- Register Button -->
             <Button
-             Text="Register"
+             Text="Update/Register"
              Command="{Binding RegisterCommand}"
              BackgroundColor="#0066CC"
              TextColor="White"

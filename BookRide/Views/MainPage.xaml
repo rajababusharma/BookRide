@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.MainPage"
-             Title="Reserve a Taxi">
+             Title="Taxi Ride">
     <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding OpenEmbeddedPdfCommand}" Text="Guide"
                      Order="Primary"
@@ -18,7 +18,7 @@
             <!-- App Logo / Title -->
             <Image Source="car.png" HeightRequest="100" HorizontalOptions="Center" />
             <Label
-                Text="Welcome To Reserve a Taxi"
+                Text="Welcome To Taxi Ride App"
                 FontSize="24"
                 FontAttributes="Bold"
                 HorizontalOptions="Center" />
