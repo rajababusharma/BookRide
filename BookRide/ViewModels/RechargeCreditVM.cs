@@ -71,7 +71,7 @@ namespace BookRide.ViewModels
             try
             {
                 
-                _whatsAppConnect.WhatsappConnect("918693849475", $"Hello, my name is {User.FirstName}"+$" {User.LastName}"+" and I have done the payment and sharing the payment screenshot with you. "+ $"You can call me on {User.Mobile} if any query");
+                _whatsAppConnect.WhatsappConnect("918693849475", $"Hello, my name is {User.FirstName}"+" and I have done the payment and sharing the payment screenshot with you. "+ $"You can call me on {User.Mobile} if any query");
 
 
             }

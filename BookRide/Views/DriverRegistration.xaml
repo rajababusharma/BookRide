@@ -31,16 +31,10 @@
 StrokeShape="RoundRectangle 12">
                 <!-- First Name -->
                 <Entry
-             Placeholder="First Name" ClearButtonVisibility="WhileEditing"
+             Placeholder="Name as per Aadhar" ClearButtonVisibility="WhileEditing"
              Text="{Binding FirstName}" />
             </Border>
-            <!-- Last Name -->
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
-StrokeShape="RoundRectangle 12">
-                <Entry
-             Placeholder="Last Name" ClearButtonVisibility="WhileEditing"
-             Text="{Binding LastName}" />
-            </Border>
+
             <!-- Age -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
@@ -154,13 +148,13 @@ StrokeShape="RoundRectangle 12">
              FontSize="13" />-->
             <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center" />
             <!--<Aadhar Card Upload -->
-                <HorizontalStackLayout Spacing="10">
-                <Button Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}"  CornerRadius="8"></Button>
-                <Entry
+
+            <Button IsVisible="{Binding IsDriver}" Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}"  CornerRadius="8"></Button>
+            <Entry IsVisible="{Binding IsDriver}"
                     Text="{Binding AadharImagePath}"
                     IsReadOnly="True"
                     HorizontalOptions="Fill" />
-            </HorizontalStackLayout>
+      
            
 
 

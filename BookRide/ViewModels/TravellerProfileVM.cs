@@ -50,7 +50,7 @@ namespace BookRide.ViewModels
             {
                 try
                 {
-                     _whatsAppConnect.WhatsappConnect("+91" + phoneNumber, $"Hello, my name is {User.FirstName} " + $" {User.LastName}" + " and I want to connect with you.");
+                     _whatsAppConnect.WhatsappConnect("+91" + phoneNumber, $"Hello, my name is {User.FirstName} " + " and I want to connect with you.");
                 }
                 catch (Exception exp)
                 {

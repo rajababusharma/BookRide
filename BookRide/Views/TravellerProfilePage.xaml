@@ -11,10 +11,9 @@
     <VerticalStackLayout>
     <Label Margin="20,10,0,10" FontSize="Title" FontAttributes="Bold">
             <Label.Text>
-                <MultiBinding StringFormat="{}{0} {1}{2}">
+                <MultiBinding StringFormat="{}{0} {1}">
                     <Binding Path="Hi"/>
                     <Binding Path="User.FirstName"/>
-                    <Binding Path="User.LastName"/>
                 </MultiBinding>
             </Label.Text>
         </Label>

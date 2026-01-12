@@ -14,14 +14,8 @@
             <Border Margin="10" Stroke="Black" StrokeThickness="1"    StrokeShape="RoundRectangle 15" HeightRequest="100" WidthRequest="100">
                 <Image Aspect="Fill" Source="person.png" HeightRequest="80" WidthRequest="80" HorizontalOptions="Center"></Image>
             </Border>
-        <Label  FontSize="Title" FontAttributes="Bold" HorizontalTextAlignment="Center">
-                <Label.Text>
-                    <MultiBinding StringFormat="{}{0} {1}">
-                        <Binding Path="User.FirstName"/>
-                        <Binding Path="User.LastName"/>
-                    </MultiBinding>
-                </Label.Text>
-            </Label>
+        <Label  FontSize="Title" Text="{Binding User.FirstName}" FontAttributes="Bold" HorizontalTextAlignment="Center">
+        </Label>
         <Label HorizontalOptions="Center" FontAttributes="Bold">
                 <Label.FormattedText>
                     <FormattedString>

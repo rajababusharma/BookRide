@@ -4,12 +4,14 @@ using BookRide.Services;
 using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Firebase.Storage;
 using Microsoft.Maui.Devices.Sensors;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
+using System.Net.Http.Headers;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
@@ -33,7 +35,6 @@ namespace BookRide.ViewModels
         private bool isBusy;
 
         [ObservableProperty] private string firstName;
-        [ObservableProperty] private string lastName;
         [ObservableProperty] private string age;
         [ObservableProperty] private string address;
         [ObservableProperty] private string mobile;
@@ -56,7 +57,9 @@ namespace BookRide.ViewModels
 
         [ObservableProperty] private string selectedDistrict;
         [ObservableProperty] private string aadharImagePath;
-       
+        private string aadharImageURL;
+      
+
         private readonly GeolocationRequest _geolocationRequest;
 
         private readonly INetworkService _networkService;
@@ -118,7 +121,9 @@ namespace BookRide.ViewModels
                 string.IsNullOrWhiteSpace(Address) ||
                 string.IsNullOrWhiteSpace(Mobile) ||
                 string.IsNullOrWhiteSpace(VehicleNo) ||
-                string.IsNullOrWhiteSpace(DrivingLicense) || string.IsNullOrWhiteSpace(SelectedVehicle))
+                string.IsNullOrWhiteSpace(AadharCard) ||
+                string.IsNullOrWhiteSpace(AadharImagePath) ||
+                string.IsNullOrWhiteSpace(SelectedVehicle))
                 {
                     ErrorMessage = "All fields are required";
                     IsBusy = false;
@@ -166,7 +171,7 @@ namespace BookRide.ViewModels
                 var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
 
                 var users = new Users
-                { FirstName = FirstName, LastName = LastName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
+                { FirstName = FirstName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
                     Password = Password, VehicleNo = VehicleNo, AadharCard = AadharCard, DrivingLicense = DrivingLicense, 
                     UserType = UserType_para, CreditPoint = CreditPoint, UserId=Mobile, VehicleType=SelectedVehicle,CurrentAddress=currentloc,
                     Latitude = lat, 
@@ -179,7 +184,7 @@ namespace BookRide.ViewModels
                     Course= course,
                     District =SelectedDistrict,
                     RegistrationDate=DateTime.Now,
-                AadharImageURL= AadharImagePath};
+                AadharImageURL= aadharImageURL};
 
                 var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
                 if(usr!=null)
@@ -274,6 +279,52 @@ namespace BookRide.ViewModels
                     IsDriver = false;
                 }
                    
+            }
+        }
+
+        [RelayCommand]
+        public async Task UploadPhotoAsync()
+        {
+            try
+            {
+                var result = await FilePicker.Default.PickAsync(new PickOptions
+                {
+                    PickerTitle = "Select Aadhar Card Image",
+                    FileTypes = FilePickerFileType.Images
+                });
+                if (result == null)
+                    return;
+               
+                    AadharImagePath = result.FileName;
+                var imageStream = await result.OpenReadAsync();
+
+                var appid = Constants.Constants.Firebase_project_id;
+
+              //  string bucket = $"{appid}.appspot.com";
+               // string fileName = $"{Guid.NewGuid()}.jpg";
+                string fileName = $"{Mobile}_Aadhar_{DateTime.Now.Ticks}.jpg";
+
+                var uploadUrl =
+                    $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
+                    $"?uploadType=media&name={Constants.Constants.Firebase_ImageLocation}/{fileName}";
+
+                using var httpClient = new HttpClient();
+                using var content = new StreamContent(imageStream);
+
+                content.Headers.ContentType =
+                    new MediaTypeHeaderValue("image/jpeg");
+
+                var response = await httpClient.PostAsync(uploadUrl, content);
+                response.EnsureSuccessStatusCode();
+
+                var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ImageLocation}%2F{fileName}?alt=media";
+                aadharImageURL = downloadUrl;
+               
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to pick image: {ex.Message}", "OK");
+                return;
             }
         }
 

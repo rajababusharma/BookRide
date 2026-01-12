@@ -18,7 +18,7 @@ namespace BookRide.Services
             //    "https://bookride-f497d-default-rtdb.firebaseio.com/");
 
             _firebase = new FirebaseClient(
-               "https://reserve-a-taxi-default-rtdb.firebaseio.com/");
+               Constants.Constants.Firebase_Realtime_Storage_url);
 
             
         }
