@@ -39,7 +39,7 @@ namespace BookRide.Models
         public double? Course { get; set; }
 
         public string? AadharImageURL { get; set; }
-        public string? ProfileImageUrl { get; set; }
+        public string? ProfileImageUrl { get; set; }= "person.png";
         public bool IsActive { get; set; } = true;
 
         //public static implicit operator Users(string v)

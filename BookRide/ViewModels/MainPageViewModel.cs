@@ -59,17 +59,17 @@ namespace BookRide.ViewModels
                     {
                         try
                         {
-                           //_creditPointService.Start(users.Mobile);
-                           //_foregroundService.Start(users.Mobile);
+                        //_creditPointService.Start(users.Mobile);
+                        //_foregroundService.Start(users.Mobile);
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
-                        intent_loc.PutExtra("USERID", users.Mobile);
+                        intent_loc.PutExtra("USERID", users.UserId);
                         Application.Context.StartForegroundService(intent_loc);
 #endif
 
 #if ANDROID
                         var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
-                        intent_credit.PutExtra("USERID", users.Mobile);
+                        intent_credit.PutExtra("USERID", users.UserId);
                         Application.Context.StartForegroundService(intent_credit);
 #endif
 

@@ -69,7 +69,9 @@ namespace BookRide.Platforms.Android.Implementations
                 {
                                   
                     var user = await _db.GetAsync<Users>($"Users/{id}");
-                    if(user.CreditPoint>0)
+
+                  //  await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
+                    if (user.CreditPoint>0)
                     {
                         user.CreditPoint -= 1;
                         // TODO: Save or upload user credit point
@@ -80,13 +82,15 @@ namespace BookRide.Platforms.Android.Implementations
                     {
                        // stop service if credit point is zero
                         StopForeground(true);
-                       
+                  
                     }
 
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                   // Console.WriteLine(ex.Message);
+                    ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
+                    await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
                 }
 
                 await Task.Delay(TimeSpan.FromHours(Constants.Constants.CreditPointService_Timer), token);

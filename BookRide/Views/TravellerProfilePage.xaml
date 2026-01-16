@@ -57,8 +57,8 @@ IsVisible="{Binding IsBusy}" />
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                                <Border StrokeShape="RoundRectangle 12" HeightRequest="110" WidthRequest="120" Grid.Row="0" Grid.Column="0" HorizontalOptions="Start" Stroke="Black" StrokeThickness="2">
-                                <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="110"   HorizontalOptions="Center"/>
+                                <Border StrokeShape="RoundRectangle 12" HeightRequest="110" WidthRequest="110" Grid.Row="0" Grid.Column="0" HorizontalOptions="Start" Stroke="Black" StrokeThickness="2">
+                                <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100"   HorizontalOptions="Center"/>
                                 </Border>
                                 <Label  Grid.Row="0" Grid.Column="1" FontSize="Title" FontAttributes="Bold">
                                 <Label.Text>

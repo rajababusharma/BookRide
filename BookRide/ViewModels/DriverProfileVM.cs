@@ -72,6 +72,13 @@ namespace BookRide.ViewModels
         {
             User = query["CurrentUser"] as Users;
             ProfileImageUrl = User.ProfileImageUrl;
+
+            // check if profile image is null or empty
+            if (string.IsNullOrEmpty(ProfileImageUrl))
+            {
+                ProfileImageUrl = "person.png";
+            }
+
             // check if user is active
             if (User.IsActive && User.CreditPoint > 0)
             {

@@ -27,36 +27,38 @@ namespace BookRide
             MainPage = new AppShell();
         }
 
-        private async void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
+        private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)
         {
             var exception = e.Exception;
             // Log the exception details
             // Mark the exception as observed to prevent the app from crashing immediately
             e.SetObserved();
-            ExceptionClass excp = new ExceptionClass { Message= exception.Message, StackTrace= exception.StackTrace, OccurredAt= DateTime.Now};
-            await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+          
           
             // Optionally, display a user-friendly alert
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-              //  await MainPage.DisplayAlert("Error", "An error occurred in a background task.", "OK");
-              //  await Shell.Current.DisplayAlert("Error", "An error occurred in a background task.", "OK");
+                ExceptionClass excp = new ExceptionClass { Message = exception.Message, StackTrace = exception.StackTrace, OccurredAt = DateTime.Now };
+                await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+                //  await MainPage.DisplayAlert("Error", "An error occurred in a background task.", "OK");
+                //  await Shell.Current.DisplayAlert("Error", "An error occurred in a background task.", "OK");
 
-                await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
+                //  await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
             });
         }
 
-        private async void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             var exception = e.ExceptionObject as Exception;
             // Log the exception details using a logging service (e.g., Application Insights, Sentry)
             System.Diagnostics.Debug.WriteLine($"Unhandled AppDomain Exception: {exception}");
-            ExceptionClass excp = new ExceptionClass { Message = exception.Message, StackTrace = exception.StackTrace, OccurredAt = DateTime.Now };
-            await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+           
             // Display a user-friendly alert on the UI thread
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
+                ExceptionClass excp = new ExceptionClass { Message = exception.Message, StackTrace = exception.StackTrace, OccurredAt = DateTime.Now };
+                await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+                // await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
                 //  await Shell.Current.DisplayAlert("Error", "Something unexpected happened. The app might need to close.", "OK");
             });
 

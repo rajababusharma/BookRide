@@ -49,6 +49,7 @@
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	  <AndroidLinkTool>r8</AndroidLinkTool>
+	  <EnableLLVM>True</EnableLLVM>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-android|AnyCPU'">
@@ -59,7 +60,8 @@
 	  <AndroidSigningKeyPass>8693849475</AndroidSigningKeyPass>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
+	  <EnableLLVM>True</EnableLLVM>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
@@ -89,6 +91,18 @@
     <AndroidEnableJetifier>true</AndroidEnableJetifier>
     <AndroidUseAndroidX>true</AndroidUseAndroidX>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <RunAOTCompilation>true</RunAOTCompilation>
+    <AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+    <AndroidEnableLLVM>true</AndroidEnableLLVM>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
+    <AndroidTargetSdkVersion>34</AndroidTargetSdkVersion>
+    <AndroidMinSdkVersion>28</AndroidMinSdkVersion>
+  </PropertyGroup>
+
+
 
 
   <ItemGroup>

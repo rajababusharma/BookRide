@@ -7,6 +7,7 @@ using AndroidX.Core.App;
 using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
+using Java.Lang;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,54 +97,64 @@ namespace BookRide.Platforms.Android.Implementations
 
                  
                     var user = await _db.GetAsync<Users>($"Users/{id}");
+
+                    // 
+                   // await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
                     if (user.CreditPoint > 0)
                     {
                         var location = await Geolocation.GetLocationAsync(request);
                         if (location != null)
                         {
+                            if (location.Latitude != 0.0 && location.Longitude != 0.0)
+                            {
 
-                            var lat = location.Latitude;
-                            var lon = location.Longitude;
-                            var alt = location?.Altitude;
-                            var acc = location?.Accuracy;
-                            var time = location?.Timestamp;
-                            var vertical = location?.VerticalAccuracy;
-                            var speed = location?.Speed;
-                            var course = location?.Course;
-
-                            var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
-
-                            user.Latitude = lat;
-                            user.Longitude = lon;
-                            user.Altitude = alt;
-                            user.Accuracy = acc;
-                            user.Timestamp = DateTime.Now;
-                            user.Vertical = vertical;
-                            user.Speed = speed;
-                            user.Course = course;
-
-                            user.CurrentAddress = currentloc;
-
-
-
-                            _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
-                            // TODO: Save or upload location
-                            Console.WriteLine(
-                                $"Lat:{location.Latitude}, Lng:{location.Longitude}");
+                                var lat = location.Latitude;
+                                var lon = location.Longitude;
+                                var alt = location?.Altitude;
+                                var acc = location?.Accuracy;
+                                var time = location?.Timestamp;
+                                var vertical = location?.VerticalAccuracy;
+                                var speed = location?.Speed;
+                                var course = location?.Course;             
+                                user.Latitude = lat;
+                                user.Longitude = lon;
+                                user.Altitude = alt;
+                                user.Accuracy = acc;
+                                user.Timestamp = DateTime.Now;
+                                user.Vertical = vertical;
+                                user.Speed = speed;
+                                user.Course = course;
+                                try
+                                {
+                                    var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
+                                    user.CurrentAddress = currentloc;
+                                }
+                                catch (System.Exception ex)
+                                {
+                                    user.CurrentAddress = null;
+                                }
+                                // TODO: Save or upload location
+                                _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
+                                
+                               
+                            }
                         }
-
                     }
                     else
                     {
                         // stop service if credit point is zero
                         StopForeground(true);
+                        StopSelf();
+                        _cts.Cancel();
 
                     }
                    
                 }
-                catch (Exception ex)
+                catch (System.Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                   // Console.WriteLine(ex.Message);
+                    ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
+                    await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
                 }
 
                 await Task.Delay(TimeSpan.FromMinutes(Constants.Constants.LocationService_Timer), token);

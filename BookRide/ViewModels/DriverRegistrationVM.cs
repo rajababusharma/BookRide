@@ -187,18 +187,6 @@ namespace BookRide.ViewModels
                     District =SelectedDistrict,
                     RegistrationDate=DateTime.Now,
                 AadharImageURL= aadharImageURL};
-
-                //var usr=await _db.GetAsync<Users>($"Users/{users.UserId}");
-                //if(usr!=null)
-                //{
-                //    ErrorMessage = "User with this mobile number already exists";
-                //    await Shell.Current.DisplayAlert(
-                //  "Alert",
-                //  "User with this mobile number already exists",
-                //  "OK");
-                //    IsBusy = false;
-                //    return;
-                //}
            
                 await _db.SaveAsync($"Users/{users.UserId}", users);
                 await Shell.Current.DisplayAlert(
@@ -215,13 +203,13 @@ namespace BookRide.ViewModels
                       {
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
-                        intent_loc.PutExtra("USERID", users.Mobile);
+                        intent_loc.PutExtra("USERID", users.UserId);
                         Application.Context.StartForegroundService(intent_loc);
 #endif
 
 #if ANDROID
                         var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
-                        intent_credit.PutExtra("USERID", users.Mobile);
+                        intent_credit.PutExtra("USERID", users.UserId);
                         Application.Context.StartForegroundService(intent_credit);
 #endif
                         // await LocationPermissionHelper.HasPermissionsAsync();
