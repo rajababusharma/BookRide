@@ -57,35 +57,23 @@ namespace BookRide.ViewModels
 
         [ObservableProperty] private string selectedDistrict;
         [ObservableProperty] private string aadharImagePath;
-        private string aadharImageURL;
+        [ObservableProperty] private string aadharImageURL; 
+       // private string aadharImageURL;
       
-
-        private readonly GeolocationRequest _geolocationRequest;
 
         private readonly INetworkService _networkService;
 
-        private readonly ICurrentAddress _currentAddress;
         private readonly IFirebaseUpload _firebaseUpload;
         public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress,IFirebaseUpload firebaseUpload)
         {
             _db = new RealtimeDatabaseService();
             States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
-            _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
       
             _networkService = networkService;
-            _currentAddress = currentAddress;
             _firebaseUpload = firebaseUpload;
 
         }
-
-        //public DriverRegistrationVM(ITest service)
-        //{
-        //    _test = service;
-
-        //    _db = new RealtimeDatabaseService();
-
-        //}
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
 
@@ -157,38 +145,17 @@ namespace BookRide.ViewModels
     
             try
             {
-              var location = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
-
-
-                var lat = location.Latitude;
-                var lon = location.Longitude;
-                var alt = location?.Altitude;
-                var acc = location?.Accuracy;
-                var time = location?.Timestamp;
-                var vertical = location?.VerticalAccuracy;
-                var speed = location?.Speed;
-                var course = location?.Course;
-
-                var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
 
                 var users = new Users
                 { FirstName = FirstName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
                     Password = Password, VehicleNo = VehicleNo,
                     UserType = UserType_para, CreditPoint = CreditPoint, 
-                    UserId=Mobile, VehicleType=SelectedVehicle,CurrentAddress=currentloc,
-                    Latitude = lat, 
-                    Longitude= lon, 
-                    Altitude = alt,
-                    Accuracy =acc,
-                    Timestamp = time?.DateTime ?? DateTime.Now,
-                    Vertical= vertical,
-                    Speed= speed,
-                    Course= course,
+                    UserId=Mobile, VehicleType=SelectedVehicle,
                     District =SelectedDistrict,
                     RegistrationDate=DateTime.Now,
-                AadharImageURL= aadharImageURL};
+                AadharImageURL= AadharImageURL};
            
-                await _db.SaveAsync($"Users/{users.UserId}", users);
+                await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
                 await Shell.Current.DisplayAlert(
                     "Success",
                     "Registration completed successfully",
@@ -204,6 +171,8 @@ namespace BookRide.ViewModels
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
                         intent_loc.PutExtra("USERID", users.UserId);
+                       // intent_loc.PutExtra("ISSERVICE1", System.Text.Json.JsonSerializer.Serialize(users));
+                       
                         Application.Context.StartForegroundService(intent_loc);
 #endif
 
@@ -284,6 +253,8 @@ namespace BookRide.ViewModels
                 Password = user.Password;
                 ConfirmPassword= user.Password;
                 UserType_para =user.UserType;
+                AadharImagePath= user.AadharImageURL;
+                AadharImageURL = user.AadharImageURL;
                 if (UserType_para == "Driver")
                 {
                     IsDriver = true;
@@ -310,30 +281,7 @@ namespace BookRide.ViewModels
                     AadharImagePath = result.FileName;
                 var imageStream = await result.OpenReadAsync();
                 var imageurl = await _firebaseUpload.UploadAadharImagesToCloud(imageStream, Mobile);
-                aadharImageURL = imageurl;
-                //  var appid = Constants.Constants.Firebase_project_id;
-
-                ////  string bucket = $"{appid}.appspot.com";
-                // // string fileName = $"{Guid.NewGuid()}.jpg";
-                //  string fileName = $"{Mobile}_Aadhar_{DateTime.Now.Ticks}.jpg";
-
-                //  var uploadUrl =
-                //      $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
-                //      $"?uploadType=media&name={Constants.Constants.Firebase_ImageLocation}/{fileName}";
-
-                //  using var httpClient = new HttpClient();
-                //  using var content = new StreamContent(imageStream);
-
-                //  content.Headers.ContentType =
-                //      new MediaTypeHeaderValue("image/jpeg");
-
-                //  var response = await httpClient.PostAsync(uploadUrl, content);
-                //  response.EnsureSuccessStatusCode();
-
-                //  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ImageLocation}%2F{fileName}?alt=media";
-                //  aadharImageURL = downloadUrl;
-
-           
+                AadharImageURL = imageurl;         
         }
 
     }

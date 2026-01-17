@@ -158,7 +158,7 @@ StrokeShape="RoundRectangle 12">
                     HorizontalOptions="Fill" />
 
             </Border>
-
+            <Image IsVisible="{Binding IsDriver}" Source="{Binding AadharImageURL}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
 
             <!-- Validation Message -->
             <Label

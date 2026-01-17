@@ -205,18 +205,22 @@ namespace BookRide.ViewModels
 
                     double radiusKm = 5.0;
 
-                    foreach (var usr in users)
+                  
+
+                foreach (var usr in users)
                     {
-                        if (usr.Latitude != null && usr.Longitude!=null)
+                    // fetch user location from User_Location nodel
+                    var _userLocation = await _db.GetAsync<User_Location>("User_Location/" + usr.UserId);
+                    if (_userLocation.Latitude != null && _userLocation.Longitude!=null)
                         {
-                        var lat = usr.Latitude;
-                        var lon = usr.Longitude;
-                        var alt = usr?.Altitude;
-                        var acc = usr?.Accuracy;
-                        var time = usr?.Timestamp;
-                        var vertical = usr?.Vertical;
-                        var speed = usr?.Speed;
-                        var course = usr?.Course;
+                        var lat = _userLocation.Latitude;
+                        var lon = _userLocation.Longitude;
+                        var alt = _userLocation?.Altitude;
+                        var acc = _userLocation?.Accuracy;
+                        var time = _userLocation?.Timestamp;
+                        var vertical = _userLocation?.Vertical;
+                        var speed = _userLocation?.Speed;
+                        var course = _userLocation?.Course;
 
                         // Create a Location object for the user's location
                         Location driverLocation = new Location();

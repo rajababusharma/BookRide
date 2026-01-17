@@ -51,9 +51,8 @@ IsVisible="{Binding IsBusy}" />
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -62,12 +61,12 @@ IsVisible="{Binding IsBusy}" />
                 <Label FontAttributes="Bold" Text="Phone Number:" Grid.Row="0" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="Address:" Grid.Row="2" Grid.Column="0"/>
                 <Label FontAttributes="Bold" Text="District:" Grid.Row="3" Grid.Column="0"/>
-                <Label FontAttributes="Bold" Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
+              
                 <Label FontAttributes="Bold" Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
 
                 <Label FontAttributes="Bold" Text="{Binding User.Address}" Grid.Row="2" Grid.Column="1"/>
                 <Label FontAttributes="Bold" Text="{Binding User.District}" Grid.Row="3" Grid.Column="1"/>
-                <Label FontAttributes="Bold" Text="{Binding User.CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
+               
             </Grid>
         </Border>
 

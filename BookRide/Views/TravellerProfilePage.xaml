@@ -72,13 +72,13 @@ IsVisible="{Binding IsBusy}" />
                             <Label Text="Vehicle No:" Grid.Row="2" Grid.Column="0"/>
                                 <Label Text="Vehicle Type:" Grid.Row="3" Grid.Column="0"/>
 
-                                <Label Text="Current Location:" Grid.Row="4" Grid.Column="0"/>
+                                <!--<Label Text="Current Location:" Grid.Row="4" Grid.Column="0"/>-->
                                 <Label Text="District:" Grid.Row="5" Grid.Column="0"/>
                                 <Label Text="{Binding Mobile}" Grid.Row="1" Grid.Column="1"/>
 
                                 <Label Text="{Binding VehicleNo}" Grid.Row="2" Grid.Column="1"/>
                             <Label Text="{Binding VehicleType}" Grid.Row="3" Grid.Column="1"/>
-                                <Label Text="{Binding CurrentAddress}" Grid.Row="4" Grid.Column="1"/>
+                                <!--<Label Text="{Binding CurrentAddress}" Grid.Row="4" Grid.Column="1"/>-->
                                 <Label Text="{Binding District}" Grid.Row="5" Grid.Column="1"/>
                
                             

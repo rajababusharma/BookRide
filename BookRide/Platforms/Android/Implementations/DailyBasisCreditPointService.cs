@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BookRide.Platforms.Android.Implementations
@@ -20,85 +21,128 @@ namespace BookRide.Platforms.Android.Implementations
     public class DailyBasisCreditPointService : Service
     {
         CancellationTokenSource _cts;
-      
+        private bool isServiceRunning = false;
 
         RealtimeDatabaseService _db;
         public DailyBasisCreditPointService()
         {
             _db = new RealtimeDatabaseService();
-          
         }
 
         public override void OnCreate()
         {
             base.OnCreate();
             _cts = new CancellationTokenSource();
-
         }
 
         public override IBinder OnBind(Intent intent) => null;
+
         public override StartCommandResult OnStartCommand(
             Intent intent,
             StartCommandFlags flags,
             int startId)
         {
-           
+            // Must call StartForeground quickly after startForegroundService() to avoid ANR.
             StartForeground(1002, CreateNotification());
-            
-        //    _cts = new CancellationTokenSource();
-            //  _ = RunHourlyLocationAsync(_cts.Token);
-            _ = Task.Run(() => RunHourlyCreditPointAsync(intent, _cts.Token));
+
+            // If already running, nothing else to do.
+            if (isServiceRunning)
+            {
+                return StartCommandResult.Sticky;
+            }
+
+            // Mark as running immediately, then kick off background work.
+            isServiceRunning = true;
+
+            // Ensure we have a cancellation token source.
+            if (_cts == null || _cts.IsCancellationRequested)
+                _cts = new CancellationTokenSource();
+
+            // Run background loop without blocking the caller.
+            _ = Task.Run(async () =>
+            {
+              
+                await RunHourlyCreditPointAsync(intent, _cts.Token);
+               
+            });
+
             return StartCommandResult.Sticky;
         }
 
         async Task RunHourlyCreditPointAsync(Intent intent, CancellationToken token)
         {
             var id = intent?.GetStringExtra("USERID");
-            // if intent value is a model object use this
-             
-            // var json = intent?.GetStringExtra("USER");
-            //Users user = null;
-            //if (!string.IsNullOrEmpty(json))
-            //{
-            //    user = JsonSerializer.Deserialize<Users>(json);
-            //}
-          
+
             while (!token.IsCancellationRequested)
             {
                 try
                 {
-                                  
                     var user = await _db.GetAsync<Users>($"Users/{id}");
 
-                  //  await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
-                    if (user.CreditPoint>0)
+                    if (user == null)
+                    {
+                        // No user found — stop service gracefully.
+                        StopForeground(true);
+                        StopSelf();
+                        isServiceRunning = false;
+                        return;
+                    }
+
+                    if (user.CreditPoint > 0)
                     {
                         user.CreditPoint -= 1;
-                        // TODO: Save or upload user credit point
                         _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
-
                     }
                     else
                     {
-                       // stop service if credit point is zero
+                        // stop service if credit point is zero
+                        isServiceRunning = false;
                         StopForeground(true);
-                  
+                        StopSelf();
+                        return;
                     }
-
+                }
+                catch (System.OperationCanceledException)
+                {
+                    // Cancellation requested — exit cleanly.
+                    isServiceRunning = false;
+                    StopForeground(true);
+                    StopSelf();
+                    return;
                 }
                 catch (Exception ex)
                 {
-                   // Console.WriteLine(ex.Message);
+                    isServiceRunning = false;
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+
+                    // Stop to avoid repeated failures; caller can restart if needed.
+                    StopForeground(true);
+                    StopSelf();
+                    return;
                 }
 
-                await Task.Delay(TimeSpan.FromHours(Constants.Constants.CreditPointService_Timer), token);
+                // Wait for the configured interval or until cancelled.
+                try
+                {
+                    await Task.Delay(TimeSpan.FromHours(Constants.Constants.CreditPointService_Timer), token);
+                }
+                catch (System.OperationCanceledException ex)
+                {
+                    ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    // cancelled while waiting
+                    isServiceRunning = false;
+                    StopForeground(true);
+                    StopSelf();
+                    return;
+                }
             }
         }
 
         public override void OnDestroy()
         {
+            isServiceRunning = false;
             _cts?.Cancel();
             base.OnDestroy();
         }
@@ -125,9 +169,10 @@ namespace BookRide.Platforms.Android.Implementations
                 .SetOngoing(true)
                 .Build();
         }
+
         void StopService()
         {
-            _cts.Cancel();
+            _cts?.Cancel();
             StopForeground(true); // remove notification
             StopSelf();
         }

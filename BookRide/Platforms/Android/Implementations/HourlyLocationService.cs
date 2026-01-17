@@ -31,7 +31,8 @@ namespace BookRide.Platforms.Android.Implementations
         private readonly RealtimeDatabaseService _db;
        
         private ICurrentAddress? _currentAddress;
-
+        private string currentloc;
+        private bool isServiceRunning = false;
         // Public parameterless constructor required by Android runtime (resolves XA4213)
         public HourlyLocationService()
         {
@@ -39,11 +40,7 @@ namespace BookRide.Platforms.Android.Implementations
             _currentAddress=new CurrentAddressService();
           
         }
-        //public HourlyLocationService(ICurrentAddress currentAddress)
-        //{
-           
-        //   // _currentAddress = currentAddress;
-        //}
+     
         
         public override void OnCreate()
         {
@@ -58,20 +55,22 @@ namespace BookRide.Platforms.Android.Implementations
             StartCommandFlags flags,
             int startId)
         {
-            //if (intent?.Action == ACTION_STOP_LOCATION)
-            //{
-            //    StopService();
-            //    return StartCommandResult.NotSticky;
-            //}
-            StartForeground(1001, CreateNotification());
-          //  _cts = new CancellationTokenSource();
-     
-          //  _ = Task.Run(() => RunHourlyLocationAsync(intent, _cts.Token));
-          Task.Run(async() =>
-          { 
-              await RunHourlyLocationAsync(intent, _cts.Token); 
-          });
-
+           
+                StartForeground(1001, CreateNotification());
+            // If already running, nothing else to do.
+            if (isServiceRunning)
+            {
+                return StartCommandResult.Sticky;
+            }
+            isServiceRunning = true;
+            Task.Run(async () =>
+                {
+                   
+                        await RunHourlyLocationAsync(intent, _cts.Token);
+             
+                   
+                });
+            
             return StartCommandResult.Sticky;
         }
 
@@ -93,7 +92,7 @@ namespace BookRide.Platforms.Android.Implementations
                 {
                     var request = new GeolocationRequest(
                         GeolocationAccuracy.Medium,
-                        TimeSpan.FromSeconds(60));
+                        TimeSpan.FromSeconds(10));
 
                  
                     var user = await _db.GetAsync<Users>($"Users/{id}");
@@ -102,6 +101,7 @@ namespace BookRide.Platforms.Android.Implementations
                    // await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
                     if (user.CreditPoint > 0)
                     {
+                       
                         var location = await Geolocation.GetLocationAsync(request);
                         if (location != null)
                         {
@@ -115,26 +115,33 @@ namespace BookRide.Platforms.Android.Implementations
                                 var time = location?.Timestamp;
                                 var vertical = location?.VerticalAccuracy;
                                 var speed = location?.Speed;
-                                var course = location?.Course;             
-                                user.Latitude = lat;
-                                user.Longitude = lon;
-                                user.Altitude = alt;
-                                user.Accuracy = acc;
-                                user.Timestamp = DateTime.Now;
-                                user.Vertical = vertical;
-                                user.Speed = speed;
-                                user.Course = course;
+                                var course = location?.Course;
                                 try
                                 {
-                                    var currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
-                                    user.CurrentAddress = currentloc;
+                                    currentloc = await _currentAddress.GetCurrentAddressAsync(lat, lon);
+                                  
                                 }
                                 catch (System.Exception ex)
                                 {
-                                    user.CurrentAddress = null;
+                                    currentloc = null;
                                 }
+                                User_Location user_Location = new User_Location
+                                {
+                                    UserId = id,
+                                    Latitude = lat,
+                                    Longitude = lon,
+                                    Altitude = alt,
+                                    Accuracy = acc,
+                                    Timestamp = DateTime.Now,
+                                    Vertical = vertical,
+                                    Speed = speed,
+                                    Course = course,
+                                    CurrentAddress = currentloc
+
+                                };
+                                
                                 // TODO: Save or upload location
-                                _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
+                                _ = _db.SaveAsync<User_Location>($"Users_Location/{user.UserId}", user_Location);
                                 
                                
                             }
@@ -142,6 +149,7 @@ namespace BookRide.Platforms.Android.Implementations
                     }
                     else
                     {
+                        isServiceRunning = false;
                         // stop service if credit point is zero
                         StopForeground(true);
                         StopSelf();
@@ -150,21 +158,45 @@ namespace BookRide.Platforms.Android.Implementations
                     }
                    
                 }
+                catch (System.OperationCanceledException ex)
+                {
+                    ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    // Cancellation requested — exit cleanly.
+                    isServiceRunning = false;
+                    StopForeground(true);
+                    StopSelf();
+                    return;
+                }
                 catch (System.Exception ex)
                 {
-                   // Console.WriteLine(ex.Message);
+                    isServiceRunning = false;
+                    // Console.WriteLine(ex.Message);
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
                 }
-
+                try
+                { 
                 await Task.Delay(TimeSpan.FromMinutes(Constants.Constants.LocationService_Timer), token);
+                }
+                catch (System.OperationCanceledException ex)
+                {
+                    ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    // cancelled while waiting
+                    isServiceRunning = false;
+                StopForeground(true);
+                StopSelf();
+                return;
             }
+        }
         }
 
 
         public override IBinder OnBind(Intent intent) => null;
         public override void OnDestroy()
         {
+            isServiceRunning = false;
             _cts?.Cancel();
             base.OnDestroy();
         }

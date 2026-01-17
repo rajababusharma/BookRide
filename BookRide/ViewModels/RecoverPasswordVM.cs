@@ -131,7 +131,7 @@ namespace BookRide.ViewModels
             }   
            
             Users.Password = Password;
-            await _db.SaveAsync($"Users/{Users.UserId}", Users);
+            await _db.SaveAsync<Users>($"Users/{Users.UserId}", Users);
             await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
             IsBusy = false;
             await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page

@@ -98,7 +98,7 @@
   </PropertyGroup>
   <PropertyGroup>
     <TargetFrameworks>net8.0-android;net8.0-ios</TargetFrameworks>
-    <AndroidTargetSdkVersion>34</AndroidTargetSdkVersion>
+    <AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>
     <AndroidMinSdkVersion>28</AndroidMinSdkVersion>
   </PropertyGroup>
 
