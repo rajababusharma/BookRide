@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace BookRide.Models
 {
+    [Serializable]
     public class User_Location
     {
         public string UserId { get; set; }

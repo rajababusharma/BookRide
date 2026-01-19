@@ -61,7 +61,6 @@ namespace BookRide
 
             // Register Services
 
-            builder.Services.AddSingleton<IUsers, UserService>();
             builder.Services.AddTransient<IWhatsAppConnect, WhatsappConnectService>();
             builder.Services.AddSingleton<INetworkService, NetworkService>();
             builder.Services.AddSingleton<ICurrentAddress, CurrentAddressService>();

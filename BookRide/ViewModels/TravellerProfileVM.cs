@@ -152,28 +152,42 @@ namespace BookRide.ViewModels
                 if (string.IsNullOrEmpty(district))
 
                 {
-                    Task.Run(async () =>
-                    {
-                        var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
-                        {
-                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.IsActive && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
-                            return new ObservableCollection<Users>(userList);
-                        });
+                    //Task.Run(async () =>
+                    //{
+                    //    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    //    {
+                    //        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.IsActive && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
+                    //        return new ObservableCollection<Users>(userList);
+                    //    });
 
-                        UsersList = await GetLocationsWithinRadiusAsync(users);
-                    }).GetAwaiter().GetResult();
+                    //    UsersList = await GetLocationsWithinRadiusAsync(users);
+                    //}).GetAwaiter().GetResult();
+                    ObservableCollection<Users> lists = new ObservableCollection<Users>();
+                    var users = await _db.GetAllAsync<Users>("Users");
+                    foreach (var item in users)
+                        lists.Add(item.Value);
+
+                    var filteredUsers = lists.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
+                    UsersList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Users>(filteredUsers));
                 }
                 else
                 {
-                    Task.Run(async () =>
-                    {
-                        var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
-                        {
-                            var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
-                            return new ObservableCollection<Users>(userList);
-                        });
-                        UsersList = await GetLocationsWithinRadiusAsync(users);
-                    }).GetAwaiter().GetResult();
+                    //Task.Run(async () =>
+                    //{
+                    //    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    //    {
+                    //        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
+                    //        return new ObservableCollection<Users>(userList);
+                    //    });
+                    //    UsersList = await GetLocationsWithinRadiusAsync(users);
+                    //}).GetAwaiter().GetResult();
+                    ObservableCollection<Users> lists = new ObservableCollection<Users>();
+                    var users = await _db.GetAllAsync<Users>("Users");
+                    foreach (var item in users)
+                        lists.Add(item.Value);
+
+                    var filteredUsers = lists.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
+                    UsersList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Users>(filteredUsers));
                 }
 
                 IsBusy = false;
