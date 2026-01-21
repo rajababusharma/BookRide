@@ -95,7 +95,7 @@ namespace BookRide.Platforms.Android.Implementations
                         TimeSpan.FromSeconds(10));
 
                  
-                    var user = await _db.GetAsync<Users>($"Users/{id}");
+                    var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
 
                     // 
                    // await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
@@ -125,7 +125,7 @@ namespace BookRide.Platforms.Android.Implementations
                                 {
                                     currentloc = null;
                                 }
-                                User_Location user_Location = new User_Location
+                                Drivers_Location drivers_Location = new Drivers_Location
                                 {
                                     UserId = id,
                                     Latitude = lat,
@@ -141,7 +141,7 @@ namespace BookRide.Platforms.Android.Implementations
                                 };
                                 
                                 // TODO: Save or upload location
-                                _ = _db.SaveAsync<User_Location>($"Users_Location/{user.UserId}", user_Location);
+                                _ = _db.SaveAsync<Drivers_Location>($"Drivers_Location/{user.UserId}", drivers_Location);
                                 
                                
                             }

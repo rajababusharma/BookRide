@@ -46,7 +46,7 @@ namespace BookRide.ViewModels
         //[ObservableProperty] private string drivingLicense;
 
         [ObservableProperty] private string userType;
-        [ObservableProperty] private int creditPoint = 30;
+        [ObservableProperty] private int creditPoint = 61;
         [ObservableProperty] private string userType_para;
 
         [ObservableProperty] private string errorMessage;
@@ -56,9 +56,10 @@ namespace BookRide.ViewModels
 
         [ObservableProperty] private string selectedDistrict;
         [ObservableProperty] private string aadharImagePath;
-        [ObservableProperty] private string aadharImageURL; 
-       // private string aadharImageURL;
-      
+        [ObservableProperty] private string aadharImageURL;
+        [ObservableProperty] private string profileImageUrl;
+        // private string aadharImageURL;
+
 
         private readonly INetworkService _networkService;
 
@@ -103,8 +104,6 @@ namespace BookRide.ViewModels
             }
             ErrorMessage = string.Empty;
 
-            if(UserType_para=="Driver")
-            {
                 if (string.IsNullOrWhiteSpace(FirstName) ||
                 string.IsNullOrWhiteSpace(Age) ||
                 string.IsNullOrWhiteSpace(Address) ||
@@ -117,19 +116,7 @@ namespace BookRide.ViewModels
                     IsBusy = false;
                     return;
                 }
-            }
-            else
-            {
-                if (string.IsNullOrWhiteSpace(FirstName) ||
-               string.IsNullOrWhiteSpace(Age) ||
-               string.IsNullOrWhiteSpace(Address) ||
-               string.IsNullOrWhiteSpace(Mobile))
-                {
-                    ErrorMessage = "All fields are required";
-                    IsBusy = false;
-                    return;
-                }
-            }
+    
 
            
 
@@ -145,39 +132,40 @@ namespace BookRide.ViewModels
             try
             {
 
-                var users = new Users
-                { FirstName = FirstName, Age = int.Parse(Age), Address = Address, Mobile = Mobile, 
-                    Password = Password, VehicleNo = VehicleNo,
-                    UserType = UserType_para, CreditPoint = CreditPoint, 
-                    UserId=Mobile, VehicleType=SelectedVehicle,
-                    District =SelectedDistrict,
-                    RegistrationDate=DateTime.Now,
-                AadharImageURL= AadharImageURL};
-           
-                await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
-                await Shell.Current.DisplayAlert(
-                    "Success",
-                    "Registration completed successfully",
-                    "OK");
-                IsBusy = false;
-
-                // start forground service to decrease credit point for driver daily and to update location
-                if (UserType_para == "Driver")
-                 {
-                    
+                    var drivers = new Drivers
+                    {
+                        FirstName = FirstName,
+                        Age = int.Parse(Age),
+                        Address = Address,
+                        Mobile = Mobile,
+                        Password = Password,
+                        VehicleNo = VehicleNo,
+                        CreditPoint = CreditPoint,
+                        UserId = Mobile,
+                        VehicleType = SelectedVehicle,
+                        District = SelectedDistrict,
+                        RegistrationDate = DateTime.Now,
+                        AadharImageURL = AadharImageURL,
+                        ProfileImageUrl = ProfileImageUrl
+                    };
+                    await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+                    await Shell.Current.DisplayAlert(
+                        "Success",
+                        "Registration completed successfully",
+                        "OK");
                     try
-                      {
+                    {
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
-                        intent_loc.PutExtra("USERID", users.UserId);
-                       // intent_loc.PutExtra("ISSERVICE1", System.Text.Json.JsonSerializer.Serialize(users));
-                       
+                        intent_loc.PutExtra("USERID", drivers.UserId);
+                        // intent_loc.PutExtra("ISSERVICE1", System.Text.Json.JsonSerializer.Serialize(users));
+
                         Application.Context.StartForegroundService(intent_loc);
 #endif
 
 #if ANDROID
                         var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
-                        intent_credit.PutExtra("USERID", users.UserId);
+                        intent_credit.PutExtra("USERID", drivers.UserId);
                         Application.Context.StartForegroundService(intent_credit);
 #endif
                         // await LocationPermissionHelper.HasPermissionsAsync();
@@ -187,11 +175,16 @@ namespace BookRide.ViewModels
 
                     }
                     catch (Exception ex)
-                      {
-                            // Handle exceptions related to starting the service
-                          //  System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
-                      }
-                }
+                    {
+                        // Handle exceptions related to starting the service
+                        //  System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                    }
+                
+
+                IsBusy = false;
+
+                // start forground service to decrease credit point for driver daily and to update location
+
                
 
                 //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
@@ -225,22 +218,11 @@ namespace BookRide.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            if (query.TryGetValue("UserType", out var userTypes))
+            
+            if (query.TryGetValue("DRIVERS", out var usr))
             {
-                UserType_para = userTypes as string;
-                if(UserType_para=="Driver")
-                {
-                    IsDriver = true;
-                }
-                else
-                {
-                    IsDriver = false;
-                }
-                   
-            }
-            if (query.TryGetValue("USER", out var usr))
-            {
-                Users user = usr as Users;
+                Drivers user = usr as Drivers;
+
                 Mobile = user.Mobile;
                 FirstName = user.FirstName;
                 Age = user.Age.ToString();
@@ -248,20 +230,12 @@ namespace BookRide.ViewModels
                 VehicleNo = user.VehicleNo;
                 SelectedDistrict = user.District;
                 SelectedVehicle = user.VehicleType;
-                UserType= user.UserType;
                 Password = user.Password;
                 ConfirmPassword= user.Password;
-                UserType_para =user.UserType;
                 AadharImagePath= user.AadharImageURL;
                 AadharImageURL = user.AadharImageURL;
-                if (UserType_para == "Driver")
-                {
-                    IsDriver = true;
-                }
-                else
-                {
-                    IsDriver = false;
-                }
+                CreditPoint = user.CreditPoint;
+                ProfileImageUrl= user.ProfileImageUrl;
             }
         }
 

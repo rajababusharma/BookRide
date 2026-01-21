@@ -1,6 +1,7 @@
 ﻿using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
+using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -23,7 +24,7 @@ namespace BookRide.ViewModels
         private bool isBusy;
 
         [ObservableProperty]
-        public ObservableCollection<Users> usersList = new();
+        public ObservableCollection<Drivers> driversList = new();
 
         [ObservableProperty]
         public Users user;
@@ -148,27 +149,38 @@ namespace BookRide.ViewModels
             }
             try
                 {
-                UsersList.Clear();
+                DriversList.Clear();
                 if (string.IsNullOrEmpty(district))
 
                 {
                     //Task.Run(async () =>
                     //{
-                    //    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
+                    //    var drivers = await _db.GetAllAsync<Drivers>("Drivers").ContinueWith(t =>
                     //    {
-                    //        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.IsActive && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
-                    //        return new ObservableCollection<Users>(userList);
+                    //        var userList = t.Result.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
+                    //        return new ObservableCollection<Drivers>(userList);
                     //    });
 
-                    //    UsersList = await GetLocationsWithinRadiusAsync(users);
+                    //    DriversList = await GetLocationsWithinRadiusAsync(drivers);
                     //}).GetAwaiter().GetResult();
-                    ObservableCollection<Users> lists = new ObservableCollection<Users>();
-                    var users = await _db.GetAllAsync<Users>("Users");
-                    foreach (var item in users)
-                        lists.Add(item.Value);
 
-                    var filteredUsers = lists.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()));
-                    UsersList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Users>(filteredUsers));
+                    Task.Run(async () =>
+                    {
+                        ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
+                        var drivers = await _db.GetAllAsync<Drivers>("Drivers");
+                        if (drivers == null)
+                        {
+                            IsBusy = false;
+                            return;
+                        }
+                        foreach (var item in drivers)
+                            lists.Add(item.Value);
+
+                        var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
+                        DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
+                    });
+
+                  
                 }
                 else
                 {
@@ -181,13 +193,19 @@ namespace BookRide.ViewModels
                     //    });
                     //    UsersList = await GetLocationsWithinRadiusAsync(users);
                     //}).GetAwaiter().GetResult();
-                    ObservableCollection<Users> lists = new ObservableCollection<Users>();
-                    var users = await _db.GetAllAsync<Users>("Users");
+                    ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
+                    var users = await _db.GetAllAsync<Drivers>("Drivers");
+                    //check drivers list is null
+                    if (users == null)
+                    {
+                        IsBusy = false;
+                        return;
+                    }
                     foreach (var item in users)
                         lists.Add(item.Value);
 
-                    var filteredUsers = lists.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
-                    UsersList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Users>(filteredUsers));
+                    var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive && x.District.Equals(district));
+                    DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
                 }
 
                 IsBusy = false;
@@ -206,14 +224,14 @@ namespace BookRide.ViewModels
           
         }
 
-        public async Task<ObservableCollection<Users>> GetLocationsWithinRadiusAsync(ObservableCollection<Users> users)
+        public async Task<ObservableCollection<Drivers>> GetLocationsWithinRadiusAsync(ObservableCollection<Drivers> drivers)
         {
             try
             {
                  
                     if (currentLocation == null)
                     {
-                        return users;
+                        return drivers;
                     }
 
 
@@ -221,10 +239,10 @@ namespace BookRide.ViewModels
 
                   
 
-                foreach (var usr in users)
+                foreach (var usr in drivers)
                     {
-                    // fetch user location from User_Location nodel
-                    var _userLocation = await _db.GetAsync<User_Location>("User_Location/" + usr.UserId);
+                    // fetch user location from Drivers_Location nodel
+                    var _userLocation = await _db.GetAsync<Drivers_Location>("Drivers_Location/" + usr.UserId);
                     if (_userLocation.Latitude != null && _userLocation.Longitude!=null)
                         {
                         var lat = _userLocation.Latitude;
@@ -251,16 +269,16 @@ namespace BookRide.ViewModels
                         double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
                             if (distance <= radiusKm)
                             {
-                                UsersList.Add(usr);
+                            DriversList.Add(usr);
                             }
                          }
                         else
                         {
-                        UsersList.Add(usr);
+                        DriversList.Add(usr);
                         }
                     }
 
-                    return UsersList;
+                    return DriversList;
                 
             }
             catch (Exception ex)
@@ -268,7 +286,7 @@ namespace BookRide.ViewModels
                 // Handle exceptions related to geolocation
                // Console.WriteLine($"Error obtaining location: {ex.Message}");
                
-                return users; // Return the original list if location cannot be obtained
+                return drivers; // Return the original list if location cannot be obtained
 
             }
            
@@ -276,6 +294,18 @@ namespace BookRide.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Users;
+        }
+
+        [RelayCommand]
+        public async Task UpdateProfileAsync()
+        {
+
+            var navigationParameter = new Dictionary<string, object>
+                    {
+                        { "USERS", User }
+                    };
+            await Shell.Current.GoToAsync(nameof(UserRegistrationPage), navigationParameter);
+
         }
     }
 }

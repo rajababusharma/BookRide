@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Android.Views.ContentCaptures;
+
 
 #if ANDROID
 using Android.Content;
@@ -34,6 +36,9 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         private string errorMessage;
 
+        [ObservableProperty]
+        private string selectedUserType;
+
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
         public bool IsNotBusy => !IsBusy;
 
@@ -48,14 +53,14 @@ namespace BookRide.ViewModels
 
 
         }
-        public async Task StartTracking(Users users)
+        public async Task StartTracking(string userid)
         {
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             try
             {
                
                     // start forground service to decrease credit point for driver daily and to update location
-                    if (users.UserType == "Driver")
+                    if (SelectedUserType.Equals(eNum.eNumUserType.Driver.ToString()))
                     {
                         try
                         {
@@ -63,13 +68,13 @@ namespace BookRide.ViewModels
                         //_foregroundService.Start(users.Mobile);
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
-                        intent_loc.PutExtra("USERID", users.UserId);
+                        intent_loc.PutExtra("USERID", userid);
                         Application.Context.StartForegroundService(intent_loc);
 #endif
 
 #if ANDROID
                         var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
-                        intent_credit.PutExtra("USERID", users.UserId);
+                        intent_credit.PutExtra("USERID", userid);
                         Application.Context.StartForegroundService(intent_credit);
 #endif
 
@@ -107,6 +112,13 @@ namespace BookRide.ViewModels
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(SelectedUserType))
+            {
+                ErrorMessage = "Please select user type";
+                IsBusy = false;
+                return;
+            }
+
             try
             {
                 if (string.IsNullOrWhiteSpace(Username) ||
@@ -116,51 +128,69 @@ namespace BookRide.ViewModels
                     IsBusy = false;
                     return;
                 }
-
-                var usr = await _db.GetAsync<Users>($"Users/{Username}");
-                if (usr != null)
+              
+                if(SelectedUserType.Equals(eNumUserType.Driver.ToString()))
                 {
-
-                    if (Username != usr.UserId || Password != usr.Password)
+                    var drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
+                    if (drs != null)
                     {
-                        ErrorMessage = "Invalid username or password";
-                        IsBusy = false;
-                        return;
-                    }
-                    else
-                    {
-                       
 
-                        if (usr.UserType.Equals(eNumUserType.Driver.ToString()))
+                        if (Username != drs.UserId || Password != drs.Password)
                         {
-                            await LocationPermissionHelper.HasPermissionsAsync();
-                            // starting a location tracking service
-                            await StartTracking(usr);
-
-                            await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
-                        {
-                            { "CurrentUser", usr }
-                        });
-                        }
-                        else if (usr.UserType.Equals(eNumUserType.Traveler.ToString()))
-                        {
-                            await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
-                        {
-                            { "CurrentUser", usr }
-                        });
+                            ErrorMessage = "Invalid username or password";
+                            IsBusy = false;
+                            return;
                         }
                         else
                         {
-                            ErrorMessage = "Unknown user type";
+                            await LocationPermissionHelper.HasPermissionsAsync();
+                            // starting a location tracking service
+                            await StartTracking(drs.UserId);
+
+                            await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
+                            {
+                                { "CurrentUser", drs }
+                            });
                         }
+                    }
+                    else
+                    {
+                        ErrorMessage = "User does not exist.";
+                        IsBusy = false;
+                        return;
                     }
                 }
                 else
                 {
-                    ErrorMessage = "User does not exist.";
-                    IsBusy = false;
-                    return;
+                    var usr = await _db.GetAsync<Users>($"Users/{Username}");
+                    if (usr != null)
+                    {
+
+                        if (Username != usr.UserId || Password != usr.Password)
+                        {
+                            ErrorMessage = "Invalid username or password";
+                            IsBusy = false;
+                            return;
+                        }
+                        else
+                        {
+
+                                await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                                {
+                                    { "CurrentUser", usr }
+                                });
+
+                        }
+                    }
+                    else
+                    {
+                        ErrorMessage = "User does not exist.";
+                        IsBusy = false;
+                        return;
+                    }
                 }
+               
+               
 
                 // Navigate to home page
                 IsBusy = false;
@@ -178,14 +208,6 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
-            IsBusy = true;
-            ErrorMessage = string.Empty;
-
-            await Task.Delay(1500); // simulate API call
-
-            // Navigate to terms and conditions page
-            IsBusy = false;
-           // await Shell.Current.GoToAsync(nameof(RegisterPage));
             await Shell.Current.GoToAsync(nameof(TermsConditionsPage));
         }
 

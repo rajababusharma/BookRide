@@ -22,15 +22,19 @@
         
 
         <VerticalStackLayout Spacing="5">
-      
+
             <Border Margin="5" Stroke="Black" StrokeThickness="2"    StrokeShape="RoundRectangle 15" HeightRequest="120" WidthRequest="120">
-            <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center"></Image>
+                <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AddProfilePhotoCommand}"></TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>
             </Border>
-            <Label  FontSize="Medium" Text="{Binding IsActive}" TextColor="{Binding IsActive, Converter={StaticResource StatusColorConverter}}"   HorizontalTextAlignment="Center">
-            </Label>
+
+
             <Label  FontSize="Title" Text="{Binding User.FirstName}" FontAttributes="Bold" HorizontalTextAlignment="Center">
         </Label>
-        <Button Text="Edit Photo" FontSize="Small" Command="{Binding AddProfilePhotoCommand}" HorizontalOptions="Center"></Button>
+      
         <Label HorizontalOptions="Center" FontAttributes="Bold">
                 <Label.FormattedText>
                     <FormattedString>
@@ -40,35 +44,34 @@
                     </FormattedString>
                 </Label.FormattedText>
             </Label>
+            <Label  FontSize="Medium" Text="{Binding IsActive}" TextColor="{Binding IsActive, Converter={StaticResource StatusColorConverter}}"   HorizontalTextAlignment="Center">
+            </Label>
+            <Label FontAttributes="Bold" Margin="20,0,0,0" FontSize="18">
+                <Label.FormattedText>
+                    <FormattedString>
+                        <Span Text="Address: "   FontAttributes="Bold"/>
+                        <!-- Binds to the property and displays the value in a different span -->
+                        <Span Text="{Binding User.Address} "  />
+                        <Span Text="{Binding User.District}"  />
+                       
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
+            <Label FontAttributes="Bold" Margin="20,0,0,0" FontSize="18">
+                <Label.FormattedText>
+                    <FormattedString>
+                       
+                        <Span Text="Contact Number: "  FontAttributes="Bold" />
+                        <Span Text="+91 "  FontAttributes="Bold" />
+                        <Span Text="{Binding User.Mobile}"  />
+                    </FormattedString>
+                </Label.FormattedText>
+            </Label>
             <!-- Loading Indicator -->
             <ActivityIndicator
 IsRunning="{Binding IsBusy}"
 IsVisible="{Binding IsBusy}" />
-            <Border Stroke="Gray" StrokeThickness="1" Margin="0,20,0,0"   StrokeShape="RoundRectangle 10" >
-            <Grid Margin="20,20,0,10" RowSpacing="20">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                    <RowDefinition Height="*"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <Label FontAttributes="Bold" Text="Phone Number:" Grid.Row="0" Grid.Column="0"/>
-                <Label FontAttributes="Bold" Text="Address:" Grid.Row="2" Grid.Column="0"/>
-                <Label FontAttributes="Bold" Text="District:" Grid.Row="3" Grid.Column="0"/>
-              
-                <Label FontAttributes="Bold" Text="{Binding User.Mobile}"  Grid.Row="0" Grid.Column="1"/>
-
-                <Label FontAttributes="Bold" Text="{Binding User.Address}" Grid.Row="2" Grid.Column="1"/>
-                <Label FontAttributes="Bold" Text="{Binding User.District}" Grid.Row="3" Grid.Column="1"/>
-               
-            </Grid>
-        </Border>
+           
 
             <!--<Button Text="Update Address" FontSize="Small" Command="{Binding OpenPopupCommand}"></Button>-->
             <Button IsVisible="{Binding IsVisible}" Text="Recharge Credit Points" Command="{Binding AddCreditCommand}"></Button>

@@ -16,27 +16,27 @@ namespace BookRide.ViewModels
         private async Task DriverAsync()
         {
             // Navigate to Driver Registration Page
-            //  await Shell.Current.GoToAsync(nameof(DriverRegistration));
+              await Shell.Current.GoToAsync(nameof(DriverRegistration));
 
-            string userType = "Driver";
-            // await Shell.Current.GoToAsync($"DriverRegistration?UserType={UserType}");
-            await Shell.Current.GoToAsync(nameof(DriverRegistration),
-                    new Dictionary<string, object>
-                    {
-                        ["UserType"] = userType
-                    });
+            //string userType = "Driver";
+           
+            //await Shell.Current.GoToAsync(nameof(DriverRegistration),
+            //        new Dictionary<string, object>
+            //        {
+            //            ["UserType"] = userType
+            //        });
         }
         [RelayCommand]
         private async Task TravellerAsync()
         {
             // Navigate to Traveler Registration Page
-         // await Shell.Current.GoToAsync(nameof(DriverRegistration));userType
-            string userType = "Traveler";
-            await Shell.Current.GoToAsync(nameof(DriverRegistration),
-                    new Dictionary<string, object>
-                    {
-                        ["UserType"] = userType
-                    });
+          await Shell.Current.GoToAsync(nameof(UserRegistrationPage));
+            //string userType = "Traveler";
+            //await Shell.Current.GoToAsync(nameof(DriverRegistration),
+            //        new Dictionary<string, object>
+            //        {
+            //            ["UserType"] = userType
+            //        });
         }
 
     }

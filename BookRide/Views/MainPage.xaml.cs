@@ -38,6 +38,19 @@ namespace BookRide
             }
         }
 
+        private void RadioButton_CheckedChanged(object sender, CheckedChangedEventArgs e)
+        {
+            if (e.Value)
+            {
+                var selected = (sender as RadioButton)?.Content.ToString();
+               // DisplayAlert("Selected", selected, "OK");
+               var viewModel = BindingContext as MainPageViewModel;
+                if (viewModel != null)
+                {
+                    viewModel.SelectedUserType = selected;
+                }
+            }
+        }
     }
 
 }

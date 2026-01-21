@@ -20,7 +20,7 @@ namespace BookRide.ViewModels
     {
 
         [ObservableProperty]
-        public Users user;
+        public Drivers user;
 
         [ObservableProperty]
         public bool isVisible;
@@ -68,51 +68,56 @@ namespace BookRide.ViewModels
 
         }
 
-        public async void ApplyQueryAttributes(IDictionary<string, object> query)
+        public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            User = query["CurrentUser"] as Users;
-            ProfileImageUrl = User.ProfileImageUrl;
+            User = query["CurrentUser"] as Drivers;
 
-            // check if profile image is null or empty
-            if (string.IsNullOrEmpty(ProfileImageUrl))
-            {
-                ProfileImageUrl = "person.png";
-            }
+            Task.Run(async () => {
+                ProfileImageUrl = User.ProfileImageUrl;
 
-            // check if user is active
-            if (User.IsActive && User.CreditPoint > 0)
-            {
-                IsActive = "Active";
-                IsVisible = false;
-            }
-            else if (User.CreditPoint == 0)
-            {
-                // update IsActive info in the users profile
-                User.IsActive = false;
-                IsVisible = true;
-                await _db.SaveAsync<Users>($"Users/{User.UserId}", User);
-                IsActive = "Deactivated";
-               await Shell.Current.DisplayAlert(
-                   "Info",
-                    $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-                   "OK");
-            }
-            else if (!User.IsActive)
-            {
-                IsActive = "Deactivated";
-               await Shell.Current.DisplayAlert(
-                   "Info",
-                    $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                   "OK");
-            }
-            else
-            {
-                IsActive = "Deactivated";
-               await Shell.Current.DisplayAlert(
-                   "Info",
-                    $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                   "OK");
-            }
+                // check if profile image is null or empty
+                if (string.IsNullOrEmpty(ProfileImageUrl))
+                {
+                    ProfileImageUrl = "person.png";
+                }
+
+                // check if user is active
+                if (User.IsActive && User.CreditPoint > 0)
+                {
+                    IsActive = "Active";
+                    IsVisible = false;
+                }
+                else if (User.CreditPoint == 0)
+                {
+                    // update IsActive info in the users profile
+                    User.IsActive = false;
+                    IsVisible = true;
+                    await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
+                    IsActive = "Deactivated";
+                    await Shell.Current.DisplayAlert(
+                        "Info",
+                         $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
+                        "OK");
+                }
+                else if (!User.IsActive)
+                {
+                    IsActive = "Deactivated";
+                    await Shell.Current.DisplayAlert(
+                        "Info",
+                         $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                        "OK");
+                }
+                else
+                {
+                    IsActive = "Deactivated";
+                    await Shell.Current.DisplayAlert(
+                        "Info",
+                         $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                        "OK");
+                }
+            });
+
+           
 
         }
 
@@ -135,7 +140,7 @@ namespace BookRide.ViewModels
                     ProfileImageUrl = imageUrl;
                 });
                
-                await _db.SaveAsync<Users>($"Users/{User.UserId}", User);
+                await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
               //  await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
 
                IsBusy = false;
@@ -153,7 +158,7 @@ namespace BookRide.ViewModels
 
             var navigationParameter = new Dictionary<string, object>
                     {
-                        { "USER", User }
+                        { "DRIVERS", User }
                     };
             await Shell.Current.GoToAsync(nameof(DriverRegistration), navigationParameter);
 

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             x:Class="BookRide.Views.UserRegistrationPage"
+             Title="Register Here">
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior 
+         IsVisible="False" 
+         IsEnabled="False" />
+    </Shell.BackButtonBehavior>
+    <ScrollView>
+        <VerticalStackLayout
+         Padding="24"
+         Spacing="16">
+
+            <!-- Header -->
+            <Label
+             Text="Create Account"
+             FontSize="28"
+             FontAttributes="Bold"
+             HorizontalOptions="Center" />
+
+            <Label
+             Text="Please fill the details below"
+             FontSize="14"
+             HorizontalOptions="Center" />
+
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <!-- First Name -->
+                <Entry
+             Placeholder="Name as per Aadhar" ClearButtonVisibility="WhileEditing"
+             Text="{Binding FirstName}" />
+            </Border>
+
+            <!-- Age -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry
+             Placeholder="Age" ClearButtonVisibility="WhileEditing"
+             Text="{Binding Age}"
+             Keyboard="Numeric" />
+            </Border>
+            <!-- Full Address -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Editor
+             Placeholder="Full Address"
+             Text="{Binding Address}"
+             AutoSize="TextChanges"
+             HeightRequest="100" />
+            </Border>
+
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Picker
+    Title="Select District"  SelectedItem="{Binding SelectedDistrict}"
+    ItemsSource="{Binding Districts}" />
+            </Border>
+
+           
+          
+            <!-- Mobile -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry ClearButtonVisibility="WhileEditing"
+                    Placeholder="Mobile Number"
+                    Text="{Binding Mobile}"
+                    Keyboard="Numeric"
+                    MaxLength="10">
+                    <Entry.Behaviors>
+                        <toolkit:TextValidationBehavior
+                            x:Name="PhoneNumberValidator"
+                            RegexPattern="^\d{10}$"
+                            Flags="ValidateOnValueChanged"
+                            InvalidStyle="{StaticResource InvalidEntryStyle}"
+                            ValidStyle="{StaticResource ValidEntryStyle}" />
+                    </Entry.Behaviors>
+                </Entry>
+            </Border>
+            <!-- Password -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry ClearButtonVisibility="WhileEditing"
+             Placeholder="Password"
+             Text="{Binding Password}"
+             IsPassword="True" />
+            </Border>
+            <!-- Confirm Password -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry ClearButtonVisibility="WhileEditing"
+             Placeholder="Confirm Password"
+             Text="{Binding ConfirmPassword}"
+             IsPassword="True" />
+            </Border>
+            <!-- Validation Message -->
+            <Label
+    Text="{Binding ErrorMessage}"
+    TextColor="Red"
+   
+    FontSize="13" />
+
+            <!-- Loading Indicator -->
+            <ActivityIndicator
+IsRunning="{Binding IsBusy}"
+IsVisible="{Binding IsBusy}"
+Color="#0066CC" />
+
+            <!-- Register Button -->
+            <Button
+             Text="Update/Register"
+             Command="{Binding RegisterCommand}"
+             BackgroundColor="#0066CC"
+             TextColor="White"
+             CornerRadius="8" />
+
+
+
+            <!-- Login Link -->
+            <Label
+             Text="Already have an account? Login"
+             TextColor="#0066CC"
+             HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+                     Command="{Binding GoToLoginCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

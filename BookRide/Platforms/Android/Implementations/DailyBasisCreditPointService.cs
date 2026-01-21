@@ -77,7 +77,7 @@ namespace BookRide.Platforms.Android.Implementations
             {
                 try
                 {
-                    var user = await _db.GetAsync<Users>($"Users/{id}");
+                    var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
 
                     if (user == null)
                     {
@@ -91,7 +91,7 @@ namespace BookRide.Platforms.Android.Implementations
                     if (user.CreditPoint > 0)
                     {
                         user.CreditPoint -= 1;
-                        _ = _db.SaveAsync<Users>($"Users/{user.UserId}", user);
+                        _ = _db.SaveAsync<Drivers>($"Drivers/{user.UserId}", user);
                     }
                     else
                     {

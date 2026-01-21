@@ -60,39 +60,16 @@ StrokeShape="RoundRectangle 12">
     ItemsSource="{Binding Districts}" />
             </Border>
             <!-- vehical -->
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Entry ClearButtonVisibility="WhileEditing"
-  Placeholder="VehicleNo" IsVisible="{Binding IsDriver}"
-  Text="{Binding VehicleNo}" /> 
+  Placeholder="VehicleNo"
+  Text="{Binding VehicleNo}" />
             </Border>
-            <!-- Aadhar --><!--
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
-StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
-Placeholder="Aadhar No" IsVisible="{Binding IsDriver}" Keyboard="Numeric" MaxLength="12"
-Text="{Binding AadharCard}">
-                    <Entry.Behaviors>
-                        <toolkit:TextValidationBehavior
-         x:Name="AadharNumberValidator"
-         RegexPattern="^\d{12}$"
-         Flags="ValidateOnValueChanged"
-         InvalidStyle="{StaticResource InvalidEntryStyle}"
-         ValidStyle="{StaticResource ValidEntryStyle}" />
-                    </Entry.Behaviors>
-                </Entry>
-            </Border>-->
-            <!-- Driving License -->
-            <!--<Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
-StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
-Placeholder="Driving License" IsVisible="{Binding IsDriver}"
-Text="{Binding DrivingLicense}"/>
-            </Border>-->
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5" IsVisible="{Binding IsDriver}"
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5" 
 StrokeShape="RoundRectangle 12">
                 <!-- Vehical Type -->
-                <Picker IsVisible="{Binding IsDriver}"  SelectedItem="{Binding SelectedVehicle}"  Title="Select a vehicle">>
+                <Picker SelectedItem="{Binding SelectedVehicle}"  Title="Select a vehicle">>
                     <Picker.ItemsSource>
                         <x:Array Type="{x:Type x:String}">
                             <x:String>Car</x:String>
@@ -146,19 +123,19 @@ StrokeShape="RoundRectangle 12">
              TextColor="Red"
              IsVisible="{Binding HasError}"
              FontSize="13" />-->
-            <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"  IsVisible="{Binding IsDriver}"/>
+            <Label Text="Upload Documents" FontSize="16" FontAttributes="Bold" HorizontalOptions="Center"/>
             <!--<Aadhar Card Upload -->
 
-            <Button IsVisible="{Binding IsDriver}" Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}" BackgroundColor="DarkGrey" CornerRadius="8"></Button>
-            <Border StrokeThickness="1" Stroke="Gray" Padding="5"  IsVisible="{Binding IsDriver}"
+            <Button Text="Browse Aadhar Card" Command="{Binding UploadPhotoCommand}" BackgroundColor="DarkGrey" CornerRadius="8"></Button>
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry IsVisible="{Binding IsDriver}"
+                <Entry
                     Text="{Binding AadharImagePath}"
                     IsReadOnly="True"
                     HorizontalOptions="Fill" />
 
             </Border>
-            <Image IsVisible="{Binding IsDriver}" Source="{Binding AadharImageURL}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
+            <Image Source="{Binding AadharImageURL}" HeightRequest="100" WidthRequest="100" Aspect="AspectFill"/>
 
             <!-- Validation Message -->
             <Label

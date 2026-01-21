@@ -1,6 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+              xmlns:local="clr-namespace:BookRide.Converters"
              x:Class="BookRide.MainPage"
              Title="Taxi Ride">
     <ContentPage.ToolbarItems>
@@ -8,6 +9,9 @@
                      Order="Primary"
                      Priority="0" />
     </ContentPage.ToolbarItems>
+    <ContentPage.Resources>
+        <local:StringEqualsConverter x:Key="StringEqualsConverter" />
+    </ContentPage.Resources>
 
     <ScrollView>
         <VerticalStackLayout
@@ -68,6 +72,24 @@ StrokeShape="RoundRectangle 12">
                         </Image>
                     </Grid>
             </Border>
+            
+            <!--Adding Radio buttons to select -->
+            <Label Text="Select User Type" FontAttributes="Bold" Margin="10,0,0,0"/>
+            <HorizontalStackLayout Padding="5" Spacing="10">
+
+               
+
+                <RadioButton 
+        Content="Traveler" CheckedChanged="RadioButton_CheckedChanged"
+        GroupName="Users"
+        IsChecked="{Binding SelectedUser, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Traveler}" />
+
+                <RadioButton 
+        Content="Driver" CheckedChanged="RadioButton_CheckedChanged"
+        GroupName="Users"
+        IsChecked="{Binding SelectedUser, Converter={StaticResource StringEqualsConverter}, ConverterParameter=Driver}" />
+
+            </HorizontalStackLayout>
             <!-- Loading Indicator -->
             <ActivityIndicator
      IsRunning="{Binding IsBusy}"

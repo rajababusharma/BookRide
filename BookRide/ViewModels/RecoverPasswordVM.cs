@@ -35,7 +35,13 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         private string confirmPassword;
 
+        [ObservableProperty]
+        private string selectedUserType;
+
         private Users Users;
+        private Drivers drivers;
+
+        private bool isDriver;
 
         private readonly INetworkService _networkService;
 
@@ -71,20 +77,53 @@ namespace BookRide.ViewModels
                     IsReadOnly = false;
                     return;
                 }
-                // Fetch all users from the database
-
-                Users = await _db.GetAsync<Users>($"Users/{Mobile}");
-                // Find the user with the matching mobile number
-              //  var user = users.FirstOrDefault(u => u.Mobile == Mobie);
-                if (Users != null)
+                if(string.IsNullOrWhiteSpace(SelectedUserType))
                 {
-                    // Simulate sending password recovery instructions
-                    // In a real application, you would send an email or SMS
-                  //  Console.WriteLine($"Password recovery instructions sent to mobile: {Mobile}");
+                    await Shell.Current.DisplayAlert("Error", "Please select a user type.", "OK");
                     IsBusy = false;
-                    IsPasswordVisible = true;
-                    IsReadOnly = true;
-                    IsVisible = false;
+                    IsReadOnly = false;
+                    return;
+                }
+                // Fetch all users from the database
+                if (SelectedUserType == eNum.eNumUserType.Driver.ToString())
+                {
+                    drivers = await _db.GetAsync<Drivers>($"Drivers/{Mobile}");
+                    if (drivers != null)
+                    {
+                        isDriver = true;
+                        IsBusy = false;
+                        IsPasswordVisible = true;
+                        IsReadOnly = true;
+                        IsVisible = false;
+                        return;
+                    }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert("Alert", "Driver with the provided mobile number not found.", "Ok");
+                        IsBusy = false;
+                        IsReadOnly = false;
+                        return;
+                    }
+                }
+               else if(SelectedUserType == eNum.eNumUserType.Traveler.ToString())
+                {
+                    Users = await _db.GetAsync<Users>($"Users/{Mobile}");
+                    if (Users != null)
+                    {
+                        isDriver = false;
+                        IsBusy = false;
+                        IsPasswordVisible = true;
+                        IsReadOnly = true;
+                        IsVisible = false;
+                        return;
+                    }
+                    else
+                    {
+                        await Shell.Current.DisplayAlert("Alert", "User with the provided mobile number not found.", "Ok");
+                        IsBusy = false;
+                        IsReadOnly = false;
+                        return;
+                    }
                 }
                 else
                 {
@@ -130,11 +169,24 @@ namespace BookRide.ViewModels
                 return;
             }   
            
-            Users.Password = Password;
-            await _db.SaveAsync<Users>($"Users/{Users.UserId}", Users);
-            await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
-            IsBusy = false;
-            await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+            if (isDriver)
+            {
+                drivers.Password = Password;
+                await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+                await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                IsBusy = false;
+                await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+                return;
+            }
+            else
+            {
+                Users.Password = Password;
+                await _db.SaveAsync<Users>($"Users/{Users.UserId}", Users);
+                await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                IsBusy = false;
+                await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+            }
+           
         }
     }
 }

@@ -10,6 +10,7 @@ using Microsoft.Maui.Controls.Hosting;
 using Microsoft.Maui.Controls.Maps;
 using Microsoft.Maui.Controls.Compatibility.Hosting;
 using CommunityToolkit.Maui;
+using Microsoft.Maui.Maps;
 
 
 namespace BookRide
@@ -43,7 +44,7 @@ namespace BookRide
             builder.Services.AddTransient<ViewModels.RechargeCreditVM>();
             builder.Services.AddTransient<ViewModels.RecoverPasswordVM>();
             builder.Services.AddTransient<ViewModels.TermsConditionVM>();
-
+            builder.Services.AddTransient<ViewModels.UserRegistrationVM>();
 
 
             // Register views
@@ -58,6 +59,7 @@ namespace BookRide
             builder.Services.AddTransient<Views.TermsConditionsPage>();
             builder.Services.AddTransient<Views.RecoverPasswordPage>();
             builder.Services.AddTransient<Views.UserGuidePage>();
+            builder.Services.AddTransient<Views.UserRegistrationPage>();
 
             // Register Services
 
