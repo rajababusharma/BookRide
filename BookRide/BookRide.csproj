@@ -47,7 +47,6 @@
 	  <AndroidSigningKeyPass>8693849475</AndroidSigningKeyPass>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-	  <AndroidLinkTool>r8</AndroidLinkTool>
 	  <EnableLLVM>True</EnableLLVM>
 	</PropertyGroup>
 
@@ -143,7 +142,8 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="10.0.20" />
 	</ItemGroup>
 
-	<ItemGroup>
+
+  <ItemGroup>
 	  <Compile Update="Views\ConfirmPage.xaml.cs">
 	    <DependentUpon>ConfirmPage.xaml</DependentUpon>
 	  </Compile>

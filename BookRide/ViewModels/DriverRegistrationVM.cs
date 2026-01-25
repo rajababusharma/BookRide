@@ -148,13 +148,33 @@ namespace BookRide.ViewModels
                         AadharImageURL = AadharImageURL,
                         ProfileImageUrl = ProfileImageUrl
                     };
-                    await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+                var status = await Task.Run( () =>
+                
+                      _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers)
+                );
+               // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+               if (!status)
+                {
+                   
+                    Console.WriteLine("Failed to save driver data to the database.");
+                }
+                else
+                {
+                    Console.WriteLine("Driver registration data saved successfully.");
                     await Shell.Current.DisplayAlert(
-                        "Success",
-                        "Registration completed successfully",
-                        "OK");
-                    try
+                      "Success",
+                      "Registration completed successfully",
+                      "OK");
+                }
+                Console.WriteLine("Driver registration data saved to Realtime Database.");
+              
+                Console.WriteLine("Starting foreground services for location updates and credit point management.");
+                try
                     {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        System.Diagnostics.Trace.WriteLine("Starting DriverCreditPointService for driver: " + drivers.UserId);             
+                        // Start foreground services here
 #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
                         intent_loc.PutExtra("USERID", drivers.UserId);
@@ -171,13 +191,13 @@ namespace BookRide.ViewModels
                         // await LocationPermissionHelper.HasPermissionsAsync();
 
                         // _foregroundService.Start(users.Mobile);
+                    });
 
-
-                    }
+                }
                     catch (Exception ex)
                     {
                         // Handle exceptions related to starting the service
-                        //  System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                          System.Diagnostics.Trace.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
                     }
                 
 
@@ -242,7 +262,8 @@ namespace BookRide.ViewModels
         [RelayCommand]
         public async Task UploadPhotoAsync()
         {
-           
+            try
+            {
                 var result = await FilePicker.Default.PickAsync(new PickOptions
                 {
                     PickerTitle = "Select Aadhar Card Image",
@@ -250,11 +271,17 @@ namespace BookRide.ViewModels
                 });
                 if (result == null)
                     return;
-               
-                    AadharImagePath = result.FileName;
+
+                AadharImagePath = result.FileName;
                 var imageStream = await result.OpenReadAsync();
                 var imageurl = await _firebaseUpload.UploadAadharImagesToCloud(imageStream, Mobile);
-                AadharImageURL = imageurl;         
+                AadharImageURL = imageurl;
+            }
+            catch (Exception ex)
+            {
+                await Shell.Current.DisplayAlert("Error", $"Failed to upload image: {ex.Message}", "OK");
+                AadharImageURL = imageurl;
+            }
         }
 
     }

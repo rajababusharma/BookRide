@@ -71,54 +71,65 @@ namespace BookRide.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Drivers;
-
-            Task.Run(async () => {
-                ProfileImageUrl = User.ProfileImageUrl;
-
-                // check if profile image is null or empty
-                if (string.IsNullOrEmpty(ProfileImageUrl))
+            try
+            {
+                Task.Run(async () =>
                 {
-                    ProfileImageUrl = "person.png";
-                }
+                    ProfileImageUrl = User.ProfileImageUrl;
 
-                // check if user is active
-                if (User.IsActive && User.CreditPoint > 0)
-                {
-                    IsActive = "Active";
-                    IsVisible = false;
-                }
-                else if (User.CreditPoint == 0)
-                {
-                    // update IsActive info in the users profile
-                    User.IsActive = false;
-                    IsVisible = true;
-                    await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
-                    IsActive = "Deactivated";
-                    await Shell.Current.DisplayAlert(
-                        "Info",
-                         $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-                        "OK");
-                }
-                else if (!User.IsActive)
-                {
-                    IsActive = "Deactivated";
-                    await Shell.Current.DisplayAlert(
-                        "Info",
-                         $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                        "OK");
-                }
-                else
-                {
-                    IsActive = "Deactivated";
-                    await Shell.Current.DisplayAlert(
-                        "Info",
-                         $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                        "OK");
-                }
-            });
+                    // check if profile image is null or empty
+                    if (string.IsNullOrEmpty(ProfileImageUrl))
+                    {
+                        ProfileImageUrl = "person.png";
+                    }
 
-           
+                    // check if user is active
+                    if (User.IsActive && User.CreditPoint > 0)
+                    {
+                        IsActive = "Active";
+                        IsVisible = false;
+                    }
+                    else if (User.CreditPoint == 0)
+                    {
+                        // update IsActive info in the users profile
+                        User.IsActive = false;
+                        IsVisible = true;
+                       // await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
+                        var status =await Task.Run(() =>
+                        
+                              _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User)
+                        );
+                        IsActive = "Deactivated";
+                        await Shell.Current.DisplayAlert(
+                            "Info",
+                             $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
+                            "OK");
+                    }
+                    else if (!User.IsActive)
+                    {
+                        IsActive = "Deactivated";
+                        await Shell.Current.DisplayAlert(
+                            "Info",
+                             $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                            "OK");
+                    }
+                    else
+                    {
+                        IsActive = "Deactivated";
+                        await Shell.Current.DisplayAlert(
+                            "Info",
+                             $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                            "OK");
+                    }
+                });
 
+            }
+
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Line: 125 DriverProfileVM Error in ApplyQueryAttributes: {ex.Message}");
+
+            }
         }
 
         // add profile photo command
@@ -126,28 +137,41 @@ namespace BookRide.ViewModels
         public async Task AddProfilePhotoAsync()
         {
             IsBusy = true;
-            var photo = await MediaPicker.Default.PickPhotoAsync();
-            if (photo == null)
-                return;
-            // Save the file into firebase storage and get the URL
-            var imageStream = await photo.OpenReadAsync();
-            var imageUrl = await _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId);
-            if (!string.IsNullOrEmpty(imageUrl))
+            try
             {
-                User.ProfileImageUrl = imageUrl;
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    ProfileImageUrl = imageUrl;
-                });
-               
-                await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
-              //  await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
 
-               IsBusy = false;
+                var photo = await MediaPicker.Default.PickPhotoAsync();
+                if (photo == null)
+                    return;
+                // Save the file into firebase storage and get the URL
+                var imageStream = await photo.OpenReadAsync();
+
+                var imageUrl = await Task.Run(() =>
+                
+                      _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId)
+                ); 
+                if (!string.IsNullOrEmpty(imageUrl))
+                {
+                    User.ProfileImageUrl = imageUrl;
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        ProfileImageUrl = imageUrl;
+                    });
+
+                    await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
+                    //  await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
+
+                    IsBusy = false;
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Line: 160 DriverProfileVM Error", "Failed to upload profile photo.", "OK");
+                    IsBusy = false;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", "Failed to upload profile photo.", "OK");
+                await Shell.Current.DisplayAlert("Line: 166 DriverProfileVMError", $"An error occurred: {ex.Message}", "OK");
                 IsBusy = false;
             }
         }

@@ -77,7 +77,12 @@ namespace BookRide.Platforms.Android.Implementations
             {
                 try
                 {
-                    var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
+                   // var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
+
+                    var user = await Task.Run(() =>
+                              _db.GetAsync<Drivers>($"Drivers/{id}")
+                           );
+
 
                     if (user == null)
                     {
@@ -87,11 +92,30 @@ namespace BookRide.Platforms.Android.Implementations
                         isServiceRunning = false;
                         return;
                     }
-
+                   
+                    // Deduct one credit point
                     if (user.CreditPoint > 0)
                     {
-                        user.CreditPoint -= 1;
-                        _ = _db.SaveAsync<Drivers>($"Drivers/{user.UserId}", user);
+                        Drivers drivers = new Drivers
+                        {
+                            UserId = user.UserId,
+                            FirstName = user.FirstName,
+                            Age = user.Age,
+                            Address = user.Address,
+                            Mobile = user.Mobile,
+                            Password = user.Password,
+                            VehicleNo = user.VehicleNo,
+                            CreditPoint = user.CreditPoint - 1,
+                            VehicleType = user.VehicleType,
+                            State = user.State,
+                            District = user.District,
+                            RegistrationDate = user.RegistrationDate,
+                            AadharImageURL = user.AadharImageURL,
+                            ProfileImageUrl = user.ProfileImageUrl,
+                            IsActive = user.IsActive
+                        };
+                       // user.CreditPoint -= 1;
+                        _ = _db.SaveAsync<Drivers>($"Drivers/{user.UserId}", drivers);
                     }
                     else
                     {

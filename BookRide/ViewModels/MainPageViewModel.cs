@@ -11,8 +11,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Android.Views.ContentCaptures;
-
-
+using System.Text.Json;
+using Org.Apache.Http.Authentication;
 #if ANDROID
 using Android.Content;
 using Application = Android.App.Application;
@@ -50,7 +50,10 @@ namespace BookRide.ViewModels
             _networkService = networkService;
          //   _creditPointService = creditPointService;
             // _db.DeleteAllAsync();
-
+            Task.Run(async () =>
+            {
+                await _db.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+            });
 
         }
         public async Task StartTracking(string userid)
@@ -60,7 +63,8 @@ namespace BookRide.ViewModels
             {
                
                     // start forground service to decrease credit point for driver daily and to update location
-                    if (SelectedUserType.Equals(eNum.eNumUserType.Driver.ToString()))
+                    Console.WriteLine("Starting Foreground Services...");
+                if (SelectedUserType.Equals(eNum.eNumUserType.Driver.ToString()))
                     {
                         try
                         {
@@ -81,17 +85,19 @@ namespace BookRide.ViewModels
                     }
                     catch (Exception ex)
                         {
-                            // Handle exceptions related to starting the service
-                           // System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
-                        }
+                        Console.WriteLine($"Line: 88 MainPageVM Error starting services: {ex.Message}");
+                        // Handle exceptions related to starting the service
+                        // System.Diagnostics.Debug.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                    }
                     }
 
 
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Line: 98 MainPageVM Error starting services: {ex.Message}");
                 // displaying an error alert message
-              //  await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+                //  await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
             }
            
            
@@ -131,7 +137,31 @@ namespace BookRide.ViewModels
               
                 if(SelectedUserType.Equals(eNumUserType.Driver.ToString()))
                 {
-                    var drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
+                    var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
+               //     var userDict = drs as IDictionary<string, object>;
+
+                    //Drivers userObj = new Drivers
+                    //{
+                    //    UserId = userDict["UserId"].ToString(),
+                    //    CreditPoint = Convert.ToInt32(userDict["CreditPoint"]),
+                    //    FirstName = userDict["FirstName"].ToString(),
+                    //    Age = Convert.ToInt32(userDict["Age"]),
+                    //    Address = userDict["Address"].ToString(),
+                    //    Mobile = userDict["Mobile"].ToString(),
+                    //    Password = userDict["Password"].ToString(),
+                    //    VehicleNo = userDict["VehicleNo"].ToString(),
+                    //    VehicleType = userDict["VehicleType"].ToString(),
+                    //    State = userDict["State"].ToString(),
+                    //    District = userDict["District"].ToString(),
+                    //    RegistrationDate = Convert.ToDateTime(userDict["RegistrationDate"]),
+                    //    AadharImageURL = userDict["AadharImageURL"]?.ToString(),
+                    //    ProfileImageUrl = userDict["ProfileImageUrl"]?.ToString(),
+                    //    IsActive = Convert.ToBoolean(userDict["IsActive"]),
+
+
+                    //    // add other properties as needed
+                    //};
+
                     if (drs != null)
                     {
 
@@ -146,7 +176,7 @@ namespace BookRide.ViewModels
                             await LocationPermissionHelper.HasPermissionsAsync();
                             // starting a location tracking service
                             await StartTracking(drs.UserId);
-
+                            await SecureStorage.SetAsync(Constants.Constants.LoggedInUser, drs.UserId);
                             await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
                             {
                                 { "CurrentUser", drs }
@@ -163,6 +193,26 @@ namespace BookRide.ViewModels
                 else
                 {
                     var usr = await _db.GetAsync<Users>($"Users/{Username}");
+                    // cast a dictionary to an object of Drivers
+                    //var userDict = usr as IDictionary<string, object>;
+
+                    //Users userObj = new Users
+                    //{
+                    //    UserId = userDict["UserId"].ToString(),
+                    //    FirstName = userDict["FirstName"].ToString(),
+                    //    Age = Convert.ToInt32(userDict["Age"]),
+                    //    Address = userDict["Address"].ToString(),
+                    //    Mobile = userDict["Mobile"].ToString(),
+                    //    Password = userDict["Password"].ToString(),
+                    //    State = userDict["State"].ToString(),
+                    //    District = userDict["District"].ToString(),
+                    //    RegistrationDate = Convert.ToDateTime(userDict["RegistrationDate"]),
+                    //    ProfileImageUrl = userDict["ProfileImageUrl"]?.ToString(),
+                    //    IsActive = Convert.ToBoolean(userDict["IsActive"]),
+
+
+                    //    // add other properties as needed
+                    //};
                     if (usr != null)
                     {
 
@@ -233,6 +283,9 @@ namespace BookRide.ViewModels
                     File = new ReadOnlyFile(filePath)
                 });
         }
+
+       
+
 
     }
 }

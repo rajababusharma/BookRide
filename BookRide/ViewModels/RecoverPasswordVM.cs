@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -38,7 +39,7 @@ namespace BookRide.ViewModels
         [ObservableProperty]
         private string selectedUserType;
 
-        private Users Users;
+        private Users users;
         private Drivers drivers;
 
         private bool isDriver;
@@ -77,7 +78,7 @@ namespace BookRide.ViewModels
                     IsReadOnly = false;
                     return;
                 }
-                if(string.IsNullOrWhiteSpace(SelectedUserType))
+                if(SelectedUserType==null)
                 {
                     await Shell.Current.DisplayAlert("Error", "Please select a user type.", "OK");
                     IsBusy = false;
@@ -87,7 +88,32 @@ namespace BookRide.ViewModels
                 // Fetch all users from the database
                 if (SelectedUserType == eNum.eNumUserType.Driver.ToString())
                 {
-                    drivers = await _db.GetAsync<Drivers>($"Drivers/{Mobile}");
+
+                   var drs = await _db.GetAsync<Drivers>($"Drivers/{Mobile}");
+                    var userDict = drs as IDictionary<string, object>;
+
+                     drivers = new Drivers
+                    {
+                        UserId = userDict["UserId"].ToString(),
+                        CreditPoint = Convert.ToInt32(userDict["CreditPoint"]),
+                        FirstName = userDict["FirstName"].ToString(),
+                        Age = Convert.ToInt32(userDict["Age"]),
+                        Address = userDict["Address"].ToString(),
+                        Mobile = userDict["Mobile"].ToString(),
+                        Password = userDict["Password"].ToString(),
+                        VehicleNo = userDict["VehicleNo"].ToString(),
+                        VehicleType = userDict["VehicleType"].ToString(),
+                        State = userDict["State"].ToString(),
+                        District = userDict["District"].ToString(),
+                        RegistrationDate = Convert.ToDateTime(userDict["RegistrationDate"]),
+                        AadharImageURL = userDict["AadharImageURL"]?.ToString(),
+                        ProfileImageUrl = userDict["ProfileImageUrl"]?.ToString(),
+                        IsActive = Convert.ToBoolean(userDict["IsActive"]),
+
+
+                        // add other properties as needed
+                    };
+
                     if (drivers != null)
                     {
                         isDriver = true;
@@ -107,8 +133,27 @@ namespace BookRide.ViewModels
                 }
                else if(SelectedUserType == eNum.eNumUserType.Traveler.ToString())
                 {
-                    Users = await _db.GetAsync<Users>($"Users/{Mobile}");
-                    if (Users != null)
+                   var usr = await _db.GetAsync<Users>($"Users/{Mobile}");
+                    var userDict = usr as IDictionary<string, object>;
+
+                     users = new Users
+                    {
+                        UserId = userDict["UserId"].ToString(),
+                        FirstName = userDict["FirstName"].ToString(),
+                        Age = Convert.ToInt32(userDict["Age"]),
+                        Address = userDict["Address"].ToString(),
+                        Mobile = userDict["Mobile"].ToString(),
+                        Password = userDict["Password"].ToString(),
+                        State = userDict["State"].ToString(),
+                        District = userDict["District"].ToString(),
+                        RegistrationDate = Convert.ToDateTime(userDict["RegistrationDate"]),
+                        ProfileImageUrl = userDict["ProfileImageUrl"]?.ToString(),
+                        IsActive = Convert.ToBoolean(userDict["IsActive"]),
+
+
+                        // add other properties as needed
+                    };
+                    if (users != null)
                     {
                         isDriver = false;
                         IsBusy = false;
@@ -172,19 +217,44 @@ namespace BookRide.ViewModels
             if (isDriver)
             {
                 drivers.Password = Password;
-                await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
-                await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
-                IsBusy = false;
-                await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
-                return;
+                var status = await Task.Run(() => _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers));
+
+               // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+               if (status)
+                {
+                    await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                    IsBusy = false;
+                    await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+                    return;                   
+                }   
+               else
+                {
+                    await Shell.Current.DisplayAlert("Error", "Failed to change password. Please try again.", "OK");
+                    IsBusy = false;
+                    return;
+                }
+               
             }
             else
             {
-                Users.Password = Password;
-                await _db.SaveAsync<Users>($"Users/{Users.UserId}", Users);
-                await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
-                IsBusy = false;
-                await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+                users.Password = Password;
+                var status = await Task.Run(() => _db.SaveAsync<Users>($"Users/{users.UserId}", users));
+
+                // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+                if (status)
+                {
+                    await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                    IsBusy = false;
+                    await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
+                    return;
+                }
+                else
+                {
+                    await Shell.Current.DisplayAlert("Error", "Failed to change password. Please try again.", "OK");
+                    IsBusy = false;
+                    return;
+                }
+               
             }
            
         }

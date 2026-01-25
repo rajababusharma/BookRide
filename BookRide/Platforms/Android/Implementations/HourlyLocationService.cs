@@ -95,10 +95,14 @@ namespace BookRide.Platforms.Android.Implementations
                         TimeSpan.FromSeconds(10));
 
                  
-                    var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
+                   // var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
 
+                    var user = await Task.Run(() =>
+                             _db.GetAsync<Drivers>($"Drivers/{id}")
+                           );
+                   
                     // 
-                   // await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
+                    // await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", user);
                     if (user.CreditPoint > 0)
                     {
                        
@@ -127,7 +131,7 @@ namespace BookRide.Platforms.Android.Implementations
                                 }
                                 Drivers_Location drivers_Location = new Drivers_Location
                                 {
-                                    UserId = id,
+                                    UserId = user.UserId,
                                     Latitude = lat,
                                     Longitude = lon,
                                     Altitude = alt,

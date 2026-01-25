@@ -107,19 +107,34 @@ namespace BookRide.ViewModels
                         District = SelectedDistrict,
                         RegistrationDate = DateTime.Now
                     };
-
-                    await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
+                var status = await Task.Run(() =>
+                
+                     _db.SaveAsync<Users>($"Users/{users.UserId}", users)
+                );
+                
+               // bool status = await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
+                if (status)
+                {
                     await Shell.Current.DisplayAlert(
                         "Success",
                         "Registration completed successfully",
                         "OK");
+                    await Shell.Current.GoToAsync(nameof(ConfirmPage));
+                }
+                else
+                {
+                    ErrorMessage = "Registration failed. Please try again.";
+                    IsBusy = false;
+                    return;
+                }
+
 
 
                 IsBusy = false;
 
                 //  await Shell.Current.GoToAsync(nameof(RegistrationConfirmationPage));
 
-                await Shell.Current.GoToAsync(nameof(ConfirmPage));
+              
 
 
 

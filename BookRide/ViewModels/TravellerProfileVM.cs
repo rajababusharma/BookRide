@@ -2,13 +2,17 @@
 using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
+using Bumptech.Glide.Load.Model;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GoogleGson;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 
@@ -42,7 +46,12 @@ namespace BookRide.ViewModels
             if (value == null) return;
             Console.WriteLine($"Selected: {value}");
 
-            LoadUsersByDistrictAsync(value);
+            Console.WriteLine("Loading drivers list by district");
+            Task.Run(async () =>
+            {
+                await LoadUsersByDistrictAsync(value);
+            });
+           // LoadUsersByDistrictAsync(value);
         }
         [RelayCommand]
         public async void WhatsappConnect(string phoneNumber)
@@ -114,17 +123,20 @@ namespace BookRide.ViewModels
         {
             try
             {
+                Console.WriteLine("Checking GPS and Location Permissions...");
                 await LocationPermissionHelper.CheckGPSLocationEnableAsync();
                 // async work
                 await LocationPermissionHelper.HasPermissionsAsync();
 
+                Console.WriteLine("Obtaining current location...");
                 currentLocation = await Geolocation.Default.GetLocationAsync(_geolocationRequest);
 
+                Console.WriteLine("Loading drivers list");
                 await LoadUsersByDistrictAsync("");
             }
             catch (Exception ex)
             {
-                await LoadUsersByDistrictAsync("");
+               // await LoadUsersByDistrictAsync("");
                 // Handle exceptions related to geolocation
                 // Console.WriteLine($"Error obtaining location: {ex.Message}");
                 await Shell.Current.DisplayAlert(
@@ -153,32 +165,31 @@ namespace BookRide.ViewModels
                 if (string.IsNullOrEmpty(district))
 
                 {
+
+
                     //Task.Run(async () =>
                     //{
-                    //    var drivers = await _db.GetAllAsync<Drivers>("Drivers").ContinueWith(t =>
-                    //    {
-                    //        var userList = t.Result.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
-                    //        return new ObservableCollection<Drivers>(userList);
-                    //    });
+                    ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
+                    var drivers = await Task.Run(() =>
+                                  _db.GetAllAsync<Drivers>("Drivers")
+                             );
 
-                    //    DriversList = await GetLocationsWithinRadiusAsync(drivers);
-                    //}).GetAwaiter().GetResult();
 
-                    Task.Run(async () =>
+                    //  var drivers = await _db.GetAllAsync<Drivers>("Drivers");
+                    if (drivers == null)
                     {
-                        ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
-                        var drivers = await _db.GetAllAsync<Drivers>("Drivers");
-                        if (drivers == null)
-                        {
-                            IsBusy = false;
-                            return;
-                        }
-                        foreach (var item in drivers)
-                            lists.Add(item.Value);
-
-                        var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
-                        DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
+                        IsBusy = false;
+                        return;
+                    }
+                    await Task.Run(() =>
+                    {
+                    foreach (var item in drivers)
+                        lists.Add(item.Value);
                     });
+
+                var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
+                        DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
+                   // });
 
                   
                 }
@@ -194,15 +205,22 @@ namespace BookRide.ViewModels
                     //    UsersList = await GetLocationsWithinRadiusAsync(users);
                     //}).GetAwaiter().GetResult();
                     ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
-                    var users = await _db.GetAllAsync<Drivers>("Drivers");
+                  //  var users = await _db.GetAllAsync<Drivers>("Drivers");
+                    var users = await Task.Run(() =>
+                                _db.GetAllAsync<Drivers>("Drivers")
+                            );
                     //check drivers list is null
                     if (users == null)
                     {
                         IsBusy = false;
                         return;
                     }
-                    foreach (var item in users)
-                        lists.Add(item.Value);
+                    await Task.Run(() =>
+                    {
+                        foreach (var item in users)
+                            lists.Add(item.Value);
+                    });
+                   
 
                     var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive && x.District.Equals(district));
                     DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
@@ -214,7 +232,7 @@ namespace BookRide.ViewModels
             catch (Exception ex)
                 {
                     // Handle exceptions related to geolocation
-                    // Console.WriteLine($"Error obtaining location: {ex.Message}");
+                     Console.WriteLine($"Line: 216, TravelerProfileVM Error obtaining drivers list: {ex.Message}");
                     IsBusy = false;
                 await Shell.Current.DisplayAlert(
                               "Error",
@@ -226,8 +244,7 @@ namespace BookRide.ViewModels
 
         public async Task<ObservableCollection<Drivers>> GetLocationsWithinRadiusAsync(ObservableCollection<Drivers> drivers)
         {
-            try
-            {
+           
                  
                     if (currentLocation == null)
                     {
@@ -238,45 +255,68 @@ namespace BookRide.ViewModels
                     double radiusKm = 5.0;
 
                   
-
-                foreach (var usr in drivers)
+                Console.WriteLine("Line: 239 TravelerProfileVM Filtering drivers within radius...");
+            try
+            {
+                await Task.Run(async () =>
+                {
+                    foreach (var usr in drivers)
                     {
-                    // fetch user location from Drivers_Location nodel
-                    var _userLocation = await _db.GetAsync<Drivers_Location>("Drivers_Location/" + usr.UserId);
-                    if (_userLocation.Latitude != null && _userLocation.Longitude!=null)
+                        // fetch user location from Drivers_Location nodel
+
+                        var _userLoc = await Task.Run(async()=>
                         {
-                        var lat = _userLocation.Latitude;
-                        var lon = _userLocation.Longitude;
-                        var alt = _userLocation?.Altitude;
-                        var acc = _userLocation?.Accuracy;
-                        var time = _userLocation?.Timestamp;
-                        var vertical = _userLocation?.Vertical;
-                        var speed = _userLocation?.Speed;
-                        var course = _userLocation?.Course;
+                            return await _db.GetAsync<Drivers_Location>("Drivers_Location/" + usr.UserId);
+                        });
+                        var userDict = _userLoc as IDictionary<string, object>;
 
-                        // Create a Location object for the user's location
-                        Location driverLocation = new Location();
-                        driverLocation.Latitude = lat;
-                        driverLocation.Longitude = lon;
-                        driverLocation.Altitude = alt ?? double.NaN;
-                        driverLocation.Accuracy = acc ?? double.NaN;
-                        driverLocation.Timestamp = DateTimeOffset.UtcNow;
-                        driverLocation.Speed = speed ?? double.NaN;
-                        driverLocation.Course = course ?? double.NaN;
-                        driverLocation.VerticalAccuracy = vertical ?? double.NaN;
+                        Drivers_Location _userLocation =new Drivers_Location
+                        {
+                            UserId = userDict["UserId"].ToString(),
+                            Latitude = Convert.ToDouble(userDict["Latitude"]),
+                            Longitude = Convert.ToDouble(userDict["Longitude"]),
+                            Altitude = userDict["Altitude"] != null ? Convert.ToDouble(userDict["Altitude"]) : (double?)null,
+                            Accuracy = userDict["Accuracy"] != null ? Convert.ToDouble(userDict["Accuracy"]) : (double?)null,
+                            Speed = userDict["Speed"] != null ? Convert.ToDouble(userDict["Speed"]) : (double?)null,
+                            Course = userDict["Course"] != null ? Convert.ToDouble(userDict["Course"]) : (double?)null,
+                        };
 
-                        // Calculate the distance in kilometers
-                        double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
+                        if (_userLocation.Latitude != null && _userLocation.Longitude != null)
+                        {
+                            var lat = _userLocation.Latitude;
+                            var lon = _userLocation.Longitude;
+                            var alt = _userLocation?.Altitude;
+                            var acc = _userLocation?.Accuracy;
+                            var time = _userLocation?.Timestamp;
+                            var vertical = _userLocation?.Vertical;
+                            var speed = _userLocation?.Speed;
+                            var course = _userLocation?.Course;
+
+                            // Create a Location object for the user's location
+                            Location driverLocation = new Location();
+                            driverLocation.Latitude = lat;
+                            driverLocation.Longitude = lon;
+                            driverLocation.Altitude = alt ?? double.NaN;
+                            driverLocation.Accuracy = acc ?? double.NaN;
+                            driverLocation.Timestamp = DateTimeOffset.UtcNow;
+                            driverLocation.Speed = speed ?? double.NaN;
+                            driverLocation.Course = course ?? double.NaN;
+                            driverLocation.VerticalAccuracy = vertical ?? double.NaN;
+
+                            // Calculate the distance in kilometers
+                            double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
                             if (distance <= radiusKm)
                             {
-                            DriversList.Add(usr);
+                                DriversList.Add(usr);
                             }
-                         }
+                        }
                         else
                         {
-                        DriversList.Add(usr);
+                            DriversList.Add(usr);
                         }
                     }
+                });
+              
 
                     return DriversList;
                 
@@ -284,7 +324,7 @@ namespace BookRide.ViewModels
             catch (Exception ex)
             {
                 // Handle exceptions related to geolocation
-               // Console.WriteLine($"Error obtaining location: {ex.Message}");
+                Console.WriteLine($"Line: 287 TravelerProfileVM Error obtaining driver list: {ex.Message}");
                
                 return drivers; // Return the original list if location cannot be obtained
 
