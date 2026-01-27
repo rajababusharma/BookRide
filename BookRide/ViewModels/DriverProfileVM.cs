@@ -71,9 +71,13 @@ namespace BookRide.ViewModels
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
             User = query["CurrentUser"] as Drivers;
+            if(User == null)
+            {
+                return;
+            }
             try
             {
-                Task.Run(async () =>
+                Task.Run(() =>
                 {
                     ProfileImageUrl = User.ProfileImageUrl;
 
@@ -91,38 +95,43 @@ namespace BookRide.ViewModels
                     }
                     else if (User.CreditPoint == 0)
                     {
+
+                        // await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
+                        var status = Task.Run(async () =>
+
+                             await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User)
+                        );
+
+                        Shell.Current.DisplayAlert(
+                      "Info",
+                       $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
+                      "OK");
                         // update IsActive info in the users profile
                         User.IsActive = false;
-                        IsVisible = true;
-                       // await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
-                        var status =await Task.Run(() =>
-                        
-                              _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User)
-                        );
                         IsActive = "Deactivated";
-                        await Shell.Current.DisplayAlert(
-                            "Info",
-                             $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-                            "OK");
+                        IsVisible = true;
+                        IsVisible = true;
+
+
                     }
                     else if (!User.IsActive)
                     {
                         IsActive = "Deactivated";
-                        await Shell.Current.DisplayAlert(
-                            "Info",
-                             $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                            "OK");
+                        Shell.Current.DisplayAlert(
+                           "Info",
+                            $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                           "OK");
                     }
                     else
                     {
                         IsActive = "Deactivated";
-                        await Shell.Current.DisplayAlert(
-                            "Info",
-                             $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                            "OK");
+                        Shell.Current.DisplayAlert(
+                           "Info",
+                            $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
+                           "OK");
                     }
-                });
 
+                });
             }
 
             catch (Exception ex)
@@ -182,7 +191,7 @@ namespace BookRide.ViewModels
 
             var navigationParameter = new Dictionary<string, object>
                     {
-                        { "DRIVERS", User }
+                        { "CurrentUser", User }
                     };
             await Shell.Current.GoToAsync(nameof(DriverRegistration), navigationParameter);
 

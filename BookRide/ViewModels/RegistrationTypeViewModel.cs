@@ -1,4 +1,5 @@
-﻿using BookRide.Views;
+﻿using BookRide.Models;
+using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
@@ -16,27 +17,30 @@ namespace BookRide.ViewModels
         private async Task DriverAsync()
         {
             // Navigate to Driver Registration Page
-              await Shell.Current.GoToAsync(nameof(DriverRegistration));
+            //  await Shell.Current.GoToAsync(nameof(DriverRegistration));
 
-            //string userType = "Driver";
-           
-            //await Shell.Current.GoToAsync(nameof(DriverRegistration),
-            //        new Dictionary<string, object>
-            //        {
-            //            ["UserType"] = userType
-            //        });
+            Drivers user = new Drivers();
+            user = null;
+
+            await Shell.Current.GoToAsync(nameof(DriverRegistration),
+                    new Dictionary<string, object>
+                    {
+                        ["CurrentUser"] = user
+                    });
         }
         [RelayCommand]
         private async Task TravellerAsync()
         {
             // Navigate to Traveler Registration Page
-          await Shell.Current.GoToAsync(nameof(UserRegistrationPage));
-            //string userType = "Traveler";
-            //await Shell.Current.GoToAsync(nameof(DriverRegistration),
-            //        new Dictionary<string, object>
-            //        {
-            //            ["UserType"] = userType
-            //        });
+            // await Shell.Current.GoToAsync(nameof(UserRegistrationPage));
+            Users user = new Users();
+            user = null;
+
+            await Shell.Current.GoToAsync(nameof(UserRegistrationPage),
+                    new Dictionary<string, object>
+                    {
+                        ["CurrentUser"] = user
+                    });
         }
 
     }

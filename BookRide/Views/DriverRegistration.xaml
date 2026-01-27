@@ -101,6 +101,23 @@ StrokeShape="RoundRectangle 12">
                     </Entry.Behaviors>
                 </Entry>
             </Border>
+            <!-- Email -->
+            <Border StrokeThickness="1" Stroke="Gray" Padding="5"
+StrokeShape="RoundRectangle 12">
+                <Entry ClearButtonVisibility="WhileEditing"
+                    Placeholder="Email"
+                    Text="{Binding EmailAddress}"
+                    Keyboard="Email">
+                    <Entry.Behaviors>
+                        <toolkit:EmailValidationBehavior
+                            x:Name="EmailValidator"
+                            RegexPattern="^[^@\s]+@[^@\s]+\.[^@\s]+$"
+                            Flags="ValidateOnValueChanged"
+                            InvalidStyle="{StaticResource InvalidEntryStyle}"
+                            ValidStyle="{StaticResource ValidEntryStyle}" />
+                    </Entry.Behaviors>
+                </Entry>
+            </Border>
             <!-- Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
@@ -150,6 +167,26 @@ IsRunning="{Binding IsBusy}"
 IsVisible="{Binding IsBusy}"
 Color="#0066CC" />
 
+            <!-- terms n conditions -->
+            <Label
+  Text="Click here to read terms and conditions"
+  TextColor="#0066CC"
+  HorizontalOptions="Center">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer
+          Command="{Binding OpenTermsConditionCommand}" />
+                </Label.GestureRecognizers>
+            </Label>
+            <HorizontalStackLayout>
+                <CheckBox IsChecked="{Binding IsTermsAccepted}"
+x:Name="chkAgree" />
+                <Label
+                    Text="Yes, I have read and consent to the terms and conditions*"
+                    VerticalOptions="Center"
+                    FontSize="Micro">
+                    
+                </Label>
+            </HorizontalStackLayout>
             <!-- Register Button -->
             <Button
              Text="Update/Register"

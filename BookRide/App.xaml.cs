@@ -1,6 +1,8 @@
 ﻿using BookRide.Models;
 using BookRide.Services;
+using BookRide.Views;
 using Microsoft.Maui.Controls;
+using System.Net;
 
 namespace BookRide
 {
@@ -25,6 +27,42 @@ namespace BookRide
 //#endif
 
             MainPage = new AppShell();
+           // SetStartPage();
+        }
+
+        private async void SetStartPage()
+        {
+            var session_dr = await SecureStorageService.GetAsync<Drivers>(Constants.Constants.LoggedInUser);
+            var session_tr = await SecureStorageService.GetAsync<Users>(Constants.Constants.LoggedInUser);
+
+            if (session_dr == null && session_tr==null)
+            {
+                // 🔥 User already logged in → Home
+                await Shell.Current.GoToAsync("//MainPage");
+            }
+            else if (session_dr != null)
+            {
+                // ✅ Logged in as Driver → Driver Home
+              //  await Shell.Current.GoToAsync("//DriverProfilePage");
+                await Shell.Current.GoToAsync("//DriverProfilePage", true, new Dictionary<string, object>
+                            {
+                                { "CurrentUser", session_dr }
+                            });
+            }
+            else if (session_tr != null)
+            {
+                // ✅ Logged in as Traveler → Traveler Home
+              //  await Shell.Current.GoToAsync("//TravellerProfilePage");
+                await Shell.Current.GoToAsync("//TravellerProfilePage", true, new Dictionary<string, object>
+                            {
+                                { "CurrentUser", session_tr }
+                            });
+            }
+            else
+            {
+                // ❌ Not logged in → Login
+                await Shell.Current.GoToAsync("//MainPage");
+            }
         }
 
         private void TaskScheduler_UnobservedTaskException(object? sender, UnobservedTaskExceptionEventArgs e)

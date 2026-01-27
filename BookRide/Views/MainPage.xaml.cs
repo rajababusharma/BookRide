@@ -18,6 +18,7 @@ namespace BookRide
         {
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             await  LocationPermissionHelper.HasPermissionsAsync();
+
             base.OnAppearing();
 
             

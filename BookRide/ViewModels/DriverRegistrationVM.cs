@@ -30,6 +30,7 @@ namespace BookRide.ViewModels
         public ObservableCollection<string> Districts { get; }
         private readonly ITest _test;
         private readonly RealtimeDatabaseService _db;
+        private readonly FirebaseAuthService _authService;
         [ObservableProperty]
         private bool isBusy;
 
@@ -38,6 +39,7 @@ namespace BookRide.ViewModels
         [ObservableProperty] private string address;
         [ObservableProperty] private string mobile;
         [ObservableProperty] private string password;
+        [ObservableProperty] private string emailAddress;
 
         [ObservableProperty] private string confirmPassword;
       
@@ -58,6 +60,7 @@ namespace BookRide.ViewModels
         [ObservableProperty] private string aadharImagePath;
         [ObservableProperty] private string aadharImageURL;
         [ObservableProperty] private string profileImageUrl;
+        [ObservableProperty] private bool isTermsAccepted;
         // private string aadharImageURL;
 
 
@@ -67,15 +70,18 @@ namespace BookRide.ViewModels
         public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress,IFirebaseUpload firebaseUpload)
         {
             _db = new RealtimeDatabaseService();
-            States = new ObservableCollection<string>(IndiaStates.All);
+            _authService = new FirebaseAuthService();
+          //  States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
       
             _networkService = networkService;
             _firebaseUpload = firebaseUpload;
+            IsBusy = false;
 
         }
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
+
 
         [RelayCommand]
         private async Task Pay()
@@ -90,7 +96,13 @@ namespace BookRide.ViewModels
         private async Task RegisterAsync()
         {
 
-
+            if (!IsTermsAccepted)
+            {
+                Shell.Current.DisplayAlert("Alert", "Please select terms and conditions first", "OK");
+                IsBusy = false;
+                return;
+            }
+           
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
 
             IsBusy = true;
@@ -108,6 +120,9 @@ namespace BookRide.ViewModels
                 string.IsNullOrWhiteSpace(Age) ||
                 string.IsNullOrWhiteSpace(Address) ||
                 string.IsNullOrWhiteSpace(Mobile) ||
+                string.IsNullOrWhiteSpace(Password) ||
+                string.IsNullOrWhiteSpace(ConfirmPassword) ||
+                string.IsNullOrWhiteSpace(SelectedDistrict) ||
                 string.IsNullOrWhiteSpace(VehicleNo) ||
                 string.IsNullOrWhiteSpace(AadharImagePath) ||
                 string.IsNullOrWhiteSpace(SelectedVehicle))
@@ -138,6 +153,7 @@ namespace BookRide.ViewModels
                         Age = int.Parse(Age),
                         Address = Address,
                         Mobile = Mobile,
+                        EmailAddress=EmailAddress,
                         Password = Password,
                         VehicleNo = VehicleNo,
                         CreditPoint = CreditPoint,
@@ -148,10 +164,20 @@ namespace BookRide.ViewModels
                         AadharImageURL = AadharImageURL,
                         ProfileImageUrl = ProfileImageUrl
                     };
-                var status = await Task.Run( () =>
-                
-                      _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers)
-                );
+
+                //var result = await _authService.RegisterAsync(drivers.DEmail, drivers.Password);
+                //if (result == null)
+                //{
+                //    ErrorMessage = $"Authentication registration failed";
+                //    IsBusy = false;
+                //    return;
+                //}
+                // var status = await Task.Run(() =>
+
+              var status=  await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
+                    
+
+               // );
                // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
                if (!status)
                 {
@@ -160,6 +186,7 @@ namespace BookRide.ViewModels
                 }
                 else
                 {
+                  
                     Console.WriteLine("Driver registration data saved successfully.");
                     await Shell.Current.DisplayAlert(
                       "Success",
@@ -171,8 +198,7 @@ namespace BookRide.ViewModels
                 Console.WriteLine("Starting foreground services for location updates and credit point management.");
                 try
                     {
-                    MainThread.BeginInvokeOnMainThread(() =>
-                    {
+
                         System.Diagnostics.Trace.WriteLine("Starting DriverCreditPointService for driver: " + drivers.UserId);             
                         // Start foreground services here
 #if ANDROID
@@ -191,7 +217,7 @@ namespace BookRide.ViewModels
                         // await LocationPermissionHelper.HasPermissionsAsync();
 
                         // _foregroundService.Start(users.Mobile);
-                    });
+               
 
                 }
                     catch (Exception ex)
@@ -236,14 +262,36 @@ namespace BookRide.ViewModels
             await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
         }
 
+        [RelayCommand]
+        private async Task OpenTermsConditionAsync()
+        {
+            using var stream = await FileSystem.OpenAppPackageFileAsync("termsncondition.pdf");
+
+            var filePath = Path.Combine(FileSystem.CacheDirectory, "termsncondition.pdf");
+
+            using var fileStream = File.Create(filePath);
+            await stream.CopyToAsync(fileStream);
+
+            await Launcher.Default.OpenAsync(
+                new OpenFileRequest
+                {
+                    File = new ReadOnlyFile(filePath)
+                });
+        }
+
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            
-            if (query.TryGetValue("DRIVERS", out var usr))
+           var user = query["CurrentUser"] as Drivers;
+            if (user == null)
             {
-                Drivers user = usr as Drivers;
+                return;
+            }
 
+            //  Drivers user = usr as Drivers;
+            Task.Run(() =>
+            {
                 Mobile = user.Mobile;
+                EmailAddress = user.EmailAddress;
                 FirstName = user.FirstName;
                 Age = user.Age.ToString();
                 Address = user.Address;
@@ -251,12 +299,14 @@ namespace BookRide.ViewModels
                 SelectedDistrict = user.District;
                 SelectedVehicle = user.VehicleType;
                 Password = user.Password;
-                ConfirmPassword= user.Password;
-                AadharImagePath= user.AadharImageURL;
+                ConfirmPassword = user.Password;
+                AadharImagePath = user.AadharImageURL;
                 AadharImageURL = user.AadharImageURL;
                 CreditPoint = user.CreditPoint;
-                ProfileImageUrl= user.ProfileImageUrl;
-            }
+                ProfileImageUrl = user.ProfileImageUrl;
+            });
+                
+            
         }
 
         [RelayCommand]
@@ -280,7 +330,7 @@ namespace BookRide.ViewModels
             catch (Exception ex)
             {
                 await Shell.Current.DisplayAlert("Error", $"Failed to upload image: {ex.Message}", "OK");
-                AadharImageURL = imageurl;
+               
             }
         }
 

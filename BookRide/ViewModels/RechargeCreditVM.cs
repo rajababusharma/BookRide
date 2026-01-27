@@ -29,10 +29,11 @@ namespace BookRide.ViewModels
         }
 
         [RelayCommand]
-        private void BackToLogin()
+        private async Task BackToLogin()
         {
            // await Shell.Current.GoToAsync($"//{nameof(MainPage)}");
-             Shell.Current.GoToAsync("..//..");
+            await Shell.Current.GoToAsync("..//..");
+          //  await Shell.Current.GoToAsync("..");
         }
 
         private async Task<FileResult> PickImageAsync()
@@ -97,6 +98,10 @@ namespace BookRide.ViewModels
             try
             {
                 User = (Drivers)query["CurrentUser"];
+                if(User == null)
+                    {
+                    return;
+                }
                 if (User != null && (User.VehicleType.Equals(eNum.eNumVehicleType.Car.ToString()) || User.VehicleType.Equals(eNum.eNumVehicleType.Tempo.ToString())))
                 {
 

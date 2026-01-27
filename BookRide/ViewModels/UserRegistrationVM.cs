@@ -21,6 +21,7 @@ namespace BookRide.ViewModels
         public ObservableCollection<string> States { get; }
         public ObservableCollection<string> Districts { get; }
         private readonly RealtimeDatabaseService _db;
+        private readonly FirebaseAuthService authService;
         [ObservableProperty]
         private bool isBusy;
 
@@ -28,6 +29,7 @@ namespace BookRide.ViewModels
         [ObservableProperty] private string age;
         [ObservableProperty] private string address;
         [ObservableProperty] private string mobile;
+        [ObservableProperty] private string emailAddress;
         [ObservableProperty] private string password;
 
         [ObservableProperty] private string confirmPassword;   
@@ -44,11 +46,12 @@ namespace BookRide.ViewModels
         public UserRegistrationVM(INetworkService networkService)
         {
             _db = new RealtimeDatabaseService();
-            States = new ObservableCollection<string>(IndiaStates.All);
+            authService = new FirebaseAuthService();
+           // States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
 
             _networkService = networkService;
-
+            IsBusy = false;
         }
 
         public bool HasError => !string.IsNullOrEmpty(ErrorMessage);
@@ -74,6 +77,8 @@ namespace BookRide.ViewModels
                 if (string.IsNullOrWhiteSpace(FirstName) ||
                string.IsNullOrWhiteSpace(Age) ||
                string.IsNullOrWhiteSpace(Address) ||
+                string.IsNullOrWhiteSpace(Password) ||
+                string.IsNullOrWhiteSpace(ConfirmPassword) ||
                string.IsNullOrWhiteSpace(Mobile))
                 {
                     ErrorMessage = "All fields are required";
@@ -102,15 +107,24 @@ namespace BookRide.ViewModels
                         Age = int.Parse(Age),
                         Address = Address,
                         Mobile = Mobile,
+                        EmailAddress = EmailAddress,
                         Password = Password,
                         UserId = Mobile,
                         District = SelectedDistrict,
                         RegistrationDate = DateTime.Now
                     };
-                var status = await Task.Run(() =>
-                
-                     _db.SaveAsync<Users>($"Users/{users.UserId}", users)
-                );
+
+                //var result = await authService.RegisterAsync(users.UEmail, users.Password);
+                //if (result == null)
+                //{
+                //    ErrorMessage = $"Authentication registration failed";
+                //    IsBusy = false;
+                //    return;
+                //}
+                //   var status = await Task.Run(() =>
+
+                var status = await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
+              //  );
                 
                // bool status = await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
                 if (status)
@@ -163,19 +177,30 @@ namespace BookRide.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-           
-            if (query.TryGetValue("USERS", out var usr))
+            var user = query["CurrentUser"] as Users;
+            if (user == null)
             {
-                Users user = usr as Users;
-                Mobile = user.Mobile;
-                FirstName = user.FirstName;
-                Age = user.Age.ToString();
-                Address = user.Address;
-                SelectedDistrict = user.District;
-                Password = user.Password;
-                ConfirmPassword = user.Password;
+                return;
             }
+            else
+            {
+
+                Task.Run(() =>
+                {
+                    Mobile = user.Mobile;
+                    EmailAddress = user.EmailAddress;
+                    FirstName = user.FirstName;
+                    Age = user.Age.ToString();
+                    Address = user.Address;
+                    SelectedDistrict = user.District;
+                    Password = user.Password;
+                    ConfirmPassword = user.Password;
+                });
+
+            }
+
         }
+    
 
     }
 }

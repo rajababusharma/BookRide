@@ -18,6 +18,7 @@ namespace BookRide.Services
     {
       //  private readonly FirebaseClient _firebase;
         private readonly HttpClient _httpClient;
+        private readonly FirebaseAuthService _firebaseAuthService;
 
         private const string BaseUrl = Constants.Constants.Firebase_Realtime_Storage_url;
         public RealtimeDatabaseService()
@@ -29,6 +30,7 @@ namespace BookRide.Services
             //   Constants.Constants.Firebase_Realtime_Storage_url);
 
             _httpClient = new HttpClient();
+            _firebaseAuthService= new FirebaseAuthService();
         }
 
         //private string BuildUrl(string path)
@@ -43,25 +45,36 @@ namespace BookRide.Services
         // CREATE / UPDATE
         public async Task<bool> SaveAsync<T>(string node, T data)
         {
-           
-           // var json = JsonSerializer.Serialize(data);
-            var json = await Task.Run(() =>
+           try
+              {
+                
+            
+                if (await IsSessionExpiredAsunc())
+                {
+                    // Token has expired, re-authenticate
+                  
+                    //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+               await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");                    
+                      await Shell.Current.GoToAsync("//MainPage");
+                      //return false;
+                }
+                // var json = JsonSerializer.Serialize(data);
+                var json = await Task.Run(() =>
             {
                 return JsonSerializer.Serialize(data); // heavy work here
             });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PutAsync(await BuildUrl(node), content);
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
-                await Task.Run(async() =>
-                {
-                     await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                });
-               
-            }
             return response.IsSuccessStatusCode;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+
+                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+                return false;
+            }
         }
 
         // Save or Update
@@ -77,26 +90,41 @@ namespace BookRide.Services
         // POST (Auto ID)
         public async Task<string> PushAsync<T>(string node, T data)
         {
-           // var json = System.Text.Json.JsonSerializer.Serialize(data);
-            var json = await Task.Run(() =>
+            try
+            {
+
+                if (await IsSessionExpiredAsunc())
+                {
+                    // Token has expired, re-authenticate
+
+                    //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                    await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
+                    await Shell.Current.GoToAsync("//MainPage");
+                   // return false;
+                }
+
+                // var json = System.Text.Json.JsonSerializer.Serialize(data);
+                var json = await Task.Run(() =>
             {
                 return System.Text.Json.JsonSerializer.Serialize(data); // heavy work here
             });
             var response = await _httpClient.PostAsync(await BuildUrl(node),
                               new StringContent(json, Encoding.UTF8, "application/json"));
-            if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
-            {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
-                await Task.Run(async () =>
-                {
-                    await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                });
-            }
 
 
             var result = await response.Content.ReadAsStringAsync();
             var obj = JsonSerializer.Deserialize<Dictionary<string, string>>(result);
             return obj?["name"]; // Firebase generated key
+
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+
+                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
+                
+                await Shell.Current.GoToAsync("//MainPage");
+                return string.Empty;
+            }
         }
 
 
@@ -109,35 +137,35 @@ namespace BookRide.Services
 
         public async Task<Dictionary<string, T>> GetAllAsync<T>(string node)
         {
+            if (await IsSessionExpiredAsunc())
+            {
+                // Token has expired, re-authenticate
+
+                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+              
+            }
             var result=new Dictionary<string, T>();
+ 
             string? json = null;
             try
             {
                  json = await _httpClient.GetStringAsync(await BuildUrl(node));
                 //  return JsonSerializer.Deserialize<Dictionary<string, T>>(json);
-            }
-           
-             catch (UnauthorizedAccessException excp)
-            {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
-                await Task.Run(async () =>
-                {
-                    await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                });
-                
-            }
-            finally
-            {
-                 result = await Task.Run(() =>
+                result = await Task.Run(() =>
                 {
                     return JsonSerializer.Deserialize<Dictionary<string, T>>(json); // heavy work here
                 });
-
-               
+                return result;
             }
-            return result;
+            catch (UnauthorizedAccessException ex)
+            {
 
-
+                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+                return result;
+            }
         }
 
         //public async Task<Dictionary<string, T>> GetAllAsync<T>(string node)
@@ -172,29 +200,35 @@ namespace BookRide.Services
         //}
         public async Task<T> GetAsync<T>(string node)
         {
-           
+            if (await IsSessionExpiredAsunc())
+            {
+                // Token has expired, re-authenticate
+
+                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+            }
             string? json = null;
             try
             {
                 json = await _httpClient.GetStringAsync(await BuildUrl(node));
 
-               //  return JsonSerializer.Deserialize<T>(json);
+                //  return JsonSerializer.Deserialize<T>(json);
+                var result = await Task.Run(() =>
+                {
+                    return JsonSerializer.Deserialize<T>(json); // heavy work here
+                });
+                //  return JsonSerializer.Deserialize<T>(json);
+                return result;
             }
+            
             catch (UnauthorizedAccessException excp)
             {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
-                await Task.Run(async () =>
-                {
-                    await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                });
-                return JsonSerializer.Deserialize<T>(json);
+                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+               return default(T);
             }
-           var result= await Task.Run(() =>
-            {
-                return JsonSerializer.Deserialize<T>(json); // heavy work here
-            });
-          //  return JsonSerializer.Deserialize<T>(json);
-          return result;
+          
 
         }
         // public async Task<Dictionary<string, T>> GetAsync<T>(string node)
@@ -242,17 +276,44 @@ namespace BookRide.Services
         // DELETE
         public async Task<bool> DeleteAsync(string node)
         {
-            var response = await _httpClient.DeleteAsync(await BuildUrl(node));
-            //checking response code
-            if(response.StatusCode==System.Net.HttpStatusCode.Unauthorized)
+            if (await IsSessionExpiredAsunc())
             {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
-                await Task.Run(async () =>
-                {
-                    await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                });
+                // Token has expired, re-authenticate
+
+                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
             }
-            return response.IsSuccessStatusCode;
+            try
+                {
+                var response = await _httpClient.DeleteAsync(await BuildUrl(node));
+                return response.IsSuccessStatusCode;
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
+                await Shell.Current.GoToAsync("//MainPage");
+                return false;
+            }
+           
+            //checking response code
+        
+        }
+
+        public async Task<bool> IsSessionExpiredAsunc()
+        {
+           
+                DateTime currenttime = DateTime.Now;
+                DateTime tokenTime = await SecureStorageService.GetAsync<DateTime>(Constants.Constants.SessionStartTime);
+                TimeSpan difference = currenttime - tokenTime;
+                if (difference.TotalMinutes >= 60)
+                {
+                return true;
+                }
+                else
+                {
+                return false;
+                }           
         }
 
         //// 🔹 Delete
@@ -269,36 +330,6 @@ namespace BookRide.Services
         //}
 
         // firebase authentication
-        public async Task GetTokenAsync(string email, string password)
-        {
-            var payload = new
-            {
-                email,
-                password,
-                returnSecureToken = true
-            };
 
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await Task.Run(() => 
-            _httpClient.PostAsync(
-                $"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={Constants.Constants.Firebase_WebApi_key}",
-                content)
-            );
-
-            response.EnsureSuccessStatusCode();
-
-            var result = await response.Content.ReadAsStringAsync();
-            //  var tocken_result = JsonSerializer.Deserialize<FirebaseAuthResponse>(result);
-            var tocken_result = await Task.Run(() =>
-      JsonSerializer.Deserialize<FirebaseAuthResponse>(result));
-
-            await SecureStorage.SetAsync(Constants.Constants.Firebase_TokenKeyValue, tocken_result.idToken);
-            await SecureStorage.SetAsync(Constants.Constants.Firebase_UIDKeyValue, tocken_result.localId);
-            await SecureStorage.SetAsync(Constants.Constants.Firebase_RefreshTokenKeyValue, tocken_result.refreshToken);
-            await SecureStorage.SetAsync(Constants.Constants.Firebase_TokenTimeKeyValue, DateTime.UtcNow.ToString());
-
-        }
     }
 }
