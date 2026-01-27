@@ -13,6 +13,8 @@ using System.Threading.Tasks;
 using Android.Views.ContentCaptures;
 using System.Text.Json;
 using Org.Apache.Http.Authentication;
+using System.Net;
+
 #if ANDROID
 using Android.Content;
 using Application = Android.App.Application;
@@ -23,6 +25,7 @@ namespace BookRide.ViewModels
     public partial class MainPageViewModel : ObservableObject
     {
         private readonly RealtimeDatabaseService _db;
+        private readonly FirebaseAuthService _authService;
 
         [ObservableProperty]
         private string username;
@@ -47,13 +50,16 @@ namespace BookRide.ViewModels
         {
            // _foregroundService = foregroundService;
             _db = new RealtimeDatabaseService();
+            _authService = new FirebaseAuthService();
             _networkService = networkService;
-         //   _creditPointService = creditPointService;
+            //   _creditPointService = creditPointService;
             // _db.DeleteAllAsync();
-            Task.Run(async () =>
+
+             Task.Run(async ()=>
             {
-                await _db.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-            });
+                await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+               
+                });
 
         }
         public async Task StartTracking(string userid)
@@ -137,8 +143,9 @@ namespace BookRide.ViewModels
               
                 if(SelectedUserType.Equals(eNumUserType.Driver.ToString()))
                 {
-                    var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
-               //     var userDict = drs as IDictionary<string, object>;
+                   // var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
+                    var drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
+                    //     var userDict = drs as IDictionary<string, object>;
 
                     //Drivers userObj = new Drivers
                     //{
@@ -175,8 +182,9 @@ namespace BookRide.ViewModels
                         {
                             await LocationPermissionHelper.HasPermissionsAsync();
                             // starting a location tracking service
-                            await StartTracking(drs.UserId);
-                            await SecureStorage.SetAsync(Constants.Constants.LoggedInUser, drs.UserId);
+                           // await StartTracking(drs.UserId);
+                           // await SecureStorage.SetAsync(Constants.Constants.LoggedInUser, drs.UserId);
+                           await SecureStorageService.SaveAsync<DateTime>(Constants.Constants.SessionStartTime, DateTime.Now);
                             await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
                             {
                                 { "CurrentUser", drs }
@@ -224,8 +232,8 @@ namespace BookRide.ViewModels
                         }
                         else
                         {
-
-                                await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
+                            await SecureStorageService.SaveAsync<Users>(Constants.Constants.LoggedInUser, usr);
+                            await Shell.Current.GoToAsync(nameof(TravellerProfilePage), true, new Dictionary<string, object>
                                 {
                                     { "CurrentUser", usr }
                                 });
@@ -258,7 +266,7 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
-            await Shell.Current.GoToAsync(nameof(TermsConditionsPage));
+            await Shell.Current.GoToAsync(nameof(RegisterPage));
         }
 
         [RelayCommand]

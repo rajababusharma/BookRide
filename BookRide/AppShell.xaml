@@ -4,40 +4,27 @@
     xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
     xmlns:local="clr-namespace:BookRide"
-    Shell.FlyoutBehavior="Disabled"
     Title="Taxi Ride">
+
 
     <ShellContent
         Title="Login"
-        Icon="icon.png"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage">
-
-      
     </ShellContent>
 
     <!--<ShellContent
-     Title="Register Type"
-     Icon="car.png"
-     ContentTemplate="{DataTemplate local:RegisterPage}"
-     Route="RegisterPage" />
-
+       Title="Home"
+       ContentTemplate="{DataTemplate local:DriverProfilePage}"
+       Route="DriverProfilePage">
+    </ShellContent>
+    
     <ShellContent
-     Title="Registration"
-     Icon="car.png"
-     ContentTemplate="{DataTemplate local:DriverRegistration}"
-     Route="DriverRegistration" />
+       Title="Home"
+       ContentTemplate="{DataTemplate local:TravellerProfilePage}"
+       Route="TravellerProfilePage">
+    </ShellContent>-->
 
-    <ShellContent
-  Title="Home"
-  Icon="car.png"
-  ContentTemplate="{DataTemplate local:DriverProfilePage}"
-  Route="DriverProfilePage" />
-
-    <ShellContent
-  Title="Home"
-  Icon="car.png"
-  ContentTemplate="{DataTemplate local:TravellerProfilePage}"
-  Route="TravellerProfilePage" />-->
+   
   
 </Shell>

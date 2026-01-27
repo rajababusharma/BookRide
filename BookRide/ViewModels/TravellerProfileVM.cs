@@ -170,9 +170,9 @@ namespace BookRide.ViewModels
                     //Task.Run(async () =>
                     //{
                     ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
-                    var drivers = await Task.Run(() =>
+                    var drivers = await
                                   _db.GetAllAsync<Drivers>("Drivers")
-                             );
+                             ;
 
 
                     //  var drivers = await _db.GetAllAsync<Drivers>("Drivers");
@@ -206,9 +206,7 @@ namespace BookRide.ViewModels
                     //}).GetAwaiter().GetResult();
                     ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
                   //  var users = await _db.GetAllAsync<Drivers>("Drivers");
-                    var users = await Task.Run(() =>
-                                _db.GetAllAsync<Drivers>("Drivers")
-                            );
+                    var users = await _db.GetAllAsync<Drivers>("Drivers");
                     //check drivers list is null
                     if (users == null)
                     {
@@ -342,7 +340,7 @@ namespace BookRide.ViewModels
 
             var navigationParameter = new Dictionary<string, object>
                     {
-                        { "USERS", User }
+                        { "CurrentUser", User }
                     };
             await Shell.Current.GoToAsync(nameof(UserRegistrationPage), navigationParameter);
 

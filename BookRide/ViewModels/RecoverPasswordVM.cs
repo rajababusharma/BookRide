@@ -217,7 +217,7 @@ namespace BookRide.ViewModels
             if (isDriver)
             {
                 drivers.Password = Password;
-                var status = await Task.Run(() => _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers));
+                var status = await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
 
                // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
                if (status)
@@ -238,7 +238,7 @@ namespace BookRide.ViewModels
             else
             {
                 users.Password = Password;
-                var status = await Task.Run(() => _db.SaveAsync<Users>($"Users/{users.UserId}", users));
+                var status = await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
 
                 // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
                 if (status)

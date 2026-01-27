@@ -15,6 +15,7 @@ namespace BookRide.Models
         public int Age { get; set; }
         public string Address { get; set; }
         public string Mobile { get; set; }
+        public string EmailAddress { get; set; }
         public string Password { get; set; }
         public string VehicleNo { get; set; }
         public int CreditPoint { get; set; } = 61;
