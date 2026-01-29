@@ -18,7 +18,13 @@ namespace BookRide
         {
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             await  LocationPermissionHelper.HasPermissionsAsync();
-
+            //if(BindingContext is MainPageViewModel viewModel)
+            //{
+            //   // await viewModel._authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+               
+            //     //   await viewModel._authService.RefreshTokenAsync();
+            //}
+            
             base.OnAppearing();
 
             
