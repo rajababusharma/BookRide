@@ -14,6 +14,8 @@ using Android.Views.ContentCaptures;
 using System.Text.Json;
 using Org.Apache.Http.Authentication;
 using System.Net;
+using AndroidX.Lifecycle;
+
 
 #if ANDROID
 using Android.Content;
@@ -55,11 +57,11 @@ namespace BookRide.ViewModels
             //   _creditPointService = creditPointService;
             // _db.DeleteAllAsync();
 
-             Task.Run(async ()=>
-            {
-                await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+            // Task.Run(async ()=>
+            //{
+            //    await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
                
-                });
+            //    });
 
         }
         public async Task StartTracking(string userid)
@@ -143,7 +145,15 @@ namespace BookRide.ViewModels
               
                 if(SelectedUserType.Equals(eNumUserType.Driver.ToString()))
                 {
-                   // var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
+                    // Getting Firebase token
+                    if(string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
+                    {
+                        Console.WriteLine("Fetching new Firebase token...");
+                        await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                    }
+                   
+                       
+                    // var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
                     var drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
                     //     var userDict = drs as IDictionary<string, object>;
 
@@ -182,7 +192,7 @@ namespace BookRide.ViewModels
                         {
                             await LocationPermissionHelper.HasPermissionsAsync();
                             // starting a location tracking service
-                           // await StartTracking(drs.UserId);
+                            await StartTracking(drs.UserId);
                            // await SecureStorage.SetAsync(Constants.Constants.LoggedInUser, drs.UserId);
                            await SecureStorageService.SaveAsync<DateTime>(Constants.Constants.SessionStartTime, DateTime.Now);
                             await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>

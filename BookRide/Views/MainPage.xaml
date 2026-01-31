@@ -91,7 +91,7 @@ StrokeShape="RoundRectangle 12">
 
             </HorizontalStackLayout>
             <!-- Loading Indicator -->
-            <ActivityIndicator
+            <ActivityIndicator 
      IsRunning="{Binding IsBusy}"
      IsVisible="{Binding IsBusy}" />
             <!-- Error Message -->

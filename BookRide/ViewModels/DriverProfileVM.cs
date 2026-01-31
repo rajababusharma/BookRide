@@ -27,6 +27,7 @@ namespace BookRide.ViewModels
 
         [ObservableProperty]
         private bool isBusy;
+
         [ObservableProperty]
         private string? profileImageUrl;
 
@@ -155,10 +156,8 @@ namespace BookRide.ViewModels
                 // Save the file into firebase storage and get the URL
                 var imageStream = await photo.OpenReadAsync();
 
-                var imageUrl = await Task.Run(() =>
+                var imageUrl = await _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId);
                 
-                      _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId)
-                ); 
                 if (!string.IsNullOrEmpty(imageUrl))
                 {
                     User.ProfileImageUrl = imageUrl;

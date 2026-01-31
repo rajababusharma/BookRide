@@ -38,6 +38,13 @@ namespace BookRide.Services
 
         private async Task<string> BuildUrl(string path)
         {
+            if (await IsSessionExpiredAsunc())
+            {
+                // Token has expired, refreshing token
+
+                await _firebaseAuthService.RefreshTokenAsync();
+
+            }
             var token = await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue);
             return $"{BaseUrl}{path}.json?auth={token}";
         } 
@@ -49,15 +56,7 @@ namespace BookRide.Services
               {
                 
             
-                if (await IsSessionExpiredAsunc())
-                {
-                    // Token has expired, re-authenticate
-                  
-                    //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-               await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");                    
-                      await Shell.Current.GoToAsync("//MainPage");
-                      //return false;
-                }
+              
                 // var json = JsonSerializer.Serialize(data);
                 var json = await Task.Run(() =>
             {
@@ -71,8 +70,7 @@ namespace BookRide.Services
             catch (UnauthorizedAccessException ex)
             {
 
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
                 return false;
             }
         }
@@ -93,16 +91,6 @@ namespace BookRide.Services
             try
             {
 
-                if (await IsSessionExpiredAsunc())
-                {
-                    // Token has expired, re-authenticate
-
-                    //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                    await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
-                    await Shell.Current.GoToAsync("//MainPage");
-                   // return false;
-                }
-
                 // var json = System.Text.Json.JsonSerializer.Serialize(data);
                 var json = await Task.Run(() =>
             {
@@ -119,10 +107,8 @@ namespace BookRide.Services
             }
             catch (UnauthorizedAccessException ex)
             {
-
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
-                
-                await Shell.Current.GoToAsync("//MainPage");
+                // displaying an alert
+                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
                 return string.Empty;
             }
         }
@@ -137,15 +123,7 @@ namespace BookRide.Services
 
         public async Task<Dictionary<string, T>> GetAllAsync<T>(string node)
         {
-            if (await IsSessionExpiredAsunc())
-            {
-                // Token has expired, re-authenticate
-
-                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
-              
-            }
+           
             var result=new Dictionary<string, T>();
  
             string? json = null;
@@ -162,8 +140,7 @@ namespace BookRide.Services
             catch (UnauthorizedAccessException ex)
             {
 
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
                 return result;
             }
         }
@@ -200,14 +177,7 @@ namespace BookRide.Services
         //}
         public async Task<T> GetAsync<T>(string node)
         {
-            if (await IsSessionExpiredAsunc())
-            {
-                // Token has expired, re-authenticate
-
-                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
-            }
+           
             string? json = null;
             try
             {
@@ -224,9 +194,8 @@ namespace BookRide.Services
             
             catch (UnauthorizedAccessException excp)
             {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
-               return default(T);
+                await Shell.Current.DisplayAlert("Exception", excp.Message, "Ok");
+                return default(T);
             }
           
 
@@ -276,14 +245,7 @@ namespace BookRide.Services
         // DELETE
         public async Task<bool> DeleteAsync(string node)
         {
-            if (await IsSessionExpiredAsunc())
-            {
-                // Token has expired, re-authenticate
-
-                //  await _firebaseAuthService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                await Shell.Current.DisplayAlert("Alert", "Session has expired, please re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
-            }
+           
             try
                 {
                 var response = await _httpClient.DeleteAsync(await BuildUrl(node));
@@ -291,8 +253,7 @@ namespace BookRide.Services
             }
             catch (UnauthorizedAccessException ex)
             {
-                await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after re-login", "Ok");
-                await Shell.Current.GoToAsync("//MainPage");
+                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
                 return false;
             }
            
