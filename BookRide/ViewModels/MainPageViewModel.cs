@@ -125,6 +125,8 @@ namespace BookRide.ViewModels
                 IsBusy = false;
                 return;
             }
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
+            await LocationPermissionHelper.HasPermissionsAsync();
 
             if (string.IsNullOrWhiteSpace(SelectedUserType))
             {
@@ -142,15 +144,17 @@ namespace BookRide.ViewModels
                     IsBusy = false;
                     return;
                 }
-              
-                if(SelectedUserType.Equals(eNumUserType.Driver.ToString()))
+
+                // Getting Firebase token
+                if (string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
                 {
-                    // Getting Firebase token
-                    if(string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
-                    {
-                        Console.WriteLine("Fetching new Firebase token...");
-                        await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
-                    }
+                    Console.WriteLine("Fetching new Firebase token...");
+                    await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                }
+
+                if (SelectedUserType.Equals(eNumUserType.Driver.ToString()))
+                {
+                   
                    
                        
                     // var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));

@@ -117,6 +117,7 @@ namespace BookRide.ViewModels
             _db = new RealtimeDatabaseService();
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
             _networkService = networkService;
+            IsBusy = false;
         }
 
         public async Task InitializeAsync()

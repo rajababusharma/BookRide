@@ -95,7 +95,8 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
-
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
+            await LocationPermissionHelper.HasPermissionsAsync();
             if (!IsTermsAccepted)
             {
                 Shell.Current.DisplayAlert("Alert", "Please select terms and conditions first", "OK");

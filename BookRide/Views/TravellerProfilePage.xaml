@@ -13,8 +13,8 @@
             IsVisible="False" 
             IsEnabled="False" />
     </Shell.BackButtonBehavior>
-    <VerticalStackLayout>
-    <Label Margin="20,10,0,10" FontSize="Title" FontAttributes="Bold">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="10">
+        <Label Margin="20,0,0,0" FontSize="Title" FontAttributes="Bold" Grid.Row="0">
             <Label.Text>
                 <MultiBinding StringFormat="{}{0} {1}">
                     <Binding Path="Hi"/>
@@ -22,28 +22,22 @@
                 </MultiBinding>
             </Label.Text>
         </Label>
-        <Label Margin="20,0,10,10" FontSize="Subtitle"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
+        <Label Grid.Row="1" Margin="20,0,10,0" FontSize="Subtitle"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
+        <!-- Loading Indicator -->
+        <ActivityIndicator Grid.Row="2"
+IsRunning="{Binding IsBusy}"
+IsVisible="{Binding IsBusy}" />
 
-       
-            <Picker x:Name="pkrdistrict"   HorizontalOptions="Fill" HorizontalTextAlignment="Center"
+        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="3" StrokeShape="RoundRectangle 10">
+            <Picker Grid.Row="3" x:Name="pkrdistrict"   HorizontalOptions="Fill" HorizontalTextAlignment="Center"
                   VerticalOptions="Center"
                   Margin="10,0,10,0"
                 Title="Click Here To Select City" FontSize="Large" FontAttributes="Bold"  SelectedItem="{Binding SelectedDistrict}"
                 ItemsSource="{Binding Districts}" />
-
-      
-
-        <!-- Loading Indicator -->
-        <ActivityIndicator
-IsRunning="{Binding IsBusy}"
-IsVisible="{Binding IsBusy}" />
-
-      
-
-       
-        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="3">
+        </Border>
+        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="4">
         <CollectionView IsVisible="True"
-            ItemsSource="{Binding DriversList}" VerticalScrollBarVisibility="Default"
+            ItemsSource="{Binding DriversList}" VerticalScrollBarVisibility="Always"
           SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
@@ -117,7 +111,7 @@ Path=BindingContext.WhatsappConnectCommand}" CommandParameter="{Binding Mobile}"
 
         </CollectionView>
         </Border>
-    </VerticalStackLayout>
+    </Grid>
 
 
 </ContentPage>

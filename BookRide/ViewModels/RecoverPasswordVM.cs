@@ -58,7 +58,8 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RecoverPasswordAsync()
         {
-           
+            await LocationPermissionHelper.CheckGPSLocationEnableAsync();
+            await LocationPermissionHelper.HasPermissionsAsync();
             IsBusy = true;
             // check internet connectivity first 
 

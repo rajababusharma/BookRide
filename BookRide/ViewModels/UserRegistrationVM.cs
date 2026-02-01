@@ -61,7 +61,9 @@ namespace BookRide.ViewModels
         {
 
 
+           // await LocationPermissionHelper.CheckGPSLocationEnableAsync();
             await LocationPermissionHelper.CheckGPSLocationEnableAsync();
+            await LocationPermissionHelper.HasPermissionsAsync();
 
             IsBusy = true;
             // check internet connectivity first 
