@@ -77,6 +77,9 @@ namespace BookRide.Services
            // await SecureStorage.SetAsync("firebase_id_token", newIdToken);
             await SecureStorage.SetAsync(Constants.Constants.Firebase_TokenKeyValue, newIdToken);
 
+            await SecureStorageService.SaveAsync<DateTime>(Constants.Constants.SessionStartTime, DateTime.Now);
+           
+
         }
     }
 }

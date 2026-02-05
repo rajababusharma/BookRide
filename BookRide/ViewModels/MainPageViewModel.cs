@@ -154,11 +154,23 @@ namespace BookRide.ViewModels
 
                 if (SelectedUserType.Equals(eNumUserType.Driver.ToString()))
                 {
-                   
-                   
-                       
+
+
+
                     // var drs = await Task.Run(()=> _db.GetAsync<Drivers>($"Drivers/{Username}"));
-                    var drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
+                    //putting the GetAsync<Drivers>($"Drivers/{Username}") inside try catch to handle exception if user not found
+                    var drs = new Drivers();
+                    try
+                    {
+                        drs = await _db.GetAsync<Drivers>($"Drivers/{Username}");
+                    }
+                    catch(Exception ex)
+                    {
+                        Console.WriteLine($"Line: 165 MainPageVM Error fetching driver data: {ex.Message}");
+                        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                    }
+
+                   
                     //     var userDict = drs as IDictionary<string, object>;
 
                     //Drivers userObj = new Drivers
@@ -214,7 +226,17 @@ namespace BookRide.ViewModels
                 }
                 else
                 {
-                    var usr = await _db.GetAsync<Users>($"Users/{Username}");
+                    var usr = new Users();
+                    try
+                    {
+                        usr = await _db.GetAsync<Users>($"Users/{Username}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Line: 231 MainPageVM Error fetching users data: {ex.Message}");
+                        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                    }
+                    
                     // cast a dictionary to an object of Drivers
                     //var userDict = usr as IDictionary<string, object>;
 
@@ -280,6 +302,12 @@ namespace BookRide.ViewModels
         [RelayCommand]
         private async Task RegisterAsync()
         {
+            // Getting Firebase token
+            if (string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
+            {
+                Console.WriteLine("Fetching new Firebase token...");
+                await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+            }
             await Shell.Current.GoToAsync(nameof(RegisterPage));
         }
 

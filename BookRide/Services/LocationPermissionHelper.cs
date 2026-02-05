@@ -69,34 +69,34 @@ namespace BookRide.Services
 
         public static async Task HasPermissionsAsync()
         {
-            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-            var status1 = await Permissions.CheckStatusAsync<Permissions.LocationAlways>();
+           // var alwaysinuse = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
 
-            if (status != PermissionStatus.Granted)
+            var alwaysinuse = await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-            }
+                return await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
+            });
 
-            if (status != PermissionStatus.Granted)
-            {
-                await Shell.Current.DisplayAlert(
-                    "Permission Required",
-                    "Location permission is required.",
-                    "OK");
-            }
-
-            if (status1 != PermissionStatus.Granted)
-            {
-                status1 = await Permissions.RequestAsync<Permissions.LocationAlways>();
-            }
-
-            if (status1 != PermissionStatus.Granted)
+            if (alwaysinuse != PermissionStatus.Granted)
             {
                 await Shell.Current.DisplayAlert(
-                    "Permission Required",
-                    "Location permission is required.",
-                    "OK");
+                 "Permission Required",
+                 "This app collects location data to enable real-time ride tracking, driver matching, and trip safety features even when the app is closed or not in use.\n Your location is used to: \n" + "1.>" + "Find nearby drivers faster.\n" + "2.>" + " Track rides in real time. \n" + "3.>" + " Improve pickup accuracy",
+                 "OK");
+
+                alwaysinuse = await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    return await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                });
+              //  alwaysinuse = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
+                if (alwaysinuse == PermissionStatus.Granted)
+                {
+                #if ANDROID
+                   await MainThread.InvokeOnMainThreadAsync(async () =>
+                                    await Permissions.RequestAsync<Permissions.LocationAlways>());
+                #endif
+                }
             }
+
         }
     }
 }

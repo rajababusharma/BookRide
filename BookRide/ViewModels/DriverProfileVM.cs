@@ -94,7 +94,10 @@ namespace BookRide.ViewModels
                         IsActive = "Active";
                         IsVisible = false;
                     }
-                    else if (User.CreditPoint == 0)
+                    else if (!string.IsNullOrWhiteSpace(User.FirstName) &&
+                   !string.IsNullOrWhiteSpace(User.UserId) &&
+                  User.CreditPoint == 0 &&
+                   !string.IsNullOrWhiteSpace(User.Mobile))                  
                     {
 
                         // await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);

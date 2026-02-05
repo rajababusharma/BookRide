@@ -1,6 +1,7 @@
 ﻿using Android.App;
 using Android.Content;
 using Android.Content.PM;
+using Android.Locations;
 using Android.OS;
 using BookRide.Models;
 using BookRide.Services;
@@ -92,9 +93,12 @@ namespace BookRide.Platforms.Android.Implementations
                         isServiceRunning = false;
                         return;
                     }
-                   
+
                     // Deduct one credit point
-                    if (user.CreditPoint > 0)
+                    if (!string.IsNullOrWhiteSpace(user.FirstName) &&
+                        !string.IsNullOrWhiteSpace(user.UserId) &&
+                        user.CreditPoint > 0 &&
+                        !string.IsNullOrWhiteSpace(user.Mobile))
                     {
                         Drivers drivers = new Drivers
                         {
