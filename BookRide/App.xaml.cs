@@ -9,11 +9,14 @@ namespace BookRide
     public partial class App : Application
     {
        private readonly RealtimeDatabaseService _db;
-        public App(AppShell shell)
+        private readonly FirebaseAuthService _authService;
+        public App(AppShell shell,FirebaseAuthService firebaseAuth, RealtimeDatabaseService databaseService)
         {
             InitializeComponent();
             // MainPage = shell;
-            _db = new RealtimeDatabaseService();
+            _authService = firebaseAuth;
+            _db = databaseService;
+           // _db = new RealtimeDatabaseService();
             // Navigate to Login page on app start
             //  Shell.Current.GoToAsync($"//{nameof(MainPage)}");
             // 1. Catch unhandled exceptions from the main application domain
@@ -103,6 +106,21 @@ namespace BookRide
             // Note: The app may still terminate after this handler runs.
         }
 
-        
+        override async protected void OnStart()
+        {
+            // Handle when your app starts
+            try
+            {
+                var token = await _authService.GetValidTokenAsync();
+
+                // Token valid → go to Home Page
+            }
+            catch
+            {
+                // Refresh failed → go to Login Page
+            }
+
+        }
+
     }
 }

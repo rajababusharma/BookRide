@@ -28,5 +28,6 @@ namespace BookRide.Constants
         public const string Firebase_Userpwd = "Rekha@7124";
         public const string LoggedInUser = "LoggedInUser";
         public const string SessionStartTime = "SessionStartTime";
+        public const string Firebase_TokenExpiryKey = "Firebase_TokenExpiryKey";
     }
 }

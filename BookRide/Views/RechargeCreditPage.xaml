@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.RechargeCreditPage"
+              Padding="{OnPlatform Android='0,30,0,20'}"
              Title="Add Credit Points">
     <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding BackToLoginCommand}" Text="Login"

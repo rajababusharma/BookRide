@@ -48,10 +48,11 @@ namespace BookRide.ViewModels
         public bool IsNotBusy => !IsBusy;
 
         private readonly INetworkService _networkService;
-        public MainPageViewModel(INetworkService networkService)
+        public MainPageViewModel(INetworkService networkService,RealtimeDatabaseService databaseService)
         {
            // _foregroundService = foregroundService;
-            _db = new RealtimeDatabaseService();
+           // _db = new RealtimeDatabaseService();
+            _db = databaseService;
             _authService = new FirebaseAuthService();
             _networkService = networkService;
             //   _creditPointService = creditPointService;
@@ -149,7 +150,8 @@ namespace BookRide.ViewModels
                 if (string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
                 {
                     Console.WriteLine("Fetching new Firebase token...");
-                    await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                   // await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                    await _authService.LoginAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
                 }
 
                 if (SelectedUserType.Equals(eNumUserType.Driver.ToString()))
@@ -306,7 +308,7 @@ namespace BookRide.ViewModels
             if (string.IsNullOrEmpty(await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue)))
             {
                 Console.WriteLine("Fetching new Firebase token...");
-                await _authService.GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
+                await _authService.LoginAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);
             }
             await Shell.Current.GoToAsync(nameof(RegisterPage));
         }

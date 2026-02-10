@@ -110,11 +110,12 @@ namespace BookRide.ViewModels
             }
         }
 
-        public TravellerProfileVM(IWhatsAppConnect whatsApp, INetworkService networkService)
+        public TravellerProfileVM(IWhatsAppConnect whatsApp, INetworkService networkService,RealtimeDatabaseService databaseService)
         {
             _whatsAppConnect = whatsApp;
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
-            _db = new RealtimeDatabaseService();
+          //  _db = new RealtimeDatabaseService();
+            _db = databaseService;
             _geolocationRequest = new GeolocationRequest(GeolocationAccuracy.Medium, TimeSpan.FromSeconds(10));
             _networkService = networkService;
             IsBusy = false;
@@ -332,7 +333,11 @@ namespace BookRide.ViewModels
         }
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-            User = query["CurrentUser"] as Users;
+           // User = query["CurrentUser"] as Users;
+            if (!query.TryGetValue("CurrentUser", out var userObj) || userObj is not Users user)
+                return;
+
+            User = user;
         }
 
         [RelayCommand]

@@ -46,9 +46,10 @@ namespace BookRide.ViewModels
 
         private readonly INetworkService _networkService;
 
-        public RecoverPasswordVM(INetworkService networkService)
+        public RecoverPasswordVM(INetworkService networkService,RealtimeDatabaseService databaseService)
         {
-            _db = new RealtimeDatabaseService();
+           // _db = new RealtimeDatabaseService();
+            _db = databaseService;
             _networkService = networkService;
             isPasswordVisible = false;
             isReadOnly = false;

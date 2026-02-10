@@ -21,7 +21,6 @@ namespace BookRide.ViewModels
         public ObservableCollection<string> States { get; }
         public ObservableCollection<string> Districts { get; }
         private readonly RealtimeDatabaseService _db;
-        private readonly FirebaseAuthService authService;
         [ObservableProperty]
         private bool isBusy;
 
@@ -43,11 +42,10 @@ namespace BookRide.ViewModels
         private readonly INetworkService _networkService;
 
         private readonly IFirebaseUpload _firebaseUpload;
-        public UserRegistrationVM(INetworkService networkService)
+        public UserRegistrationVM(INetworkService networkService,RealtimeDatabaseService databaseService)
         {
-            _db = new RealtimeDatabaseService();
-            authService = new FirebaseAuthService();
-           // States = new ObservableCollection<string>(IndiaStates.All);
+            _db = databaseService;
+            // States = new ObservableCollection<string>(IndiaStates.All);
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
 
             _networkService = networkService;

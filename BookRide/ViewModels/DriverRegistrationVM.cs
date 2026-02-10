@@ -30,7 +30,7 @@ namespace BookRide.ViewModels
         public ObservableCollection<string> Districts { get; }
         private readonly ITest _test;
         private readonly RealtimeDatabaseService _db;
-        private readonly FirebaseAuthService _authService;
+       
         [ObservableProperty]
         private bool isBusy;
 
@@ -67,12 +67,12 @@ namespace BookRide.ViewModels
         private readonly INetworkService _networkService;
 
         private readonly IFirebaseUpload _firebaseUpload;
-        public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress,IFirebaseUpload firebaseUpload)
+        public DriverRegistrationVM(INetworkService networkService,ICurrentAddress currentAddress,IFirebaseUpload firebaseUpload,RealtimeDatabaseService databaseService)
         {
-            _db = new RealtimeDatabaseService();
-            _authService = new FirebaseAuthService();
-          //  States = new ObservableCollection<string>(IndiaStates.All);
-            Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
+            _db = databaseService;
+           
+                //  States = new ObservableCollection<string>(IndiaStates.All);
+                Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
       
             _networkService = networkService;
             _firebaseUpload = firebaseUpload;
@@ -282,33 +282,33 @@ namespace BookRide.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
-           var user = query["CurrentUser"] as Drivers;
-            if (user == null)
-            {
+            if (!query.TryGetValue("CurrentUser", out var userObj) || userObj is not Drivers user)
                 return;
-            }
 
-            //  Drivers user = usr as Drivers;
-            Task.Run(() =>
-            {
-                Mobile = user.Mobile;
-                EmailAddress = user.EmailAddress;
-                FirstName = user.FirstName;
-                Age = user.Age.ToString();
-                Address = user.Address;
-                VehicleNo = user.VehicleNo;
-                SelectedDistrict = user.District;
-                SelectedVehicle = user.VehicleType;
-                Password = user.Password;
-                ConfirmPassword = user.Password;
-                AadharImagePath = user.AadharImageURL;
-                AadharImageURL = user.AadharImageURL;
-                CreditPoint = user.CreditPoint;
-                ProfileImageUrl = user.ProfileImageUrl;
-            });
-                
-            
+
+            MapDriverToViewModel(user);
+
         }
+        private void MapDriverToViewModel(Drivers user)
+        {
+            Mobile = user.Mobile ?? string.Empty;
+            EmailAddress = user.EmailAddress ?? string.Empty;
+            FirstName = user.FirstName ?? string.Empty;
+            Age = user.Age.ToString(); // FIX: Remove '?' operator, since Age is int (not nullable)
+            Address = user.Address ?? string.Empty;
+            VehicleNo = user.VehicleNo ?? string.Empty;
+            SelectedDistrict = user.District ?? string.Empty;
+            SelectedVehicle = user.VehicleType ?? string.Empty;
+            Password = user.Password ?? string.Empty;
+            ConfirmPassword = user.Password ?? string.Empty;
+            AadharImagePath = user.AadharImageURL ?? string.Empty;
+            AadharImageURL = user.AadharImageURL ?? string.Empty;
+            AadharImageURL = string.IsNullOrWhiteSpace(user.AadharImageURL) ? "person.png" : user.AadharImageURL;
+           
+            ProfileImageUrl = string.IsNullOrWhiteSpace(user.ProfileImageUrl) ? "person.png" : user.ProfileImageUrl;
+            CreditPoint = user.CreditPoint;
+        }
+
 
         [RelayCommand]
         public async Task UploadPhotoAsync()

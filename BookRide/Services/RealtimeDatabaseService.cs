@@ -7,6 +7,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Bumptech.Glide.Load.Model;
+using System.Net.Http.Headers;
+
 
 #if ANDROID
 using Android.Security.Keystore;
@@ -38,14 +40,17 @@ namespace BookRide.Services
 
         private async Task<string> BuildUrl(string path)
         {
-            if (await IsSessionExpiredAsunc())
-            {
-                // Token has expired, refreshing token
+            //if (await IsSessionExpiredAsunc())
+            //{
+            //    // Token has expired, refreshing token
 
-                await _firebaseAuthService.RefreshTokenAsync();
+            //    await _firebaseAuthService.RefreshTokenAsync();
 
-            }
-            var token = await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue);
+            //}
+            var token =await _firebaseAuthService.GetValidTokenAsync();
+    //        _httpClient.DefaultRequestHeaders.Authorization =
+    //new AuthenticationHeaderValue("Bearer", token.ToString());
+            // var token = await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue);
             return $"{BaseUrl}{path}.json?auth={token}";
         } 
 
@@ -64,7 +69,7 @@ namespace BookRide.Services
             });
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync(await BuildUrl(node), content);
+            var response = await _httpClient.PutAsync(await BuildUrl(node), content).ConfigureAwait(false);
             return response.IsSuccessStatusCode;
             }
             catch (UnauthorizedAccessException ex)
@@ -97,7 +102,7 @@ namespace BookRide.Services
                 return System.Text.Json.JsonSerializer.Serialize(data); // heavy work here
             });
             var response = await _httpClient.PostAsync(await BuildUrl(node),
-                              new StringContent(json, Encoding.UTF8, "application/json"));
+                              new StringContent(json, Encoding.UTF8, "application/json")).ConfigureAwait(false);
 
 
             var result = await response.Content.ReadAsStringAsync();
@@ -124,25 +129,29 @@ namespace BookRide.Services
         public async Task<Dictionary<string, T>> GetAllAsync<T>(string node)
         {
            
-            var result=new Dictionary<string, T>();
+           // var result=new Dictionary<string, T>();
  
-            string? json = null;
+          //  string? json = null;
             try
             {
-                 json = await _httpClient.GetStringAsync(await BuildUrl(node));
-                //  return JsonSerializer.Deserialize<Dictionary<string, T>>(json);
-                result = await Task.Run(() =>
-                {
-                    return JsonSerializer.Deserialize<Dictionary<string, T>>(json); // heavy work here
-                });
-                return result;
-            }
-            catch (UnauthorizedAccessException ex)
-            {
+                var url = await BuildUrl(node).ConfigureAwait(false);
+                var json = await _httpClient.GetStringAsync(url).ConfigureAwait(false);
 
-                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
+                // Only use Task.Run if JSON is VERY large
+                var result = JsonSerializer.Deserialize<Dictionary<string, T>>(json);
+
                 return result;
             }
+            catch (UnauthorizedAccessException)
+            {
+                // Let UI layer handle this
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+
         }
 
         //public async Task<Dictionary<string, T>> GetAllAsync<T>(string node)
@@ -178,26 +187,27 @@ namespace BookRide.Services
         public async Task<T> GetAsync<T>(string node)
         {
            
-            string? json = null;
+           // string? json = null;
             try
             {
-                json = await _httpClient.GetStringAsync(await BuildUrl(node));
+               var json = await _httpClient.GetStringAsync(await BuildUrl(node)).ConfigureAwait(false);
 
                 //  return JsonSerializer.Deserialize<T>(json);
-                var result = await Task.Run(() =>
-                {
+
                     return JsonSerializer.Deserialize<T>(json); // heavy work here
-                });
-                //  return JsonSerializer.Deserialize<T>(json);
-                return result;
+
+                //  return JsonSerializer.Deserialize<T>(json);;
             }
             
-            catch (UnauthorizedAccessException excp)
+            catch (UnauthorizedAccessException)
             {
-                await Shell.Current.DisplayAlert("Exception", excp.Message, "Ok");
-                return default(T);
+                throw;
             }
-          
+            catch (Exception)
+            {
+                throw;
+            }
+
 
         }
         // public async Task<Dictionary<string, T>> GetAsync<T>(string node)
@@ -248,24 +258,28 @@ namespace BookRide.Services
            
             try
                 {
-                var response = await _httpClient.DeleteAsync(await BuildUrl(node));
+                var response = await _httpClient.DeleteAsync(await BuildUrl(node)).ConfigureAwait(false);
                 return response.IsSuccessStatusCode;
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
-                return false;
+                throw;
             }
-           
-            //checking response code
-        
-        }
+            catch (Exception)
+            {
+                throw;
+            }
 
-        public async Task<bool> IsSessionExpiredAsunc()
+            //checking response code
+
+        }
+ 
+
+        public async Task<bool> IsSessionExpiredAsunc1()
         {
            
                 DateTime currenttime = DateTime.Now;
-                DateTime tokenTime = await SecureStorageService.GetAsync<DateTime>(Constants.Constants.SessionStartTime);
+                DateTime tokenTime = await SecureStorageService.GetAsync<DateTime>(Constants.Constants.SessionStartTime).ConfigureAwait(false); ;
                 TimeSpan difference = currenttime - tokenTime;
                 if (difference.TotalMinutes >= 60)
                 {
@@ -276,6 +290,9 @@ namespace BookRide.Services
                 return false;
                 }           
         }
+
+
+
 
         //// 🔹 Delete
         //public async Task DeleteAsync(string path)

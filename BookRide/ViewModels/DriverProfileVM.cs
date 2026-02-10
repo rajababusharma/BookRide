@@ -37,10 +37,11 @@ namespace BookRide.ViewModels
         private readonly IFirebaseUpload _firebaseUpload;
 
         private readonly RealtimeDatabaseService _db;
-        public DriverProfileVM(IFirebaseUpload firebaseUpload)
+        public DriverProfileVM(IFirebaseUpload firebaseUpload, RealtimeDatabaseService databaseService)
         {
             _firebaseUpload = firebaseUpload;
-            _db = new RealtimeDatabaseService();
+            _db = databaseService;
+           // _db = new RealtimeDatabaseService();
         }
 
         [RelayCommand]
@@ -71,6 +72,67 @@ namespace BookRide.ViewModels
 
         public void ApplyQueryAttributes(IDictionary<string, object> query)
         {
+            if (!query.TryGetValue("CurrentUser", out var userObj) || userObj is not Drivers user)
+                return;
+
+            User = user;
+
+            // Run async logic without blocking navigation
+            _ = InitializeUserAsync();
+        }
+        private async Task InitializeUserAsync()
+        {
+            try
+            {
+                
+
+                ProfileImageUrl = string.IsNullOrEmpty(User.ProfileImageUrl)
+                    ? "person.png"
+                    : User.ProfileImageUrl;
+
+                if (User.IsActive && User.CreditPoint > 0)
+                {
+                    IsActive = "Active";
+                    IsVisible = false;
+                    return;
+                }
+
+                if (!string.IsNullOrWhiteSpace(User.FirstName) &&
+                    !string.IsNullOrWhiteSpace(User.UserId) &&
+                    User.CreditPoint == 0 &&
+                    !string.IsNullOrWhiteSpace(User.Mobile))
+                {
+                    await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
+
+                    User.IsActive = false;
+                    IsActive = "Deactivated";
+                    IsVisible = true;
+
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                        Shell.Current.DisplayAlert(
+                            "Low Credit",
+                            $"Your current credit points are {User.CreditPoint}. Please recharge to keep your account active.",
+                            "OK"));
+                    return;
+                }
+
+                // Deactivated cases
+                IsActive = "Deactivated";
+                IsVisible = true;
+
+                await MainThread.InvokeOnMainThreadAsync(() =>
+                    Shell.Current.DisplayAlert(
+                        "Account Deactivated",
+                        "Your account has been deactivated due to a compliance reason. Please contact support.",
+                        "OK"));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"User init error: {ex}");
+            }
+        }
+        public void ApplyQueryAttributes1(IDictionary<string, object> query)
+        {
             User = query["CurrentUser"] as Drivers;
             if(User == null)
             {
@@ -80,13 +142,9 @@ namespace BookRide.ViewModels
             {
                 Task.Run(() =>
                 {
-                    ProfileImageUrl = User.ProfileImageUrl;
-
-                    // check if profile image is null or empty
-                    if (string.IsNullOrEmpty(ProfileImageUrl))
-                    {
-                        ProfileImageUrl = "person.png";
-                    }
+                    ProfileImageUrl = string.IsNullOrEmpty(User.ProfileImageUrl)
+                   ? "person.png"
+                   : User.ProfileImageUrl;
 
                     // check if user is active
                     if (User.IsActive && User.CreditPoint > 0)

@@ -65,6 +65,8 @@ namespace BookRide
             builder.Services.AddSingleton<INetworkService, NetworkService>();
             builder.Services.AddSingleton<ICurrentAddress, CurrentAddressService>();
             builder.Services.AddTransient<IFirebaseUpload, UploadImage>();
+            builder.Services.AddSingleton<FirebaseAuthService>();
+            builder.Services.AddSingleton<RealtimeDatabaseService>();
 
 
             //#if ANDROID

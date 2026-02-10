@@ -86,6 +86,15 @@ namespace BookRide.Platforms.Android.Implementations
             //    user = JsonSerializer.Deserialize<Users>(json);
             //}
 
+            if (string.IsNullOrEmpty(id))
+            {
+                // No user ID provided, stop the service
+                isServiceRunning = false;
+                StopForeground(true);
+                StopSelf();
+                return;
+            }
+
             while (!token.IsCancellationRequested)
             {
                 try

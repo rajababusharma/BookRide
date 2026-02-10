@@ -20,7 +20,7 @@ namespace BookRide.Services
             httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", idToken);
 
-            var imageStream = await httpClient.GetStreamAsync(downloadUrl);
+            var imageStream = await httpClient.GetStreamAsync(downloadUrl).ConfigureAwait(false);
             // return stream;
             if (imageStream == null)
                 return null;
@@ -62,7 +62,7 @@ namespace BookRide.Services
                     new MediaTypeHeaderValue("image/jpeg");
 
                 Console.WriteLine("Uploading Aadhar image to Firebase Storage...");
-                var response = await httpClient.PostAsync(uploadUrl, content);
+                var response = await httpClient.PostAsync(uploadUrl, content).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
                 var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_AadharLocation}%2F{fileName}?alt=media";
@@ -104,7 +104,7 @@ namespace BookRide.Services
                     new MediaTypeHeaderValue("image/jpeg");
 
                 Console.WriteLine("Uploading payment image to Firebase Storage...");
-                var response = await httpClient.PostAsync(uploadUrl, content);
+                var response = await httpClient.PostAsync(uploadUrl, content).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
                // var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_PaymentImageLocation}%2F{fileName}?alt=media";
@@ -150,7 +150,7 @@ namespace BookRide.Services
 
                // var url = $"https://firebasestorage.googleapis.com/v0/b/YOUR_BUCKET_NAME/o?uploadType=media&name={fileName}";
 
-                var response = await httpClient.PostAsync(uploadUrl, content);
+                var response = await httpClient.PostAsync(uploadUrl, content).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
               //  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ProfileImageLocation}%2F{fileName}?alt=media";

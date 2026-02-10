@@ -21,10 +21,8 @@ namespace BookRide.ViewModels
         // the property to bind image to UI
         [ObservableProperty]
         private ImageSource qrCode;
-       private readonly IWhatsAppConnect _whatsAppConnect;
-        public RechargeCreditVM(IWhatsAppConnect whatsApp, IFirebaseUpload firebaseUpload)
+        public RechargeCreditVM(IFirebaseUpload firebaseUpload)
         {
-            _whatsAppConnect = whatsApp;
             _firebaseUpload = firebaseUpload;
         }
 

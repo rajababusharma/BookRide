@@ -73,6 +73,14 @@ namespace BookRide.Platforms.Android.Implementations
         async Task RunHourlyCreditPointAsync(Intent intent, CancellationToken token)
         {
             var id = intent?.GetStringExtra("USERID");
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                // No user ID provided — stop service gracefully.
+                StopForeground(true);
+                StopSelf();
+                isServiceRunning = false;
+                return;
+            }
 
             while (!token.IsCancellationRequested)
             {
