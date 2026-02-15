@@ -2,6 +2,7 @@
 using Android.Content;
 using Android.Content.PM;
 using Android.Locations;
+using Android.Util;
 using Android.OS;
 using BookRide.Models;
 using BookRide.Services;
@@ -15,10 +16,9 @@ using System.Threading.Tasks;
 
 namespace BookRide.Platforms.Android.Implementations
 {
-    [Service(Name = "com.companyname.bookride.DailyBasisCreditPointService",
-    ForegroundServiceType = ForegroundService.TypeDataSync,
-    Exported = false
-)]
+    [Service(Name = "com.intellicstech.bookrides.DailyBasisCreditPointService",
+        ForegroundServiceType = ForegroundService.TypeDataSync,
+        Exported = true)]
     public class DailyBasisCreditPointService : Service
     {
         CancellationTokenSource _cts;
@@ -43,6 +43,7 @@ namespace BookRide.Platforms.Android.Implementations
             StartCommandFlags flags,
             int startId)
         {
+           // Android.Util.Log.Debug("DailyBasisCreditPointService", $"OnStartCommand called. intent={(intent == null ? "null" : "present")}, startId={startId}");
             // Must call StartForeground quickly after startForegroundService() to avoid ANR.
             StartForeground(1002, CreateNotification());
 
@@ -62,9 +63,7 @@ namespace BookRide.Platforms.Android.Implementations
             // Run background loop without blocking the caller.
             _ = Task.Run(async () =>
             {
-              
                 await RunHourlyCreditPointAsync(intent, _cts.Token);
-               
             });
 
             return StartCommandResult.Sticky;
@@ -75,6 +74,7 @@ namespace BookRide.Platforms.Android.Implementations
             var id = intent?.GetStringExtra("USERID");
             if (string.IsNullOrWhiteSpace(id))
             {
+               // Android.Util.Log.Warn("DailyBasisCreditPointService", "RunHourlyCreditPointAsync: USERID is missing from intent. Stopping service.");
                 // No user ID provided — stop service gracefully.
                 StopForeground(true);
                 StopSelf();
@@ -86,15 +86,13 @@ namespace BookRide.Platforms.Android.Implementations
             {
                 try
                 {
-                   // var user = await _db.GetAsync<Drivers>($"Drivers/{id}");
-
                     var user = await Task.Run(() =>
                               _db.GetAsync<Drivers>($"Drivers/{id}")
                            );
 
-
                     if (user == null)
                     {
+                       // Android.Util.Log.Warn("DailyBasisCreditPointService", $"No driver found for id={id}. Stopping service.");
                         // No user found — stop service gracefully.
                         StopForeground(true);
                         StopSelf();
@@ -131,6 +129,7 @@ namespace BookRide.Platforms.Android.Implementations
                     }
                     else
                     {
+                       // Android.Util.Log.Info("DailyBasisCreditPointService", $"User {id} has no credits or invalid data. Stopping service.");
                         // stop service if credit point is zero
                         isServiceRunning = false;
                         StopForeground(true);
@@ -141,6 +140,7 @@ namespace BookRide.Platforms.Android.Implementations
                 catch (System.OperationCanceledException)
                 {
                     // Cancellation requested — exit cleanly.
+                   // Android.Util.Log.Info("DailyBasisCreditPointService", "Operation canceled, stopping service.");
                     isServiceRunning = false;
                     StopForeground(true);
                     StopSelf();
@@ -148,6 +148,7 @@ namespace BookRide.Platforms.Android.Implementations
                 }
                 catch (Exception ex)
                 {
+                   // Android.Util.Log.Error("DailyBasisCreditPointService", $"Unhandled exception: {ex}");
                     isServiceRunning = false;
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
                     await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
@@ -165,6 +166,7 @@ namespace BookRide.Platforms.Android.Implementations
                 }
                 catch (System.OperationCanceledException ex)
                 {
+                   // Android.Util.Log.Info("DailyBasisCreditPointService", $"Delay cancelled: {ex.Message}");
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
                     await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
                     // cancelled while waiting

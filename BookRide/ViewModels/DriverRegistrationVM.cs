@@ -198,34 +198,39 @@ namespace BookRide.ViewModels
               
                 Console.WriteLine("Starting foreground services for location updates and credit point management.");
                 try
+                {
+                    // Guard: ensure we have a valid UserId before attempting to start foreground services
+                    if (string.IsNullOrWhiteSpace(drivers.UserId))
                     {
-
-                        System.Diagnostics.Trace.WriteLine("Starting DriverCreditPointService for driver: " + drivers.UserId);             
+                        System.Diagnostics.Trace.WriteLine("DriverRegistrationVM: UserId is null or empty, skipping start of foreground services.");
+                    }
+                    else
+                    {
+                        System.Diagnostics.Trace.WriteLine("Starting DriverCreditPointService for driver: " + drivers.UserId);
                         // Start foreground services here
-#if ANDROID
+    #if ANDROID
                         var intent_loc = new Intent(Application.Context, typeof(HourlyLocationService));
                         intent_loc.PutExtra("USERID", drivers.UserId);
                         // intent_loc.PutExtra("ISSERVICE1", System.Text.Json.JsonSerializer.Serialize(users));
 
                         Application.Context.StartForegroundService(intent_loc);
-#endif
+    #endif
 
-#if ANDROID
+    #if ANDROID
                         var intent_credit = new Intent(Application.Context, typeof(DailyBasisCreditPointService));
                         intent_credit.PutExtra("USERID", drivers.UserId);
                         Application.Context.StartForegroundService(intent_credit);
-#endif
-                        // await LocationPermissionHelper.HasPermissionsAsync();
-
-                        // _foregroundService.Start(users.Mobile);
-               
-
-                }
-                    catch (Exception ex)
-                    {
-                        // Handle exceptions related to starting the service
-                          System.Diagnostics.Trace.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+    #endif
                     }
+                    // await LocationPermissionHelper.HasPermissionsAsync();
+
+                    // _foregroundService.Start(users.Mobile);
+                }
+                catch (Exception ex)
+                {
+                    // Handle exceptions related to starting the service
+                    System.Diagnostics.Trace.WriteLine($"Error starting DriverCreditPointService: {ex.Message}");
+                }
                 
 
                 IsBusy = false;

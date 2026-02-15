@@ -4,10 +4,11 @@ using Android.Content.PM;
 using Android.Locations;
 using Android.OS;
 using AndroidX.Core.App;
+using Android.Util;
 using BookRide.Interfaces;
 using BookRide.Models;
 using BookRide.Services;
-using Java.Lang;
+// removed Java.Lang to avoid Exception ambiguity with System.Exception
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,11 +19,9 @@ using static Android.Graphics.ImageDecoder;
 
 namespace BookRide.Platforms.Android.Implementations
 {
-    [Service
-        ( Name = "com.companyname.bookride.HourlyLocationService",
-    ForegroundServiceType = ForegroundService.TypeLocation,
-    Exported = false
-)]
+    [Service(Name = "com.intellicstech.bookrides.HourlyLocationService",
+        ForegroundServiceType = ForegroundService.TypeLocation,
+        Exported = true)]
     public class HourlyLocationService : Service
     {
         CancellationTokenSource _cts;
@@ -55,7 +54,7 @@ namespace BookRide.Platforms.Android.Implementations
             StartCommandFlags flags,
             int startId)
         {
-           
+
                 StartForeground(1001, CreateNotification());
             // If already running, nothing else to do.
             if (isServiceRunning)
@@ -79,22 +78,21 @@ namespace BookRide.Platforms.Android.Implementations
             var id = intent?.GetStringExtra("USERID");
 
             // if intent value is a model object use this
-           // var json = intent?.GetStringExtra("USER");
+            // var json = intent?.GetStringExtra("USER");
             //Users user = null;
             //if (!string.IsNullOrEmpty(json))
             //{
             //    user = JsonSerializer.Deserialize<Users>(json);
             //}
-
-            if (string.IsNullOrEmpty(id))
+            if (string.IsNullOrWhiteSpace(id))
             {
-                // No user ID provided, stop the service
-                isServiceRunning = false;
+                // Android.Util.Log.Warn("DailyBasisCreditPointService", "RunHourlyCreditPointAsync: USERID is missing from intent. Stopping service.");
+                // No user ID provided — stop service gracefully.
                 StopForeground(true);
                 StopSelf();
+                isServiceRunning = false;
                 return;
             }
-
             while (!token.IsCancellationRequested)
             {
                 try
@@ -198,9 +196,9 @@ namespace BookRide.Platforms.Android.Implementations
                     await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
                     // cancelled while waiting
                     isServiceRunning = false;
-                StopForeground(true);
-                StopSelf();
-                return;
+                    StopForeground(true);
+                    StopSelf();
+                    return;
             }
         }
         }
