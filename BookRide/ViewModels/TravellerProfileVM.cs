@@ -264,56 +264,63 @@ namespace BookRide.ViewModels
                     {
                         // fetch user location from Drivers_Location nodel
 
-                        var _userLoc = await Task.Run(async()=>
+                        var _userLocation = await Task.Run(async()=>
                         {
                             return await _db.GetAsync<Drivers_Location>("Drivers_Location/" + usr.UserId);
                         });
-                        var userDict = _userLoc as IDictionary<string, object>;
+                        // var userDict = _userLoc as IDictionary<string, object>;
 
-                        Drivers_Location _userLocation =new Drivers_Location
+                        //Drivers_Location _userLocation =new Drivers_Location
+                        //{
+                        //    UserId = userDict["UserId"].ToString(),
+                        //    Latitude = Convert.ToDouble(userDict["Latitude"]),
+                        //    Longitude = Convert.ToDouble(userDict["Longitude"]),
+                        //    Altitude = userDict["Altitude"] != null ? Convert.ToDouble(userDict["Altitude"]) : (double?)null,
+                        //    Accuracy = userDict["Accuracy"] != null ? Convert.ToDouble(userDict["Accuracy"]) : (double?)null,
+                        //    Speed = userDict["Speed"] != null ? Convert.ToDouble(userDict["Speed"]) : (double?)null,
+                        //    Course = userDict["Course"] != null ? Convert.ToDouble(userDict["Course"]) : (double?)null,
+                        //};
+
+                        // checking _userLocation is null or not and also check if latitude and longitude are not null
+                        if (_userLocation == null)
                         {
-                            UserId = userDict["UserId"].ToString(),
-                            Latitude = Convert.ToDouble(userDict["Latitude"]),
-                            Longitude = Convert.ToDouble(userDict["Longitude"]),
-                            Altitude = userDict["Altitude"] != null ? Convert.ToDouble(userDict["Altitude"]) : (double?)null,
-                            Accuracy = userDict["Accuracy"] != null ? Convert.ToDouble(userDict["Accuracy"]) : (double?)null,
-                            Speed = userDict["Speed"] != null ? Convert.ToDouble(userDict["Speed"]) : (double?)null,
-                            Course = userDict["Course"] != null ? Convert.ToDouble(userDict["Course"]) : (double?)null,
-                        };
-
-                        if (_userLocation.Latitude != null && _userLocation.Longitude != null)
-                        {
-                            var lat = _userLocation.Latitude;
-                            var lon = _userLocation.Longitude;
-                            var alt = _userLocation?.Altitude;
-                            var acc = _userLocation?.Accuracy;
-                            var time = _userLocation?.Timestamp;
-                            var vertical = _userLocation?.Vertical;
-                            var speed = _userLocation?.Speed;
-                            var course = _userLocation?.Course;
-
-                            // Create a Location object for the user's location
-                            Location driverLocation = new Location();
-                            driverLocation.Latitude = lat;
-                            driverLocation.Longitude = lon;
-                            driverLocation.Altitude = alt ?? double.NaN;
-                            driverLocation.Accuracy = acc ?? double.NaN;
-                            driverLocation.Timestamp = DateTimeOffset.UtcNow;
-                            driverLocation.Speed = speed ?? double.NaN;
-                            driverLocation.Course = course ?? double.NaN;
-                            driverLocation.VerticalAccuracy = vertical ?? double.NaN;
-
-                            // Calculate the distance in kilometers
-                            double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
-                            if (distance <= radiusKm)
-                            {
-                                DriversList.Add(usr);
-                            }
+                          
                         }
-                        else
+
+                        if (_userLocation.Latitude == null && _userLocation.Longitude == null)
+                        {
+                            DriversList.Add(usr);
+                            continue;
+                           
+                        }
+
+                        var lat = _userLocation.Latitude;
+                        var lon = _userLocation.Longitude;
+                        var alt = _userLocation?.Altitude;
+                        var acc = _userLocation?.Accuracy;
+                        var time = _userLocation?.Timestamp;
+                        var vertical = _userLocation?.Vertical;
+                        var speed = _userLocation?.Speed;
+                        var course = _userLocation?.Course;
+
+                        // Create a Location object for the user's location
+                        Location driverLocation = new Location();
+                        driverLocation.Latitude = lat;
+                        driverLocation.Longitude = lon;
+                        driverLocation.Altitude = alt ?? double.NaN;
+                        driverLocation.Accuracy = acc ?? double.NaN;
+                        driverLocation.Timestamp = DateTimeOffset.UtcNow;
+                        driverLocation.Speed = speed ?? double.NaN;
+                        driverLocation.Course = course ?? double.NaN;
+                        driverLocation.VerticalAccuracy = vertical ?? double.NaN;
+
+                        // Calculate the distance in kilometers
+                        double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
+                        if (distance <= radiusKm)
                         {
                             DriversList.Add(usr);
                         }
+
                     }
                 });
               

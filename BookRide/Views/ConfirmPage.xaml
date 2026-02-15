@@ -11,7 +11,7 @@
     </Shell.BackButtonBehavior>
     <VerticalStackLayout>
         <Label FontSize="Subtitle" Margin="10,20,0,20"
-            Text="You have successfully completed the registration."
+            Text="You have successfully completed/updated the registration."
             VerticalOptions="Center" 
             HorizontalOptions="Center" />
         <Label Margin="10,20,0,20"
