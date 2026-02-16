@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 
 namespace BookRide.Platforms.Android.Implementations
 {
-    [Service(Name = "com.intellicstech.bookrides.DailyBasisCreditPointService",
+    [Service(Name = "com.intellics.bookride.DailyBasisCreditPointService",
         ForegroundServiceType = ForegroundService.TypeDataSync,
         Exported = true)]
     public class DailyBasisCreditPointService : Service

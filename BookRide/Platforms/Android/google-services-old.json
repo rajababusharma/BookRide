@@ -8,35 +8,6 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:512183391871:android:9eac284ab8faf1e6f3514a",
-        "android_client_info": {
-          "package_name": "com.intellics.bookride"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "512183391871-nafr2dch5e9jivtv3ko3ja4q25pg5vg9.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyCGIOTg5SZ9IedIRzFNVFEBP2wEjXGeu2I"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "512183391871-nafr2dch5e9jivtv3ko3ja4q25pg5vg9.apps.googleusercontent.com",
-              "client_type": 3
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
         "mobilesdk_app_id": "1:512183391871:android:8316cf26c46ede9bf3514a",
         "android_client_info": {
           "package_name": "com.intellicstech.bookrides"

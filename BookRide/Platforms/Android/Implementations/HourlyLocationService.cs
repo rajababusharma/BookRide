@@ -19,7 +19,7 @@ using static Android.Graphics.ImageDecoder;
 
 namespace BookRide.Platforms.Android.Implementations
 {
-    [Service(Name = "com.intellicstech.bookrides.HourlyLocationService",
+    [Service(Name = "com.intellics.bookride.HourlyLocationService",
         ForegroundServiceType = ForegroundService.TypeLocation,
         Exported = true)]
     public class HourlyLocationService : Service

@@ -11,7 +11,8 @@ namespace BookRide.Constants
     {
 
         public const string Firebase_WebApi_key = "AIzaSyBrQSvoldFIOvbfbrY25qBbp6jRa2Z1vfM";
-        public const string Firebase_App_id = "1:512183391871:android:8316cf26c46ede9bf3514a";
+        public const string Firebase_App_id1 = "1:512183391871:android:8316cf26c46ede9bf3514a";
+        public const string Firebase_App_id = "1:512183391871:android:9eac284ab8faf1e6f3514a";
         public const string Firebase_project_id = "taxi-ride-e2fb5";
         public const string Firebase_Bucket = "taxi-ride-e2fb5.firebasestorage.app";   // for debug/release mode
         public const string Firebase_Realtime_Storage_url = "https://taxi-ride-e2fb5-default-rtdb.firebaseio.com/";

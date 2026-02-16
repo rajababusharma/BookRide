@@ -14,7 +14,10 @@
 
 		<!-- APP INFO -->
 		<ApplicationTitle>Taxi Ride</ApplicationTitle>
+		<!--
 		<ApplicationId>com.intellicstech.bookride</ApplicationId>
+		-->
+		<ApplicationId>com.intellics.bookride</ApplicationId>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>6</ApplicationVersion>
 
@@ -86,5 +89,15 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.1" />
 		<PackageReference Include="Microsoft.Maui.Controls.Maps" Version="10.0.20" />
 	</ItemGroup>
+
+	<ItemGroup>
+		<GoogleServicesJson Include="Platforms\Android\google-services-old.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<GoogleServicesJson Include="Platforms\Android\google-services.json" />
+	</ItemGroup>
+
+
 
 </Project>
