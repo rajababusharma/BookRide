@@ -79,17 +79,25 @@ namespace BookRide
             // Optionally, display a user-friendly alert
             MainThread.BeginInvokeOnMainThread(async () =>
             {
+                string user_exception = "Unknown";
+                var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                if(user != null)
+                {
+                    user_exception = user;
+                }
+                
                 ExceptionClass excp = new ExceptionClass { Message = exception.Message, StackTrace = exception.StackTrace, OccurredAt = DateTime.Now };
-                await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
-                //  await MainPage.DisplayAlert("Error", "An error occurred in a background task.", "OK");
-                //  await Shell.Current.DisplayAlert("Error", "An error occurred in a background task.", "OK");
+                await _db.SaveAsync($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
+                //  await MainPage.DisplayAlertAsync("Error", "An error occurred in a background task.", "OK");
+                //  await Shell.Current.DisplayAlertAsync("Error", "An error occurred in a background task.", "OK");
 
-                //  await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
+                //  await Shell.Current.DisplayAlertAsync("Error", exception.Message, "OK");
             });
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
+
             var exception = e.ExceptionObject as Exception;
             // Log the exception details using a logging service (e.g., Application Insights, Sentry)
             System.Diagnostics.Debug.WriteLine($"Unhandled AppDomain Exception: {exception}");
@@ -97,10 +105,16 @@ namespace BookRide
             // Display a user-friendly alert on the UI thread
             MainThread.BeginInvokeOnMainThread(async () =>
             {
+                string user_exception = "Unknown";
+                var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                if (user != null)
+                {
+                    user_exception = user;
+                }
                 ExceptionClass excp = new ExceptionClass { Message = exception.Message, StackTrace = exception.StackTrace, OccurredAt = DateTime.Now };
-                await _db.SaveAsync($"Exceptions/{Guid.NewGuid()}", excp);
-                // await Shell.Current.DisplayAlert("Error", exception.Message, "OK");
-                //  await Shell.Current.DisplayAlert("Error", "Something unexpected happened. The app might need to close.", "OK");
+                await _db.SaveAsync($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
+                // await Shell.Current.DisplayAlertAsync("Error", exception.Message, "OK");
+                //  await Shell.Current.DisplayAlertAsync("Error", "Something unexpected happened. The app might need to close.", "OK");
             });
 
             // Note: The app may still terminate after this handler runs.

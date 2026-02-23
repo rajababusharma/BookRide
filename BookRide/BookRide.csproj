@@ -19,7 +19,7 @@
 		-->
 		<ApplicationId>com.intellics.bookride</ApplicationId>
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
-		<ApplicationVersion>6</ApplicationVersion>
+		<ApplicationVersion>2</ApplicationVersion>
 
 		<!-- ANDROID SDK -->
 		<AndroidTargetSdkVersion>35</AndroidTargetSdkVersion>

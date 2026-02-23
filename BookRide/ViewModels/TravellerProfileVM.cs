@@ -2,7 +2,7 @@
 using BookRide.Models;
 using BookRide.Services;
 using BookRide.Views;
-using Bumptech.Glide.Load.Model;
+using Microsoft.Maui.ApplicationModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using GoogleGson;
@@ -36,52 +36,69 @@ namespace BookRide.ViewModels
         public string hi="Hi";
         [ObservableProperty]
         public string selectedDistrict;
+        [ObservableProperty]
+        private bool isFeatureEnabled;
         private readonly GeolocationRequest _geolocationRequest;
 
         private readonly INetworkService _networkService;
 
-        private Location currentLocation;
-        partial void  OnSelectedDistrictChanged(string value)
+        private Location? currentLocation;
+        private string selected_district="";
+        partial void OnSelectedDistrictChanged(string value)
         {
             if (value == null) return;
             Console.WriteLine($"Selected: {value}");
-
+            selected_district = value;
             Console.WriteLine("Loading drivers list by district");
-            Task.Run(async () =>
-            {
-                await LoadUsersByDistrictAsync(value);
-            });
-           // LoadUsersByDistrictAsync(value);
+            // Fire-and-forget the async load. The async method manages IsBusy and UI updates.
+            _ = LoadUsersByDistrictAsync("0");
         }
+
+        // Optional: Logic to run when the value changes
+        partial void OnIsFeatureEnabledChanged(bool value)
+        {
+            // Your logic here (e.g., saving settings)
+            if(value)
+            {
+                _ = LoadUsersByDistrictAsync("1");
+            }
+            else
+            {
+                if(String.IsNullOrEmpty(selected_district))
+                {
+                    _ = LoadUsersByDistrictAsync("");
+                }
+                else
+                {
+                    _ = LoadUsersByDistrictAsync("0");
+                }
+             
+            }
+        }
+
         [RelayCommand]
-        public async void WhatsappConnect(string phoneNumber)
+        public async Task WhatsappConnect(string phoneNumber)
         {
             if (phoneNumber != null && phoneNumber.Length == 10)
             {
                 try
                 {
-                     _whatsAppConnect.WhatsappConnect("+91" + phoneNumber, $"Hello, my name is {User.FirstName} " + " and I want to connect with you.");
+                     _whatsAppConnect.WhatsappConnect("+91" + phoneNumber, $"Hello, my name is {User.FirstName} " + " and I want to connect with you to book your vehicle for ride.");
                 }
                 catch (Exception exp)
                 {
                     // Handle error
-                    await Shell.Current.DisplayAlert(
-                           "Error",
-                           exp.Message,
-                           "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", exp.Message, "OK");
                 }
             }
             else
             {
-                await Shell.Current.DisplayAlert(
-                          "Error",
-                          "Incorrect phone number",
-                          "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "Incorrect phone number", "OK");
             }
         }
 
         [RelayCommand]
-        public async void Call(string phoneNumber)
+        public async Task Call(string phoneNumber)
         {
             if (phoneNumber != null && phoneNumber.Length == 10)
             {
@@ -95,18 +112,12 @@ namespace BookRide.ViewModels
                 catch (Exception exp)
                 {
                     // Handle error
-                    await Shell.Current.DisplayAlert(
-                           "Error",
-                           exp.Message,
-                           "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", exp.Message, "OK");
                 }
             }
             else
             {
-                await Shell.Current.DisplayAlert(
-                          "Error",
-                          "Incorrect phone number",
-                          "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "Incorrect phone number", "OK");
             }
         }
 
@@ -121,6 +132,7 @@ namespace BookRide.ViewModels
             IsBusy = false;
         }
 
+        // calling this method on page load to check GPS and location permissions and also to load drivers list
         public async Task InitializeAsync()
         {
             try
@@ -141,7 +153,7 @@ namespace BookRide.ViewModels
                // await LoadUsersByDistrictAsync("");
                 // Handle exceptions related to geolocation
                 // Console.WriteLine($"Error obtaining location: {ex.Message}");
-                await Shell.Current.DisplayAlert(
+                await Shell.Current.DisplayAlertAsync(
                               "Error",
                               $"Error obtaining location: {ex.Message}",
                               "OK");
@@ -156,76 +168,57 @@ namespace BookRide.ViewModels
             // check internet connectivity first 
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                 // ErrorMessage = "No internet connection. Please check your connection and try again.";
                 IsBusy = false;
                 return;
             }
             try
                 {
-                DriversList.Clear();
-                if (string.IsNullOrEmpty(district))
-
+                // fetch all drivers from firebase and then filter them by district and also check if credit point is greater than 0 and user is active
+                var drivers = await _db.GetAllAsync<Drivers>("Drivers");
+                if (drivers == null)
                 {
-
-
-                    //Task.Run(async () =>
-                    //{
-                    ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
-                    var drivers = await
-                                  _db.GetAllAsync<Drivers>("Drivers")
-                             ;
-
-
-                    //  var drivers = await _db.GetAllAsync<Drivers>("Drivers");
-                    if (drivers == null)
-                    {
-                        IsBusy = false;
-                        return;
-                    }
-                    await Task.Run(() =>
-                    {
-                    foreach (var item in drivers)
-                        lists.Add(item.Value);
-                    });
-
-                var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive);
-                        DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
-                   // });
-
+                    IsBusy = false;
+                    return;
+                }
+                //deleting all items from the driver list
+                DriversList.Clear();
+                // Flatten results
+                var lists = new List<Drivers>(drivers.Count);
+                foreach (var item in drivers)
+                    lists.Add(item.Value);
+                ObservableCollection<Drivers> result = new ObservableCollection<Drivers>();
+                IEnumerable<Drivers> filteredUsers = lists.Where(x => x.CreditPoint > 0 && x.IsActive);
+                if (district.Equals("0"))
+                {
+                    filteredUsers = filteredUsers.Where(x => string.Equals(x.District, selected_district, StringComparison.OrdinalIgnoreCase));
                   
+                    foreach(var driver in filteredUsers)
+                    {
+                        result.Add(driver);
+                    }
+                }
+                else if(district.Equals("1"))
+                {
+                    // Get filtered list within radius (this method returns a new collection)
+                    result = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
                 }
                 else
                 {
-                    //Task.Run(async () =>
-                    //{
-                    //    var users = await _db.GetAllAsync<Users>("Users").ContinueWith(t =>
-                    //    {
-                    //        var userList = t.Result.Where<Users>(x => x.CreditPoint > 0 && x.UserType.Equals(eNum.eNumUserType.Driver.ToString()) && x.District.Equals(district));
-                    //        return new ObservableCollection<Users>(userList);
-                    //    });
-                    //    UsersList = await GetLocationsWithinRadiusAsync(users);
-                    //}).GetAwaiter().GetResult();
-                    ObservableCollection<Drivers> lists = new ObservableCollection<Drivers>();
-                  //  var users = await _db.GetAllAsync<Drivers>("Drivers");
-                    var users = await _db.GetAllAsync<Drivers>("Drivers");
-                    //check drivers list is null
-                    if (users == null)
+                    foreach (var driver in filteredUsers)
                     {
-                        IsBusy = false;
-                        return;
+                        result.Add(driver);
                     }
-                    await Task.Run(() =>
-                    {
-                        foreach (var item in users)
-                            lists.Add(item.Value);
-                    });
-                   
-
-                    var filteredUsers = lists.Where<Drivers>(x => x.CreditPoint > 0 && x.IsActive && x.District.Equals(district));
-                    DriversList = await GetLocationsWithinRadiusAsync(new ObservableCollection<Drivers>(filteredUsers));
                 }
+               
+                  
 
+                    // Ensure we update the observable collection on the main thread
+                    MainThread.BeginInvokeOnMainThread(() => DriversList = result);
+                
+
+               
                 IsBusy = false;
 
             }
@@ -234,7 +227,7 @@ namespace BookRide.ViewModels
                     // Handle exceptions related to geolocation
                      Console.WriteLine($"Line: 216, TravelerProfileVM Error obtaining drivers list: {ex.Message}");
                     IsBusy = false;
-                await Shell.Current.DisplayAlert(
+                await Shell.Current.DisplayAlertAsync(
                               "Error",
                               $"Error obtaining location: {ex.Message}",
                               "OK");
@@ -244,15 +237,15 @@ namespace BookRide.ViewModels
 
         public async Task<ObservableCollection<Drivers>> GetLocationsWithinRadiusAsync(ObservableCollection<Drivers> drivers)
         {
-           
-                 
-                    if (currentLocation == null)
+
+            // user curret location is null then return the original list without filtering
+            if (currentLocation == null)
                     {
                         return drivers;
                     }
 
 
-                    double radiusKm = 5.0;
+                    double radiusKm = Constants.Constants.RADIUS_KM;
 
                   
                 Console.WriteLine("Line: 239 TravelerProfileVM Filtering drivers within radius...");
@@ -264,7 +257,7 @@ namespace BookRide.ViewModels
                     {
                         // fetch user location from Drivers_Location nodel
 
-                        var _userLocation = await Task.Run(async()=>
+                        var _driverLocation = await Task.Run(async()=>
                         {
                             return await _db.GetAsync<Drivers_Location>("Drivers_Location/" + usr.UserId);
                         });
@@ -282,44 +275,48 @@ namespace BookRide.ViewModels
                         //};
 
                         // checking _userLocation is null or not and also check if latitude and longitude are not null
-                        if (_userLocation == null)
-                        {
-                          
-                        }
+                        //if (_driverLocation == null)
+                        //{
 
-                        if (_userLocation.Latitude == null && _userLocation.Longitude == null)
+                        //}
+
+                        if (_driverLocation?.Latitude == null && _driverLocation?.Longitude == null)
                         {
                             DriversList.Add(usr);
                             continue;
-                           
+
                         }
-
-                        var lat = _userLocation.Latitude;
-                        var lon = _userLocation.Longitude;
-                        var alt = _userLocation?.Altitude;
-                        var acc = _userLocation?.Accuracy;
-                        var time = _userLocation?.Timestamp;
-                        var vertical = _userLocation?.Vertical;
-                        var speed = _userLocation?.Speed;
-                        var course = _userLocation?.Course;
-
-                        // Create a Location object for the user's location
-                        Location driverLocation = new Location();
-                        driverLocation.Latitude = lat;
-                        driverLocation.Longitude = lon;
-                        driverLocation.Altitude = alt ?? double.NaN;
-                        driverLocation.Accuracy = acc ?? double.NaN;
-                        driverLocation.Timestamp = DateTimeOffset.UtcNow;
-                        driverLocation.Speed = speed ?? double.NaN;
-                        driverLocation.Course = course ?? double.NaN;
-                        driverLocation.VerticalAccuracy = vertical ?? double.NaN;
-
-                        // Calculate the distance in kilometers
-                        double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
-                        if (distance <= radiusKm)
+                        else
                         {
-                            DriversList.Add(usr);
+                            var lat = _driverLocation.Latitude;
+                            var lon = _driverLocation.Longitude;
+                            var alt = _driverLocation?.Altitude;
+                            var acc = _driverLocation?.Accuracy;
+                            var time = _driverLocation?.Timestamp;
+                            var vertical = _driverLocation?.Vertical;
+                            var speed = _driverLocation?.Speed;
+                            var course = _driverLocation?.Course;
+
+                            // Create a Location object for the user's location
+                            Location driverLocation = new Location();
+                            driverLocation.Latitude = lat;
+                            driverLocation.Longitude = lon;
+                            driverLocation.Altitude = alt ?? double.NaN;
+                            driverLocation.Accuracy = acc ?? double.NaN;
+                            driverLocation.Timestamp = DateTimeOffset.UtcNow;
+                            driverLocation.Speed = speed ?? double.NaN;
+                            driverLocation.Course = course ?? double.NaN;
+                            driverLocation.VerticalAccuracy = vertical ?? double.NaN;
+
+                            // Calculate the distance in kilometers
+                            double distance = currentLocation.CalculateDistance(driverLocation, DistanceUnits.Kilometers);
+                            if (distance <= radiusKm)
+                            {
+                                DriversList.Add(usr);
+                            }
                         }
+
+                       
 
                     }
                 });

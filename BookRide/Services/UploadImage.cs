@@ -7,6 +7,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Maui.ApplicationModel;
 
 namespace BookRide.Services
 {
@@ -66,13 +67,13 @@ namespace BookRide.Services
                 response.EnsureSuccessStatusCode();
 
                 var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_AadharLocation}%2F{fileName}?alt=media";
-                await Shell.Current.DisplayAlert("Success", "File uploaded successfully.", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Success", "File uploaded successfully.", "OK"));
               //  Console.WriteLine("Aadhar image uploaded successfully.");
                 return downloadUrl;
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to pick image: {ex.Message}", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Error", $"Failed to pick image: {ex.Message}", "OK"));
                 return null;
             }
         }
@@ -83,6 +84,12 @@ namespace BookRide.Services
         {
             try
             {
+                string user_loc = "Unknown";
+                var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                if (user != null)
+                {
+                    user_loc = user;
+                }
                 var token = await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue);
                 var appid = Constants.Constants.Firebase_project_id;
 
@@ -92,7 +99,7 @@ namespace BookRide.Services
 
                 var uploadUrl =
                     $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
-                    $"?uploadType=media&name={Constants.Constants.Firebase_PaymentImageLocation}/{fileName}";
+                    $"?uploadType=media&name={Constants.Constants.Firebase_PaymentImageLocation}/{user_loc}/{fileName}";
 
                 using var httpClient = new HttpClient();
                 using var content = new StreamContent(filestream);
@@ -108,14 +115,14 @@ namespace BookRide.Services
                 response.EnsureSuccessStatusCode();
 
                // var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_PaymentImageLocation}%2F{fileName}?alt=media";
-                var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_PaymentImageLocation}%2F{fileName}?alt=media";
-                await Shell.Current.DisplayAlert("Success", "File uploaded successfully.", "OK");
+                var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_PaymentImageLocation}%2F{user_loc}%2F{fileName}?alt=media";
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Success", "File uploaded successfully.", "OK"));
               //  Console.WriteLine("Payment image uploaded successfully.");
                 return downloadUrl;
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to pick image: {ex.Message}", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Error", $"Failed to pick image: {ex.Message}", "OK"));
                 return null;
             }
         }
@@ -124,6 +131,12 @@ namespace BookRide.Services
         {
             try
             {
+                string user_loc = "Unknown";
+                var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                if (user != null)
+                {
+                    user_loc = user;
+                }
                 var token = await SecureStorage.GetAsync(Constants.Constants.Firebase_TokenKeyValue);
                 var appid = Constants.Constants.Firebase_project_id;
 
@@ -133,7 +146,7 @@ namespace BookRide.Services
 
                 var uploadUrl =
                     $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o" +
-                    $"?uploadType=media&name={Constants.Constants.Firebase_ProfileImageLocation}/{fileName}";
+                    $"?uploadType=media&name={Constants.Constants.Firebase_ProfileImageLocation}/{user_loc}/{fileName}";
 
                 using var httpClient = new HttpClient();
                 using var content = new StreamContent(filestream);
@@ -154,15 +167,15 @@ namespace BookRide.Services
                 response.EnsureSuccessStatusCode();
 
               //  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ProfileImageLocation}%2F{fileName}?alt=media";
-                  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ProfileImageLocation}%2F{fileName}?alt=media";
+                  var downloadUrl = $"https://firebasestorage.googleapis.com/v0/b/{Constants.Constants.Firebase_Bucket}/o/{Constants.Constants.Firebase_ProfileImageLocation}%2F{user_loc}%2F{fileName}?alt=media";
             
-                await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Success", "Profile photo updated successfully.", "OK"));
                // Console.WriteLine("Profile image uploaded successfully.");
                 return downloadUrl;
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to pick image: {ex.Message}", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () => await Shell.Current.DisplayAlertAsync("Error", $"Failed to pick image: {ex.Message}", "OK"));
                 return null;
             }
         }

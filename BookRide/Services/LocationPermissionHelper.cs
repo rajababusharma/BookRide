@@ -25,7 +25,7 @@ namespace BookRide.Services
 
             if (!isLocationEnabled)
             {
-                await Application.Current.MainPage.DisplayAlert(
+                await Application.Current.MainPage.DisplayAlertAsync(
                     "Location Disabled",
                     "Please enable location services.",
                     "Open Settings");
@@ -78,7 +78,7 @@ namespace BookRide.Services
 
             if (alwaysinuse != PermissionStatus.Granted)
             {
-                await Shell.Current.DisplayAlert(
+                await Shell.Current.DisplayAlertAsync(
                  "Permission Required",
                  "This app collects location data to enable real-time ride tracking, driver matching, and trip safety features even when the app is closed or not in use.\n Your location is used to: \n" + "1.>" + "Find nearby drivers faster.\n" + "2.>" + " Track rides in real time. \n" + "3.>" + " Improve pickup accuracy",
                  "OK");

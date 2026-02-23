@@ -150,8 +150,14 @@ namespace BookRide.Platforms.Android.Implementations
                 {
                    // Android.Util.Log.Error("DailyBasisCreditPointService", $"Unhandled exception: {ex}");
                     isServiceRunning = false;
+                    string user_exception = "Unknown";
+                    var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                    if (user != null)
+                    {
+                        user_exception = user;
+                    }
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
 
                     // Stop to avoid repeated failures; caller can restart if needed.
                     StopForeground(true);
@@ -166,9 +172,15 @@ namespace BookRide.Platforms.Android.Implementations
                 }
                 catch (System.OperationCanceledException ex)
                 {
-                   // Android.Util.Log.Info("DailyBasisCreditPointService", $"Delay cancelled: {ex.Message}");
+                    string user_exception = "Unknown";
+                    var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                    if (user != null)
+                    {
+                        user_exception = user;
+                    }
+                    // Android.Util.Log.Info("DailyBasisCreditPointService", $"Delay cancelled: {ex.Message}");
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
                     // cancelled while waiting
                     isServiceRunning = false;
                     StopForeground(true);

@@ -99,7 +99,7 @@ namespace BookRide.ViewModels
             await LocationPermissionHelper.HasPermissionsAsync();
             if (!IsTermsAccepted)
             {
-                Shell.Current.DisplayAlert("Alert", "Please select terms and conditions first", "OK");
+               await Shell.Current.DisplayAlertAsync("Alert", "Please select terms and conditions first", "OK");
                 IsBusy = false;
                 return;
             }
@@ -110,7 +110,7 @@ namespace BookRide.ViewModels
             // check internet connectivity first 
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                 // ErrorMessage = "No internet connection. Please check your connection and try again.";
                 IsBusy = false;
                 return;
@@ -189,7 +189,7 @@ namespace BookRide.ViewModels
                 {
                   
                     Console.WriteLine("Driver registration data saved successfully.");
-                    await Shell.Current.DisplayAlert(
+                    await Shell.Current.DisplayAlertAsync(
                       "Success",
                       "Registration completed successfully",
                       "OK");
@@ -335,7 +335,7 @@ namespace BookRide.ViewModels
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Error", $"Failed to upload image: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"Failed to upload image: {ex.Message}", "OK");
                
             }
         }

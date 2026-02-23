@@ -30,8 +30,8 @@ namespace BookRide
             //{
             //    // Access the current main page of the application
                 
-            //      //  await  DisplayAlert("Result", "An activity result was received.", "OK");
-            //      await Shell.Current.DisplayAlert("Result", $"An activity result was received.{resultCode}", "OK");
+            //      //  await  DisplayAlertAsync("Result", "An activity result was received.", "OK");
+            //      await Shell.Current.DisplayAlertAsync("Result", $"An activity result was received.{resultCode}", "OK");
 
             //});
 

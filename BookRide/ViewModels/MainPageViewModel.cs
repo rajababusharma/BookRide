@@ -106,7 +106,7 @@ namespace BookRide.ViewModels
             {
                 Console.WriteLine($"Line: 98 MainPageVM Error starting services: {ex.Message}");
                 // displaying an error alert message
-                //  await Shell.Current.DisplayAlert("Error", ex.Message, "Ok");
+                //  await Shell.Current.DisplayAlertAsync("Error", ex.Message, "Ok");
             }
            
            
@@ -122,7 +122,7 @@ namespace BookRide.ViewModels
            
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                 IsBusy = false;
                 return;
             }
@@ -169,7 +169,7 @@ namespace BookRide.ViewModels
                     catch(Exception ex)
                     {
                         Console.WriteLine($"Line: 165 MainPageVM Error fetching driver data: {ex.Message}");
-                        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                        await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
                     }
 
                    
@@ -213,6 +213,7 @@ namespace BookRide.ViewModels
                             await StartTracking(drs.UserId);
                            // await SecureStorage.SetAsync(Constants.Constants.LoggedInUser, drs.UserId);
                            await SecureStorageService.SaveAsync<DateTime>(Constants.Constants.SessionStartTime, DateTime.Now);
+                            await SecureStorageService.SaveAsync<string>(Constants.Constants.CurrentUserId, Username);
                             await Shell.Current.GoToAsync(nameof(DriverProfilePage), true, new Dictionary<string, object>
                             {
                                 { "CurrentUser", drs }
@@ -236,7 +237,7 @@ namespace BookRide.ViewModels
                     catch (Exception ex)
                     {
                         Console.WriteLine($"Line: 231 MainPageVM Error fetching users data: {ex.Message}");
-                        await Shell.Current.DisplayAlert("Error", ex.Message, "OK");
+                        await Shell.Current.DisplayAlertAsync("Error", ex.Message, "OK");
                     }
                     
                     // cast a dictionary to an object of Drivers
@@ -294,7 +295,7 @@ namespace BookRide.ViewModels
             catch (Exception ex)
             {
                 ErrorMessage = $"An error occurred: {ex.Message}";
-                await Shell.Current.DisplayAlert("Error", $"An error occurred: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"An error occurred: {ex.Message}", "OK");
                 IsBusy = false;
                 return;
             }

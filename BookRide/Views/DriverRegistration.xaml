@@ -32,7 +32,7 @@
 StrokeShape="RoundRectangle 12">
                 <!-- First Name -->
                 <Entry
-             Placeholder="Name as per Aadhar" ClearButtonVisibility="WhileEditing"
+             Placeholder="Name as per Aadhar" ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
              Text="{Binding FirstName}" />
             </Border>
 
@@ -40,7 +40,7 @@ StrokeShape="RoundRectangle 12">
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Entry
-             Placeholder="Age" ClearButtonVisibility="WhileEditing"
+             Placeholder="Age" ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
              Text="{Binding Age}"
              Keyboard="Numeric" />
             </Border>
@@ -48,7 +48,7 @@ StrokeShape="RoundRectangle 12">
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
                 <Editor
-             Placeholder="Full Address"
+             Placeholder="Full Address" IsTextPredictionEnabled="False"
              Text="{Binding Address}"
              AutoSize="TextChanges"
              HeightRequest="100" />
@@ -63,7 +63,7 @@ StrokeShape="RoundRectangle 12">
             <!-- vehical -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
+                <Entry ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
   Placeholder="VehicleNo"
   Text="{Binding VehicleNo}" />
             </Border>
@@ -87,7 +87,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Mobile -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
+                <Entry ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
                     Placeholder="Mobile Number"
                     Text="{Binding Mobile}"
                     Keyboard="Numeric"
@@ -105,7 +105,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Email -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
+                <Entry ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
                     Placeholder="Email"
                     Text="{Binding EmailAddress}"
                     Keyboard="Email">
@@ -122,7 +122,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
+                <Entry ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
              Placeholder="Password"
              Text="{Binding Password}"
              IsPassword="True" />
@@ -130,7 +130,7 @@ StrokeShape="RoundRectangle 12">
             <!-- Confirm Password -->
             <Border StrokeThickness="1" Stroke="Gray" Padding="5"
 StrokeShape="RoundRectangle 12">
-                <Entry ClearButtonVisibility="WhileEditing"
+                <Entry ClearButtonVisibility="WhileEditing" IsTextPredictionEnabled="False"
              Placeholder="Confirm Password"
              Text="{Binding ConfirmPassword}"
              IsPassword="True" />

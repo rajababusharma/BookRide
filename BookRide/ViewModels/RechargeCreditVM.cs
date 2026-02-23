@@ -51,7 +51,7 @@ namespace BookRide.ViewModels
                 // Check if the file is an image (optional, as FilePickerFileType.Images helps)
                 if (!result.ContentType.StartsWith("image/"))
                 {
-                    await Shell.Current.DisplayAlert("Error", "Selected file is not an image.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", "Selected file is not an image.", "OK");
                     return null;
                 }
 
@@ -87,7 +87,7 @@ namespace BookRide.ViewModels
             catch (Exception ex)
             {
                 // Log or display the exception
-                await Shell.Current.DisplayAlert("Error", $"Unable to share file: {ex.Message}", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", $"Unable to share file: {ex.Message}", "OK");
             }
         }
 

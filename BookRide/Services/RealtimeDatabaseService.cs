@@ -75,7 +75,7 @@ namespace BookRide.Services
             catch (UnauthorizedAccessException ex)
             {
 
-                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
+                await Shell.Current.DisplayAlertAsync("Exception", ex.Message, "Ok");
                 return false;
             }
         }
@@ -113,7 +113,7 @@ namespace BookRide.Services
             catch (UnauthorizedAccessException ex)
             {
                 // displaying an alert
-                await Shell.Current.DisplayAlert("Exception", ex.Message, "Ok");
+                await Shell.Current.DisplayAlertAsync("Exception", ex.Message, "Ok");
                 return string.Empty;
             }
         }
@@ -222,7 +222,7 @@ namespace BookRide.Services
         //     }
         //     catch (UnauthorizedAccessException excp)
         //     {
-        //         await Shell.Current.DisplayAlert("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
+        //         await Shell.Current.DisplayAlertAsync("Alert", "Server is not responding at the moment, please try again after sometimes", "Ok");
         //         await Task.Run(async () =>
         //         {
         //             await GetTokenAsync(Constants.Constants.Firebase_UserId, Constants.Constants.Firebase_Userpwd);

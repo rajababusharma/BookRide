@@ -52,7 +52,7 @@ namespace BookRide
             if (e.Value)
             {
                 var selected = (sender as RadioButton)?.Content.ToString();
-               // DisplayAlert("Selected", selected, "OK");
+               // DisplayAlertAsync("Selected", selected, "OK");
                var viewModel = BindingContext as MainPageViewModel;
                 if (viewModel != null)
                 {

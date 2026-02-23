@@ -16,7 +16,7 @@ public partial class RecoverPasswordPage : ContentPage
         if (e.Value)
         {
             var selected = (sender as RadioButton)?.Content.ToString();
-            // DisplayAlert("Selected", selected, "OK");
+            // DisplayAlertAsync("Selected", selected, "OK");
             var viewModel = BindingContext as RecoverPasswordVM;
             if (viewModel != null)
             {

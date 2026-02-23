@@ -4,14 +4,9 @@ using BookRide.Services;
 using BookRide.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using Microsoft.Maui.Controls.Maps;
-using Microsoft.Maui.Maps;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace BookRide.ViewModels
@@ -50,7 +45,7 @@ namespace BookRide.ViewModels
             // Navigate to RechargeCreditPage with User as parameter if credit points are less than 1
             if (User.CreditPoint < 1)
             {
-                //await Shell.Current.DisplayAlert(
+                //await Shell.Current.DisplayAlertAsync(
                 //    "Insufficient Credit Points",
                 //    "Your credit points are insufficient. Please recharge to continue using our services.",
                 //    "OK");
@@ -62,7 +57,7 @@ namespace BookRide.ViewModels
             }
             else
             {
-                await Shell.Current.DisplayAlert(
+                await Shell.Current.DisplayAlertAsync(
                     "Alert",
                     $"You can add credit point when it reaches to zero",
                     "OK");
@@ -75,25 +70,43 @@ namespace BookRide.ViewModels
             if (!query.TryGetValue("CurrentUser", out var userObj) || userObj is not Drivers user)
                 return;
 
+            // check if user is null
+            if (user == null)
+            {
+                return;
+            }
+
             User = user;
 
-            // Run async logic without blocking navigation
-            _ = InitializeUserAsync();
+            // Run async logic without blocking navigation. Observe exceptions.
+            InitializeUserAsync().ContinueWith(t =>
+            {
+                if (t.Exception != null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"InitializeUserAsync error: {t.Exception}");
+                }
+            }, TaskScheduler.Default);
         }
         private async Task InitializeUserAsync()
         {
             try
             {
-                
-
-                ProfileImageUrl = string.IsNullOrEmpty(User.ProfileImageUrl)
-                    ? "person.png"
-                    : User.ProfileImageUrl;
-
-                if (User.IsActive && User.CreditPoint > 0)
+                // Ensure UI properties are set on the main thread
+                await MainThread.InvokeOnMainThreadAsync(() =>
                 {
-                    IsActive = "Active";
-                    IsVisible = false;
+                    ProfileImageUrl = string.IsNullOrEmpty(User.ProfileImageUrl)
+                        ? "person.png"
+                        : User.ProfileImageUrl;
+                });
+
+                var isActiveAndHasCredit = User.IsActive && User.CreditPoint > 0;
+                if (isActiveAndHasCredit)
+                {
+                    await MainThread.InvokeOnMainThreadAsync(() =>
+                    {
+                        IsActive = "Active";
+                        IsVisible = false;
+                    });
                     return;
                 }
 
@@ -105,142 +118,76 @@ namespace BookRide.ViewModels
                     await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
 
                     User.IsActive = false;
-                    IsActive = "Deactivated";
-                    IsVisible = true;
 
-                    await MainThread.InvokeOnMainThreadAsync(() =>
-                        Shell.Current.DisplayAlert(
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                    {
+                        IsActive = "Deactivated";
+                        IsVisible = true;
+                        await Shell.Current.DisplayAlertAsync(
                             "Low Credit",
                             $"Your current credit points are {User.CreditPoint}. Please recharge to keep your account active.",
-                            "OK"));
+                            "OK");
+                    });
+
                     return;
                 }
 
                 // Deactivated cases
-                IsActive = "Deactivated";
-                IsVisible = true;
-
-                await MainThread.InvokeOnMainThreadAsync(() =>
-                    Shell.Current.DisplayAlert(
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    IsActive = "Deactivated";
+                    IsVisible = true;
+                    await Shell.Current.DisplayAlertAsync(
                         "Account Deactivated",
                         "Your account has been deactivated due to a compliance reason. Please contact support.",
-                        "OK"));
+                        "OK");
+                });
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"User init error: {ex}");
             }
         }
-        public void ApplyQueryAttributes1(IDictionary<string, object> query)
-        {
-            User = query["CurrentUser"] as Drivers;
-            if(User == null)
-            {
-                return;
-            }
-            try
-            {
-                Task.Run(() =>
-                {
-                    ProfileImageUrl = string.IsNullOrEmpty(User.ProfileImageUrl)
-                   ? "person.png"
-                   : User.ProfileImageUrl;
-
-                    // check if user is active
-                    if (User.IsActive && User.CreditPoint > 0)
-                    {
-                        IsActive = "Active";
-                        IsVisible = false;
-                    }
-                    else if (!string.IsNullOrWhiteSpace(User.FirstName) &&
-                   !string.IsNullOrWhiteSpace(User.UserId) &&
-                  User.CreditPoint == 0 &&
-                   !string.IsNullOrWhiteSpace(User.Mobile))                  
-                    {
-
-                        // await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
-                        var status = Task.Run(async () =>
-
-                             await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User)
-                        );
-
-                        Shell.Current.DisplayAlert(
-                      "Info",
-                       $"Your current credit points are {User.CreditPoint}. Please recharge to add credit points to keep your account active.",
-                      "OK");
-                        // update IsActive info in the users profile
-                        User.IsActive = false;
-                        IsActive = "Deactivated";
-                        IsVisible = true;
-                        IsVisible = true;
-
-
-                    }
-                    else if (!User.IsActive)
-                    {
-                        IsActive = "Deactivated";
-                        Shell.Current.DisplayAlert(
-                           "Info",
-                            $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                           "OK");
-                    }
-                    else
-                    {
-                        IsActive = "Deactivated";
-                        Shell.Current.DisplayAlert(
-                           "Info",
-                            $"Your account has been deactivated due to some complaince reason. Please contact to our support system.",
-                           "OK");
-                    }
-
-                });
-            }
-
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Line: 125 DriverProfileVM Error in ApplyQueryAttributes: {ex.Message}");
-
-            }
-        }
-
         // add profile photo command
         [RelayCommand]
         public async Task AddProfilePhotoAsync()
         {
+            if (User == null)
+                return;
+
             IsBusy = true;
             try
             {
-
-                var photo = await MediaPicker.Default.PickPhotoAsync();
-                if (photo == null)
+                var photos = await MediaPicker.Default.PickPhotosAsync();
+                if (photos == null || photos.Count == 0)
                     return;
+
+                var photo = photos.First();
                 // Save the file into firebase storage and get the URL
-                var imageStream = await photo.OpenReadAsync();
+                using var imageStream = await photo.OpenReadAsync();
 
                 var imageUrl = await _firebaseUpload.UploadProfieImagesToCloud(imageStream, User.UserId);
-                
+
                 if (!string.IsNullOrEmpty(imageUrl))
                 {
                     User.ProfileImageUrl = imageUrl;
-                    MainThread.BeginInvokeOnMainThread(() =>
-                    {
-                        ProfileImageUrl = imageUrl;
-                    });
+                    await MainThread.InvokeOnMainThreadAsync(() => ProfileImageUrl = imageUrl);
 
                     await _db.SaveAsync<Drivers>($"Drivers/{User.UserId}", User);
-                    //  await Shell.Current.DisplayAlert("Success", "Profile photo updated successfully.", "OK");
-
-                    IsBusy = false;
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Line: 160 DriverProfileVM Error", "Failed to upload profile photo.", "OK");
-                    IsBusy = false;
+                    await MainThread.InvokeOnMainThreadAsync(async () =>
+                        await Shell.Current.DisplayAlertAsync("DriverProfile", "Failed to upload profile photo.", "OK"));
                 }
             }
             catch (Exception ex)
             {
-                await Shell.Current.DisplayAlert("Line: 166 DriverProfileVMError", $"An error occurred: {ex.Message}", "OK");
+                await MainThread.InvokeOnMainThreadAsync(async () =>
+                    await Shell.Current.DisplayAlertAsync("DriverProfile Error", $"An error occurred: {ex.Message}", "OK"));
+            }
+            finally
+            {
                 IsBusy = false;
             }
         }

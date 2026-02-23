@@ -30,5 +30,7 @@ namespace BookRide.Constants
         public const string LoggedInUser = "LoggedInUser";
         public const string SessionStartTime = "SessionStartTime";
         public const string Firebase_TokenExpiryKey = "Firebase_TokenExpiryKey";
+        public const string CurrentUserId = "CurrentUserId";
+        public const double RADIUS_KM = 5.0;
     }
 }

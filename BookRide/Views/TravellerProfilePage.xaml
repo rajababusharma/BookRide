@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="BookRide.Views.TravellerProfilePage"
-              Padding="{OnPlatform Android='0,30,0,20'}"
+              Padding="{OnPlatform Android='0,15,0,20'}"
              Title="Taxi Ride">
     <ContentPage.ToolbarItems>
         <ToolbarItem Command="{Binding UpdateProfileCommand}" Text="Update Profile"
@@ -14,8 +14,8 @@
             IsVisible="False" 
             IsEnabled="False" />
     </Shell.BackButtonBehavior>
-    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" RowSpacing="10">
-        <Label Margin="20,0,0,0" FontSize="Title" FontAttributes="Bold" Grid.Row="0">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*" RowSpacing="10">
+        <Label Margin="20,0,0,0" FontSize="Subtitle" FontAttributes="Bold" Grid.Row="0">
             <Label.Text>
                 <MultiBinding StringFormat="{}{0} {1}">
                     <Binding Path="Hi"/>
@@ -23,27 +23,31 @@
                 </MultiBinding>
             </Label.Text>
         </Label>
-        <Label Grid.Row="1" Margin="20,0,10,0" FontSize="Subtitle"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
+        <Label Grid.Row="1" Margin="20,0,10,0"  Text="Below are the list of available drivers, you can call them to book your ride"></Label>
         <!-- Loading Indicator -->
         <ActivityIndicator Grid.Row="2"
 IsRunning="{Binding IsBusy}"
 IsVisible="{Binding IsBusy}" />
 
-        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="3" StrokeShape="RoundRectangle 10">
+        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="3" StrokeShape="RoundRectangle 10" BackgroundColor="Peru" Margin="10,0,10,0">
             <Picker Grid.Row="3" x:Name="pkrdistrict"   HorizontalOptions="Fill" HorizontalTextAlignment="Center"
                   VerticalOptions="Center"
-                  Margin="10,0,10,0"
                 Title="Click Here To Select City" FontSize="Large" FontAttributes="Bold"  SelectedItem="{Binding SelectedDistrict}"
                 ItemsSource="{Binding Districts}" />
         </Border>
-        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="4">
+        <HorizontalStackLayout Spacing="5" Grid.Row="4">
+            <CheckBox IsChecked="{Binding IsFeatureEnabled, Mode=TwoWay}" 
+                      Color="DeepPink" />
+            <Label Text="Check Drivers availability in 2 KM range" VerticalOptions="Center" />
+        </HorizontalStackLayout>
+        <Border Stroke="Gray" StrokeThickness="1" Grid.Row="5">
         <CollectionView IsVisible="True"
             ItemsSource="{Binding DriversList}" VerticalScrollBarVisibility="Always"
           SelectionMode="None">
             <CollectionView.ItemTemplate>
                 <DataTemplate>
-                    <Frame BorderColor="Gray">
-                        <Grid Margin="2,0,0,10" RowSpacing="2" ColumnSpacing="2">
+                    <Border Stroke="LightGrey">
+                        <Grid Margin="10,5,0,10" RowSpacing="2" ColumnSpacing="2">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*"/>
                                 <RowDefinition Height="*"/>
@@ -92,21 +96,21 @@ IsVisible="{Binding IsBusy}" />
                                 </Grid>
                                
                                                       
-                                <Label Text="Call Or connect with WhatsApp to reserve a Taxi" Grid.Row="1" Grid.ColumnSpan="2" FontAttributes="Bold" FontSize="Medium"/>
-                                <Image HorizontalOptions="Start" Grid.Row="2" Grid.Column="0" Source="call.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0">
+                                <Label Text="Call Or connect:" Grid.Row="2" Grid.ColumnSpan="0" FontAttributes="Bold" VerticalTextAlignment="Center"/>
+                                <Image HorizontalOptions="Start" Grid.Row="2" Grid.Column="1" Source="call.png" WidthRequest="40" HeightRequest="40" Margin="10,0,0,0">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
                             Path=BindingContext.CallCommand}" CommandParameter="{Binding Mobile}" />
                                     </Image.GestureRecognizers>
                                 </Image>
-                                <Image HorizontalOptions="Start" Aspect="AspectFill"  Grid.Row="2" Grid.Column="1" Source="whatsapp.png" WidthRequest="50" HeightRequest="50" Margin="10,0,0,0" >
+                                <Image HorizontalOptions="Center" Aspect="AspectFill"  Grid.Row="2" Grid.Column="1" Source="whatsapp.png" WidthRequest="40" HeightRequest="40" Margin="10,0,0,0" >
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Command="{Binding Source={RelativeSource AncestorType={x:Type CollectionView}},
 Path=BindingContext.WhatsappConnectCommand}" CommandParameter="{Binding Mobile}" />
                                     </Image.GestureRecognizers>
                                 </Image>
                             </Grid>
-                    </Frame>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
 

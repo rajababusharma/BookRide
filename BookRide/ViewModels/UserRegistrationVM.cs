@@ -67,7 +67,7 @@ namespace BookRide.ViewModels
             // check internet connectivity first 
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                 // ErrorMessage = "No internet connection. Please check your connection and try again.";
                 IsBusy = false;
                 return;
@@ -129,7 +129,7 @@ namespace BookRide.ViewModels
                // bool status = await _db.SaveAsync<Users>($"Users/{users.UserId}", users);
                 if (status)
                 {
-                    await Shell.Current.DisplayAlert(
+                    await Shell.Current.DisplayAlertAsync(
                         "Success",
                         "Registration completed successfully",
                         "OK");

@@ -66,7 +66,7 @@ namespace BookRide.ViewModels
 
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                // ErrorMessage = "No internet connection. Please check your connection and try again.";
                 IsBusy = false;
                 return;
@@ -82,7 +82,7 @@ namespace BookRide.ViewModels
                 }
                 if(SelectedUserType==null)
                 {
-                    await Shell.Current.DisplayAlert("Error", "Please select a user type.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", "Please select a user type.", "OK");
                     IsBusy = false;
                     IsReadOnly = false;
                     return;
@@ -127,7 +127,7 @@ namespace BookRide.ViewModels
                     }
                     else
                     {
-                        await Shell.Current.DisplayAlert("Alert", "Driver with the provided mobile number not found.", "Ok");
+                        await Shell.Current.DisplayAlertAsync("Alert", "Driver with the provided mobile number not found.", "Ok");
                         IsBusy = false;
                         IsReadOnly = false;
                         return;
@@ -166,7 +166,7 @@ namespace BookRide.ViewModels
                     }
                     else
                     {
-                        await Shell.Current.DisplayAlert("Alert", "User with the provided mobile number not found.", "Ok");
+                        await Shell.Current.DisplayAlertAsync("Alert", "User with the provided mobile number not found.", "Ok");
                         IsBusy = false;
                         IsReadOnly = false;
                         return;
@@ -176,7 +176,7 @@ namespace BookRide.ViewModels
                 {
                     // Handle case where user is not found
                     Console.WriteLine("User with the provided mobile number not found.");
-                    await Shell.Current.DisplayAlert("Alert", "User with the provided mobile number not found.", "Ok");
+                    await Shell.Current.DisplayAlertAsync("Alert", "User with the provided mobile number not found.", "Ok");
                     IsBusy = false;
                     IsReadOnly = false;
                 }
@@ -196,7 +196,7 @@ namespace BookRide.ViewModels
             IsBusy = true;
             if (!_networkService.HasInternet())
             {
-                await Shell.Current.DisplayAlert("No Internet", "Please check your internet connection and try again.", "OK");
+                await Shell.Current.DisplayAlertAsync("No Internet", "Please check your internet connection and try again.", "OK");
                 // ErrorMessage = "No internet connection. Please check your connection and try again.";
                 IsBusy = false;
                 return;
@@ -204,14 +204,14 @@ namespace BookRide.ViewModels
             if (string.IsNullOrWhiteSpace(Password) || string.IsNullOrWhiteSpace(ConfirmPassword))
             {
                 // Handle empty password fields
-                await Shell.Current.DisplayAlert("Error", "Password fields cannot be empty.", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "Password fields cannot be empty.", "OK");
                 IsBusy = false;
                 return;
             }
             if (Password != ConfirmPassword)
             {
                 // Handle password mismatch
-                await Shell.Current.DisplayAlert("Error", "Passwords do not match.", "OK");
+                await Shell.Current.DisplayAlertAsync("Error", "Passwords do not match.", "OK");
                 IsBusy = false;
                 return;
             }   
@@ -224,14 +224,14 @@ namespace BookRide.ViewModels
                // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
                if (status)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Success", "Password changed successfully.", "OK");
                     IsBusy = false;
                     await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
                     return;                   
                 }   
                else
                 {
-                    await Shell.Current.DisplayAlert("Error", "Failed to change password. Please try again.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", "Failed to change password. Please try again.", "OK");
                     IsBusy = false;
                     return;
                 }
@@ -245,14 +245,14 @@ namespace BookRide.ViewModels
                 // await _db.SaveAsync<Drivers>($"Drivers/{drivers.UserId}", drivers);
                 if (status)
                 {
-                    await Shell.Current.DisplayAlert("Success", "Password changed successfully.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Success", "Password changed successfully.", "OK");
                     IsBusy = false;
                     await Shell.Current.GoToAsync("//MainPage"); // Navigates to the root of the Page
                     return;
                 }
                 else
                 {
-                    await Shell.Current.DisplayAlert("Error", "Failed to change password. Please try again.", "OK");
+                    await Shell.Current.DisplayAlertAsync("Error", "Failed to change password. Please try again.", "OK");
                     IsBusy = false;
                     return;
                 }

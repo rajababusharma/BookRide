@@ -171,8 +171,14 @@ namespace BookRide.Platforms.Android.Implementations
                 }
                 catch (System.OperationCanceledException ex)
                 {
+                    string user_exception = "Unknown";
+                    var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                    if (user != null)
+                    {
+                        user_exception = user;
+                    }
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
                     // Cancellation requested — exit cleanly.
                     isServiceRunning = false;
                     StopForeground(true);
@@ -183,8 +189,14 @@ namespace BookRide.Platforms.Android.Implementations
                 {
                     isServiceRunning = false;
                     // Console.WriteLine(ex.Message);
+                    string user_exception = "Unknown";
+                    var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                    if (user != null)
+                    {
+                        user_exception = user;
+                    }
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
                 }
                 try
                 { 
@@ -192,8 +204,14 @@ namespace BookRide.Platforms.Android.Implementations
                 }
                 catch (System.OperationCanceledException ex)
                 {
+                    string user_exception = "Unknown";
+                    var user = await SecureStorageService.GetAsync<string>(Constants.Constants.CurrentUserId);
+                    if (user != null)
+                    {
+                        user_exception = user;
+                    }
                     ExceptionClass excp = new ExceptionClass { Message = ex.Message, StackTrace = ex.StackTrace, OccurredAt = DateTime.Now };
-                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{Guid.NewGuid()}", excp);
+                    await _db.SaveAsync<ExceptionClass>($"Exceptions/{user_exception}/{Guid.NewGuid()}", excp);
                     // cancelled while waiting
                     isServiceRunning = false;
                     StopForeground(true);
