@@ -7,15 +7,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Android.Views.ContentCaptures;
-using System.Text.Json;
-using Org.Apache.Http.Authentication;
-using System.Net;
-using AndroidX.Lifecycle;
-
 
 #if ANDROID
 using Android.Content;
