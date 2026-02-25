@@ -10,6 +10,7 @@ namespace BookRide.Models
     {
         public static List<string> All => new()
         {
+            "Select District",
             "Agra",
             "Aligarh",
             "Ambedkar Nagar",

@@ -28,14 +28,14 @@ namespace BookRide.ViewModels
         private bool isBusy;
 
         [ObservableProperty]
-        public ObservableCollection<Drivers> driversList = new();
+        private ObservableCollection<Drivers> driversList = new();
 
         [ObservableProperty]
-        public Users user;
+        private Users user;
         [ObservableProperty]
-        public string hi="Hi";
+        private string hi="Hi";
         [ObservableProperty]
-        public string selectedDistrict;
+        private string selectedDistrict = "Select District";
         [ObservableProperty]
         private bool isFeatureEnabled;
         private readonly GeolocationRequest _geolocationRequest;
@@ -43,13 +43,17 @@ namespace BookRide.ViewModels
         private readonly INetworkService _networkService;
 
         private Location? currentLocation;
-        private string selected_district="";
+       // private string selected_district="";
         partial void OnSelectedDistrictChanged(string value)
         {
             if (value == null) return;
             Console.WriteLine($"Selected: {value}");
-            selected_district = value;
+            SelectedDistrict = value;
             Console.WriteLine("Loading drivers list by district");
+            if (IsBusy)
+            {
+                IsBusy = false;
+            }
             // Fire-and-forget the async load. The async method manages IsBusy and UI updates.
             _ = LoadUsersByDistrictAsync("0");
         }
@@ -57,22 +61,20 @@ namespace BookRide.ViewModels
         // Optional: Logic to run when the value changes
         partial void OnIsFeatureEnabledChanged(bool value)
         {
+            SelectedDistrict = "Select District";
+            if (IsBusy)
+            {
+                IsBusy = false;
+            }
             // Your logic here (e.g., saving settings)
-            if(value)
+            if (value)
             {
                 _ = LoadUsersByDistrictAsync("1");
             }
             else
-            {
-                if(String.IsNullOrEmpty(selected_district))
-                {
-                    _ = LoadUsersByDistrictAsync("");
-                }
-                else
-                {
+            {              
                     _ = LoadUsersByDistrictAsync("0");
-                }
-             
+                           
             }
         }
 
@@ -123,6 +125,7 @@ namespace BookRide.ViewModels
 
         public TravellerProfileVM(IWhatsAppConnect whatsApp, INetworkService networkService,RealtimeDatabaseService databaseService)
         {
+            SelectedDistrict = "Select District";
             _whatsAppConnect = whatsApp;
             Districts = new ObservableCollection<string>(UttarPradeshDistricts.All);
           //  _db = new RealtimeDatabaseService();
@@ -137,6 +140,7 @@ namespace BookRide.ViewModels
         {
             try
             {
+                SelectedDistrict = "Select District";
                 Console.WriteLine("Checking GPS and Location Permissions...");
                 await LocationPermissionHelper.CheckGPSLocationEnableAsync();
                 // async work
@@ -162,9 +166,17 @@ namespace BookRide.ViewModels
             //  await LoadDataAsync();
         }
 
+
         public async Task LoadUsersByDistrictAsync(string district)
         {
-            IsBusy = true;
+            if (IsBusy)
+            {
+                IsBusy = false;
+                return;
+            }
+               
+
+            IsBusy = true; // Shows the spinner
             // check internet connectivity first 
             if (!_networkService.HasInternet())
             {
@@ -192,7 +204,14 @@ namespace BookRide.ViewModels
                 IEnumerable<Drivers> filteredUsers = lists.Where(x => x.CreditPoint > 0 && x.IsActive);
                 if (district.Equals("0"))
                 {
-                    filteredUsers = filteredUsers.Where(x => string.Equals(x.District, selected_district, StringComparison.OrdinalIgnoreCase));
+                    // check if selected district is not "Select District" then filter the list by district
+                    if (!SelectedDistrict.Equals("Select District", StringComparison.OrdinalIgnoreCase))
+                    {
+                            Console.WriteLine($"Filtering drivers by district: {SelectedDistrict}");
+                        filteredUsers = filteredUsers.Where(x => string.Equals(x.District, SelectedDistrict, StringComparison.OrdinalIgnoreCase));
+                    }
+
+                   
                   
                     foreach(var driver in filteredUsers)
                     {
@@ -212,6 +231,7 @@ namespace BookRide.ViewModels
                     }
                 }
                
+               
                   
 
                     // Ensure we update the observable collection on the main thread
@@ -219,7 +239,7 @@ namespace BookRide.ViewModels
                 
 
                
-                IsBusy = false;
+              
 
             }
             catch (Exception ex)
@@ -232,6 +252,10 @@ namespace BookRide.ViewModels
                               $"Error obtaining location: {ex.Message}",
                               "OK");
                 }
+            finally
+            {
+                IsBusy = false;
+            }
           
         }
 

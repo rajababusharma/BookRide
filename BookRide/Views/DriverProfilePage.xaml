@@ -25,11 +25,23 @@
         <VerticalStackLayout Spacing="5">
 
             <Border Margin="5" Stroke="Black" StrokeThickness="2"    StrokeShape="RoundRectangle 15" HeightRequest="120" WidthRequest="120">
-                <Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
+                <Image Aspect="Fill" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
+                    <Image.Source>
+                        <UriImageSource Uri="{Binding ProfileImageUrl}"
+                        CachingEnabled="True"
+                        CacheValidity="7.00:00:00" />
+                        <!-- Cache for 7 days -->
+                    </Image.Source>
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Command="{Binding AddProfilePhotoCommand}"></TapGestureRecognizer>
                     </Image.GestureRecognizers>
                 </Image>
+                <!--<Image Aspect="Fill" Source="{Binding ProfileImageUrl}" HeightRequest="100" WidthRequest="100" HorizontalOptions="Center">
+                    
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Command="{Binding AddProfilePhotoCommand}"></TapGestureRecognizer>
+                    </Image.GestureRecognizers>
+                </Image>-->
             </Border>
 
 
